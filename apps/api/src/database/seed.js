@@ -141,4 +141,8 @@ async function seed() {
   }
 }
 
-seed().catch(() => process.exit(1));
+seed().catch((err) => {
+  const msg = err.errors ? err.errors.map(e => e.message).join('; ') : err.message;
+  process.stderr.write(`Seed failed: ${msg}\n`);
+  process.exit(1);
+});

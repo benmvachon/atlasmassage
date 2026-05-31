@@ -59,4 +59,8 @@ async function runMigrations() {
   }
 }
 
-runMigrations().catch(() => process.exit(1));
+runMigrations().catch((err) => {
+  const msg = err.errors ? err.errors.map(e => e.message).join('; ') : err.message;
+  process.stderr.write(`Migration failed: ${msg}\n`);
+  process.exit(1);
+});

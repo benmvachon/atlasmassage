@@ -9,7 +9,8 @@
     "packages/*"
   ],
   "scripts": {
-    "predev": "npm run migrate --workspace=apps/api && npm run seed --workspace=apps/api",
+    "db:start": "docker compose up -d db && docker compose exec db sh -c 'until pg_isready -U postgres; do sleep 1; done'",
+    "predev": "npm run db:start && npm run migrate --workspace=apps/api && npm run seed --workspace=apps/api",
     "dev": "npm run dev:api & npm run dev:web",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run dev --workspace=apps/api",
