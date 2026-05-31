@@ -23,6 +23,7 @@ export default function AppRoutes() {
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/booking" element={<BookingPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>
@@ -30,7 +31,6 @@ export default function AppRoutes() {
       </Route>
 
       <Route element={<DashboardLayout />}>
-        <Route path="/booking" element={<BookingPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/therapist/schedule" element={<TherapistSchedulePage />} />
         <Route path="/therapist/settings" element={<TherapistSettingsPage />} />

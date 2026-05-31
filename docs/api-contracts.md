@@ -74,9 +74,16 @@ Paginated lists include:
 **Query**: `page, limit, status?, therapistId?, clientId?, from?, to?`
 **Response**: paginated `appointment[]`
 
-### POST `/appointments` _(client)_
-**Body**: `{ therapistId, serviceId, scheduledAt, notes? }`
-**Response**: `{ appointment }`
+### POST `/appointments` _(public — guest or authenticated client)_
+Authentication is optional. See [ADR-0011](adr/ADR-0011-guest-checkout.md).
+
+**Authenticated body**: `{ therapistId, serviceId, scheduledAt, notes? }`
+**Guest body**: `{ therapistId, serviceId, scheduledAt, guestName, guestEmail, guestPhone?, notes? }`
+
+When a valid access token is present, `clientId` is taken from the token and guest fields are ignored.
+When no token is present, `guestName` and `guestEmail` are required.
+
+**Response**: `{ appointment }` (guest bookings include a `confirmationToken` for status lookup)
 
 ### GET `/appointments/:id` _(auth required)_
 ### PUT `/appointments/:id` _(auth required)_

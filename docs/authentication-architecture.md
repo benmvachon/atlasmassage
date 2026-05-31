@@ -1,10 +1,14 @@
 # Authentication Architecture
 
-> See [ADR-0005](adr/ADR-0005-role-based-access-control.md) and [ADR-0006](adr/ADR-0006-jwt-authentication-strategy.md).
+> See [ADR-0005](adr/ADR-0005-role-based-access-control.md), [ADR-0006](adr/ADR-0006-jwt-authentication-strategy.md), and [ADR-0011](adr/ADR-0011-guest-checkout.md).
 
 ## Strategy Overview
 
 Atlas Massage uses a stateless JWT access token combined with a database-tracked refresh token. This balances statelessness (no session store required for normal requests) with revocability (refresh tokens can be individually invalidated).
+
+## Guest Checkout
+
+Appointment booking does not require authentication. The `POST /appointments` endpoint accepts either an authenticated request (token in `Authorization` header → `clientId` resolved from token) or an unauthenticated guest request (`guestName`, `guestEmail` in request body). The `optionalAuthenticate` middleware handles both cases: it decodes the JWT if present, sets `req.user = null` if absent, and never rejects the request. See [ADR-0011](adr/ADR-0011-guest-checkout.md).
 
 ## Token Lifecycle
 

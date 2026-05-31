@@ -134,7 +134,7 @@ ADRs are the authoritative record of every major architectural decision in this 
 
 ### Numbering Convention
 
-ADRs are numbered sequentially: `ADR-XXXX-short-title.md`. The next ADR should be `ADR-0011`. Never reuse or renumber an existing ADR — if a decision is reversed, create a new ADR that supersedes the old one and mark the old one as `Superseded by ADR-XXXX`.
+ADRs are numbered sequentially: `ADR-XXXX-short-title.md`. The next ADR should be `ADR-0012`. Never reuse or renumber an existing ADR — if a decision is reversed, create a new ADR that supersedes the old one and mark the old one as `Superseded by ADR-XXXX`.
 
 ### Current ADRs
 
@@ -150,6 +150,7 @@ ADRs are numbered sequentially: `ADR-XXXX-short-title.md`. The next ADR should b
 | [ADR-0008](docs/adr/ADR-0008-winston-logging.md) | Winston Structured Logging | Accepted |
 | [ADR-0009](docs/adr/ADR-0009-pm2-process-management.md) | PM2 Process Management | Accepted |
 | [ADR-0010](docs/adr/ADR-0010-testing-strategy.md) | Testing Strategy | Accepted |
+| [ADR-0011](docs/adr/ADR-0011-guest-checkout.md) | Guest Checkout for Appointment Booking | Accepted |
 
 ### When to Create an ADR
 
