@@ -13,7 +13,8 @@
     "test:coverage": "node --experimental-vm-modules ../../node_modules/.bin/jest --coverage",
     "lint": "eslint src",
     "migrate": "node src/database/migrate.js",
-    "migrate:rollback": "node src/database/migrate.js rollback"
+    "migrate:rollback": "node src/database/migrate.js rollback",
+    "seed": "node src/database/seed.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
