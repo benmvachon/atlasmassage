@@ -1,19 +1,21 @@
 import { Routes, Route } from 'react-router-dom';
-import PublicLayout from '../layouts/PublicLayout';
-import AuthLayout from '../layouts/AuthLayout';
-import DashboardLayout from '../layouts/DashboardLayout';
+import PublicLayout from '../layouts/PublicLayout.jsx';
+import AuthLayout from '../layouts/AuthLayout.jsx';
+import DashboardLayout from '../layouts/DashboardLayout.jsx';
+import ProtectedRoute from '../components/ProtectedRoute.jsx';
 
-import HomePage from '../pages/HomePage';
-import ServicesPage from '../pages/ServicesPage';
-import TestimonialsPage from '../pages/TestimonialsPage';
-import TeamPage from '../pages/TeamPage';
-import LoginPage from '../pages/LoginPage';
-import BookingPage from '../pages/BookingPage';
-import SettingsPage from '../pages/SettingsPage';
-import TherapistSchedulePage from '../pages/therapist/TherapistSchedulePage';
-import TherapistSettingsPage from '../pages/therapist/TherapistSettingsPage';
-import OwnerDashboardPage from '../pages/owner/OwnerDashboardPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import HomePage from '../pages/HomePage.jsx';
+import ServicesPage from '../pages/ServicesPage.jsx';
+import TestimonialsPage from '../pages/TestimonialsPage.jsx';
+import TeamPage from '../pages/TeamPage.jsx';
+import LoginPage from '../pages/LoginPage.jsx';
+import SignupPage from '../pages/SignupPage.jsx';
+import BookingPage from '../pages/BookingPage.jsx';
+import SettingsPage from '../pages/SettingsPage.jsx';
+import TherapistSchedulePage from '../pages/therapist/TherapistSchedulePage.jsx';
+import TherapistSettingsPage from '../pages/therapist/TherapistSettingsPage.jsx';
+import OwnerDashboardPage from '../pages/owner/OwnerDashboardPage.jsx';
+import NotFoundPage from '../pages/NotFoundPage.jsx';
 
 export default function AppRoutes() {
   return (
@@ -28,13 +30,14 @@ export default function AppRoutes() {
 
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Route>
 
       <Route element={<DashboardLayout />}>
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/therapist/schedule" element={<TherapistSchedulePage />} />
-        <Route path="/therapist/settings" element={<TherapistSettingsPage />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+        <Route path="/therapist/schedule" element={<ProtectedRoute><TherapistSchedulePage /></ProtectedRoute>} />
+        <Route path="/therapist/settings" element={<ProtectedRoute><TherapistSettingsPage /></ProtectedRoute>} />
+        <Route path="/owner/dashboard" element={<ProtectedRoute><OwnerDashboardPage /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

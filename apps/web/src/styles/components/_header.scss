@@ -41,4 +41,9 @@
       &.active { color: $color-primary; }
     }
   }
+
+  &__signout {
+    font-size: $font-size-sm;
+    padding: $space-2 $space-3;
+  }
 }
