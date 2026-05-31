@@ -2,6 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import { config } from './config/index.js';
 import { requestLogger } from './middleware/requestLogger.js';
@@ -17,6 +18,7 @@ app.use(cors({ origin: config.cors.origin, credentials: true }));
 // Parsing
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
 app.use(compression());
 
 // Rate limiting

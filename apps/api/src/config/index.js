@@ -62,4 +62,8 @@ export const config = {
   logging: {
     level: optional('LOG_LEVEL', 'info'),
   },
+
+  app: {
+    url: optional('APP_URL', 'http://localhost:5173'),
+  },
 };
