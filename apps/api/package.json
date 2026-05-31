@@ -11,7 +11,7 @@
     "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --runInBand",
     "test:watch": "node --experimental-vm-modules ../../node_modules/.bin/jest --watch",
     "test:coverage": "node --experimental-vm-modules ../../node_modules/.bin/jest --coverage",
-    "lint": "eslint src --ext .js",
+    "lint": "eslint src",
     "migrate": "node src/database/migrate.js",
     "migrate:rollback": "node src/database/migrate.js rollback"
   },
