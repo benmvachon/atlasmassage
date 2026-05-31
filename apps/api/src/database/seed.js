@@ -1,8 +1,9 @@
 /**
- * Development seed script — idempotent, safe to run multiple times.
- * Inserts sample users (owner, therapists, clients) if they don't already exist.
+ * Development seed script.
+ * Clears all user-related data, then inserts a known set of sample users.
+ * Runs automatically as part of `npm run dev`.
  *
- * Usage:  npm run seed --workspace=apps/api
+ * Refuses to run in production.
  */
 
 import 'dotenv/config';
@@ -10,7 +11,12 @@ import bcrypt from 'bcrypt';
 import { getPool, closePool } from './pool.js';
 import { logger } from '../logging/logger.js';
 
-const BCRYPT_ROUNDS = 10; // lower cost in dev for speed
+if (process.env.NODE_ENV === 'production') {
+  logger.error('seed_refused', { reason: 'will not run in production' });
+  process.exit(1);
+}
+
+const BCRYPT_ROUNDS = 10; // lower cost than production for dev speed
 
 const USERS = [
   {
@@ -19,7 +25,11 @@ const USERS = [
     firstName: 'Alex',
     lastName: 'Rivera',
     roles: ['owner', 'therapist'],
-    therapist: { bio: 'Practice owner and senior therapist.', specialties: ['deep tissue', 'sports massage'], isAcceptingClients: true },
+    therapist: {
+      bio: 'Practice owner and senior therapist.',
+      specialties: ['deep tissue', 'sports massage'],
+      isAcceptingClients: true,
+    },
   },
   {
     email: 'sarah@atlasmassage.com',
@@ -27,7 +37,11 @@ const USERS = [
     firstName: 'Sarah',
     lastName: 'Chen',
     roles: ['therapist'],
-    therapist: { bio: 'Specializing in relaxation and prenatal massage.', specialties: ['swedish', 'prenatal'], isAcceptingClients: true },
+    therapist: {
+      bio: 'Specializing in relaxation and prenatal massage.',
+      specialties: ['swedish', 'prenatal'],
+      isAcceptingClients: true,
+    },
   },
   {
     email: 'marcus@atlasmassage.com',
@@ -35,7 +49,11 @@ const USERS = [
     firstName: 'Marcus',
     lastName: 'Johnson',
     roles: ['therapist'],
-    therapist: { bio: 'Sports massage and injury recovery specialist.', specialties: ['sports massage', 'trigger point'], isAcceptingClients: true },
+    therapist: {
+      bio: 'Sports massage and injury recovery specialist.',
+      specialties: ['sports massage', 'trigger point'],
+      isAcceptingClients: true,
+    },
   },
   {
     email: 'client1@example.com',
@@ -70,23 +88,13 @@ async function seed() {
   try {
     await client.query('BEGIN');
 
-    // Ensure roles exist (migration 001 should have run, but be safe)
-    await client.query(`
-      INSERT INTO roles (name) VALUES ('client'), ('therapist'), ('owner')
-      ON CONFLICT (name) DO NOTHING
-    `);
+    // Wipe all user-related data so each dev start is a clean slate.
+    // TRUNCATE ... CASCADE follows every FK that references users.
+    // The roles lookup table is left intact (seeded by migration 001).
+    await client.query('TRUNCATE users CASCADE');
+    logger.info('seed_truncated');
 
     for (const u of USERS) {
-      const { rows: existing } = await client.query(
-        'SELECT id FROM users WHERE email = $1',
-        [u.email]
-      );
-
-      if (existing.length) {
-        logger.info('seed_skip', { email: u.email, reason: 'already exists' });
-        continue;
-      }
-
       const passwordHash = await bcrypt.hash(u.password, BCRYPT_ROUNDS);
 
       const { rows: [user] } = await client.query(
@@ -122,7 +130,7 @@ async function seed() {
     }
 
     await client.query('COMMIT');
-    logger.info('seed_complete');
+    logger.info('seed_complete', { users: USERS.length });
   } catch (err) {
     await client.query('ROLLBACK');
     logger.error('seed_failed', { message: err.message });
