@@ -1,0 +1,37 @@
+@use '../abstracts/variables' as *;
+
+.footer {
+  margin-top: auto;
+  padding: $space-8 0;
+  background-color: $color-text;
+  color: $color-bg;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $space-4;
+  }
+
+  &__copy {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: 0;
+  }
+
+  &__nav {
+    display: flex;
+    gap: $space-6;
+
+    a {
+      font-family: $font-family-ui;
+      font-size: $font-size-sm;
+      color: $color-bg-alt;
+      transition: color 150ms ease;
+
+      &:hover { color: $color-white; }
+    }
+  }
+}

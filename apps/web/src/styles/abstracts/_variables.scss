@@ -1,0 +1,63 @@
+// Color palette
+$color-primary:       #2c6e49;
+$color-primary-dark:  #1a4a30;
+$color-primary-light: #4c956c;
+$color-secondary:     #d4a373;
+$color-accent:        #fefae0;
+
+$color-text:          #1a1a2e;
+$color-text-muted:    #6b7280;
+$color-bg:            #fafaf9;
+$color-bg-alt:        #f3f4f6;
+$color-white:         #ffffff;
+$color-error:         #dc2626;
+$color-success:       #16a34a;
+
+// Typography
+$font-family-base:    'Georgia', 'Times New Roman', serif;
+$font-family-ui:      system-ui, -apple-system, sans-serif;
+$font-size-base:      16px;
+$line-height-base:    1.6;
+
+$font-size-xs:   0.75rem;
+$font-size-sm:   0.875rem;
+$font-size-md:   1rem;
+$font-size-lg:   1.25rem;
+$font-size-xl:   1.5rem;
+$font-size-2xl:  2rem;
+$font-size-3xl:  3rem;
+
+// Spacing (8px base unit)
+$space-1:  0.25rem;
+$space-2:  0.5rem;
+$space-3:  0.75rem;
+$space-4:  1rem;
+$space-6:  1.5rem;
+$space-8:  2rem;
+$space-12: 3rem;
+$space-16: 4rem;
+
+// Breakpoints
+$bp-sm:  640px;
+$bp-md:  768px;
+$bp-lg:  1024px;
+$bp-xl:  1280px;
+
+// Layout
+$container-max-width: 1200px;
+$header-height:       72px;
+
+// Borders & shadows
+$border-radius-sm:  4px;
+$border-radius-md:  8px;
+$border-radius-lg:  16px;
+$border-radius-full: 9999px;
+
+$shadow-sm: 0 1px 2px rgb(0 0 0 / 5%);
+$shadow-md: 0 4px 6px rgb(0 0 0 / 8%);
+$shadow-lg: 0 10px 25px rgb(0 0 0 / 12%);
+
+// Transitions
+$transition-fast:   150ms ease;
+$transition-base:   250ms ease;
+$transition-slow:   400ms ease;

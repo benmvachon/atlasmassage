@@ -1,0 +1,55 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-3 $space-6;
+  border: 2px solid transparent;
+  border-radius: $border-radius-md;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast, border-color $transition-fast;
+  text-decoration: none;
+
+  @include focus-ring;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background-color: $color-primary;
+    color: $color-white;
+    border-color: $color-primary;
+
+    &:hover:not(:disabled) {
+      background-color: $color-primary-dark;
+      border-color: $color-primary-dark;
+    }
+  }
+
+  &--outline {
+    background-color: transparent;
+    color: $color-primary;
+    border-color: $color-primary;
+
+    &:hover:not(:disabled) {
+      background-color: $color-primary;
+      color: $color-white;
+    }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: $color-text;
+    border-color: transparent;
+
+    &:hover:not(:disabled) { background-color: $color-bg-alt; }
+  }
+}

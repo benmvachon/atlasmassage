@@ -1,0 +1,37 @@
+@use '../abstracts/variables' as *;
+
+.container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: 0 $space-4;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &__content {
+    flex: 1;
+    padding: $space-8 $space-4;
+
+    &--centered {
+      @extend .container;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &--dashboard &__body {
+    display: flex;
+    flex: 1;
+  }
+}
+
+.page {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  width: 100%;
+}

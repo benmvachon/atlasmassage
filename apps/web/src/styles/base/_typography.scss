@@ -1,0 +1,20 @@
+@use '../abstracts/variables' as *;
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-base;
+  font-weight: 700;
+  line-height: 1.2;
+  color: $color-text;
+}
+
+h1 { font-size: $font-size-3xl; }
+h2 { font-size: $font-size-2xl; }
+h3 { font-size: $font-size-xl; }
+h4 { font-size: $font-size-lg; }
+h5 { font-size: $font-size-md; }
+h6 { font-size: $font-size-sm; }
+
+p { margin-bottom: $space-4; }
+
+.text-muted { color: $color-text-muted; }
+.text-small { font-size: $font-size-sm; }
