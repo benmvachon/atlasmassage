@@ -2,6 +2,7 @@
   "name": "atlasmassage",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Atlas Massage practice management platform",
   "workspaces": [
     "apps/*",
@@ -17,7 +18,8 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,scss}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "typescript-eslint": "^8.0.0"
   },
   "engines": {
     "node": ">=20.0.0",
