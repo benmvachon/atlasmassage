@@ -30,9 +30,9 @@ export function errorHandler(err, req, res, _next) {
   res.status(statusCode).json({
     success: false,
     error: {
-      code: err.code || 'INTERNAL_ERROR',
+      code: isOperational ? (err.code || 'INTERNAL_ERROR') : 'INTERNAL_ERROR',
       message: isOperational ? err.message : 'An unexpected error occurred',
-      ...(err.details && { details: err.details }),
+      ...(isOperational && err.details && { details: err.details }),
     },
   });
 }

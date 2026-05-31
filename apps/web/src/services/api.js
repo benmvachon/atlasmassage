@@ -17,7 +17,16 @@ async function request(method, path, body) {
     ...(body !== undefined && { body: JSON.stringify(body) }),
   });
 
-  const data = await res.json();
+  // Vite's proxy-error responses are plain text, not JSON.
+  // Guard here so a failed proxy doesn't surface a cryptic SyntaxError.
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    const err = new Error('Service unavailable. Please try again shortly.');
+    err.status = res.status;
+    throw err;
+  }
 
   if (!res.ok) {
     const err = new Error(data?.error?.message || 'Request failed');
