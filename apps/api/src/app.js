@@ -15,6 +15,9 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: config.cors.origin, credentials: true }));
 
+// Raw body for Stripe webhooks — must precede express.json()
+app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
+
 // Parsing
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

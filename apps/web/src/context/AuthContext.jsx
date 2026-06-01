@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/authService.js';
+import { userService } from '../services/userService.js';
 import { setAccessToken } from '../services/api.js';
 
 const AuthContext = createContext(null);
@@ -43,8 +44,13 @@ export function AuthProvider({ children }) {
     clearSession();
   }, [clearSession]);
 
+  const refreshUser = useCallback(async () => {
+    const { data } = await userService.getMe();
+    setUser(data.user);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

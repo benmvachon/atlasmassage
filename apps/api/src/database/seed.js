@@ -18,6 +18,30 @@ if (process.env.NODE_ENV === 'production') {
 
 const BCRYPT_ROUNDS = 10; // lower cost than production for dev speed
 
+const MEMBERSHIP_PLANS = [
+  {
+    name: 'Essentials',
+    description: 'One 60-minute massage per month. Perfect for maintaining wellness.',
+    priceMonthlyCents: 7900,
+    creditsPerMonth: 1,
+    stripePriceId: 'price_1TdbGCQec936INktczEfSHnr',
+  },
+  {
+    name: 'Wellness',
+    description: 'Two 60-minute massages per month. Our most popular plan.',
+    priceMonthlyCents: 13900,
+    creditsPerMonth: 2,
+    stripePriceId: 'price_1TdbGCQec936INktHP8B88JA',
+  },
+  {
+    name: 'Unlimited',
+    description: 'Four 60-minute massages per month. Maximum recovery and relaxation.',
+    priceMonthlyCents: 24900,
+    creditsPerMonth: 4,
+    stripePriceId: 'price_1TdbGCQec936INktwkkXuy8M',
+  },
+];
+
 const SERVICES = [
   { name: 'Swedish Massage', description: 'A gentle, relaxing full-body massage using long, flowing strokes.', durationMinutes: 60, priceCents: 9000 },
   { name: 'Deep Tissue Massage', description: 'Targets deep muscle layers to relieve chronic tension and pain.', durationMinutes: 60, priceCents: 10500 },
@@ -143,9 +167,18 @@ async function seed() {
     // TRUNCATE ... CASCADE follows all FKs. The roles lookup table is left
     // intact (seeded by migration 001).
     await client.query(
-      'TRUNCATE users, services, massage_beds, business_hours RESTART IDENTITY CASCADE'
+      'TRUNCATE users, services, massage_beds, business_hours, membership_plans RESTART IDENTITY CASCADE'
     );
     logger.info('seed_truncated');
+
+    for (const p of MEMBERSHIP_PLANS) {
+      await client.query(
+        `INSERT INTO membership_plans (name, description, price_monthly_cents, credits_per_month, stripe_price_id)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [p.name, p.description, p.priceMonthlyCents, p.creditsPerMonth, p.stripePriceId]
+      );
+    }
+    logger.info('seed_membership_plans', { count: MEMBERSHIP_PLANS.length });
 
     for (const s of SERVICES) {
       await client.query(

@@ -21,4 +21,9 @@ export const bookingService = {
     const res = await api.post('/appointments', data);
     return res.data;
   },
+
+  async confirmAppointment(id) {
+    const res = await api.post(`/appointments/${id}/confirm`);
+    return res.data;
+  },
 };

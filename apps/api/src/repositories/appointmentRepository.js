@@ -16,6 +16,30 @@ export class AppointmentRepository {
     return rows;
   }
 
+  async findById(id) {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM appointments WHERE id = $1',
+      [id]
+    );
+    return rows[0] ?? null;
+  }
+
+  async findServiceById(id) {
+    const { rows } = await this.pool.query(
+      'SELECT id, name, price_cents, duration_minutes FROM services WHERE id = $1',
+      [id]
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateStatus(id, status) {
+    const { rows: [appt] } = await this.pool.query(
+      `UPDATE appointments SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [status, id]
+    );
+    return appt;
+  }
+
   async create({
     clientId, therapistId, serviceId, scheduledAt, durationMinutes,
     notes, guestName, guestEmail, guestPhone,

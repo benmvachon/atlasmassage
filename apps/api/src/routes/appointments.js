@@ -11,7 +11,8 @@ router.post('/', optionalAuthenticate, createAppointmentRules, validate, appoint
 router.get('/:id', authenticate, appointmentController.getAppointment);
 router.put('/:id', authenticate, appointmentController.updateAppointment);
 router.post('/:id/cancel', authenticate, appointmentController.cancelAppointment);
-router.post('/:id/confirm', authenticate, authorize('therapist', 'owner'), appointmentController.confirmAppointment);
+// Clients confirm their own booking after successful payment; staff can also confirm
+router.post('/:id/confirm', authenticate, appointmentController.confirmAppointment);
 router.post('/:id/complete', authenticate, authorize('therapist', 'owner'), appointmentController.completeAppointment);
 
 export default router;

@@ -88,4 +88,26 @@ export class UserRepository {
       [id]
     );
   }
+
+  async update(id, { firstName, lastName, phone }) {
+    const sets = ['updated_at = NOW()'];
+    const vals = [];
+    let i = 1;
+    if (firstName !== undefined) { sets.push(`first_name = $${i++}`); vals.push(firstName); }
+    if (lastName !== undefined)  { sets.push(`last_name = $${i++}`);  vals.push(lastName); }
+    if (phone !== undefined)     { sets.push(`phone = $${i++}`);      vals.push(phone || null); }
+    vals.push(id);
+    await this.pool.query(
+      `UPDATE users SET ${sets.join(', ')} WHERE id = $${i}`,
+      vals
+    );
+    return this.findById(id);
+  }
+
+  async updateStripeCustomerId(id, stripeCustomerId) {
+    await this.pool.query(
+      'UPDATE users SET stripe_customer_id = $1, updated_at = NOW() WHERE id = $2',
+      [stripeCustomerId, id]
+    );
+  }
 }
