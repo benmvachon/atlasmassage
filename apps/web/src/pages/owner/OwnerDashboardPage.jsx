@@ -26,7 +26,7 @@ export default function OwnerDashboardPage() {
 
   useEffect(() => {
     adminService.getDashboard()
-      .then(r => setStats(r.data.data))
+      .then(r => setStats(r.data))
       .catch(() => setError('Could not load dashboard stats.'));
   }, []);
 

@@ -79,7 +79,7 @@ export default function TransferRequestsPage() {
     setLoading(true);
     setError(null);
     adminService.listTransferRequests()
-      .then(r => setData(r.data.data))
+      .then(r => setData(r.data))
       .catch(() => setError('Failed to load transfer requests.'))
       .finally(() => setLoading(false));
   }, []);

@@ -92,7 +92,7 @@ export default function RevenueDashboardPage() {
     const end = toISODate(new Date());
     const start = toISODate(new Date(Date.now() - (range - 1) * 86400000));
     adminService.getRevenue(start, end)
-      .then(r => setData(r.data.data))
+      .then(r => setData(r.data))
       .catch(() => setError('Failed to load revenue data.'))
       .finally(() => setLoading(false));
   }, [range]);

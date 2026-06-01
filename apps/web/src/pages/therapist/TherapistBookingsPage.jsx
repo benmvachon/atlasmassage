@@ -117,7 +117,7 @@ export default function TherapistBookingsPage() {
     if (clientSearch) params.set('client', clientSearch);
     if (statusFilter) params.set('status', statusFilter);
     api.get(`/appointments?${params}`)
-      .then(r => setAppointments(r.data.data))
+      .then(r => setAppointments(r.data))
       .catch(() => setError('Failed to load appointments.'))
       .finally(() => setLoading(false));
   }, [month, clientSearch, statusFilter]);
@@ -149,7 +149,7 @@ export default function TherapistBookingsPage() {
       setTransferAppt(null);
       load();
     } catch (err) {
-      setTransferError(err.response?.data?.message || 'Failed to submit transfer request.');
+      setTransferError(err.message || 'Failed to submit transfer request.');
     } finally {
       setTransferSaving(false);
     }

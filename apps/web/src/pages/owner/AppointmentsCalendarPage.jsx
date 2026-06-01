@@ -269,7 +269,7 @@ export default function AppointmentsCalendarPage() {
     setError(null);
     const { start, end } = getRange();
     adminService.listAppointments(start, end, therapistId || undefined)
-      .then(r => setData(r.data.data))
+      .then(r => setData(r.data))
       .catch(() => setError('Failed to load appointments.'))
       .finally(() => setLoading(false));
   }, [getRange, therapistId]);
