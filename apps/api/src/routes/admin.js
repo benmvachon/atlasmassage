@@ -26,6 +26,11 @@ router.patch('/appointments/:id/status', adminController.updateAppointmentStatus
 // ── Revenue ───────────────────────────────────────────────────────────────────
 router.get('/revenue', adminController.getRevenue);
 
+// ── Transfer requests ─────────────────────────────────────────────────────────
+router.get('/transfer-requests', adminController.listTransferRequests);
+router.post('/transfer-requests/:id/approve', adminController.approveTransferRequest);
+router.post('/transfer-requests/:id/deny', adminController.denyTransferRequest);
+
 // ── Remaining stubs ───────────────────────────────────────────────────────────
 router.get('/users', adminController.listUsers);
 router.put('/settings', adminController.updateSettings);

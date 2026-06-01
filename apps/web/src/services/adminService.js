@@ -42,4 +42,11 @@ export const adminService = {
     if (end) params.set('end', end);
     return api.get(`/admin/revenue?${params}`);
   },
+
+  // Transfer requests
+  listTransferRequests: () => api.get('/admin/transfer-requests'),
+  approveTransferRequest: (id, toTherapistId) =>
+    api.post(`/admin/transfer-requests/${id}/approve`, { toTherapistId }),
+  denyTransferRequest: (id) =>
+    api.post(`/admin/transfer-requests/${id}/deny`),
 };

@@ -1,6 +1,7 @@
 import { getPool } from '../database/pool.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { AvailabilityRepository } from '../repositories/availabilityRepository.js';
+import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { PaymentService } from '../services/paymentService.js';
 import { NotificationService } from '../services/notificationService.js';
 import { generateSlots } from '../services/slotService.js';
@@ -15,6 +16,7 @@ function repos() {
   return {
     appointment: new AppointmentRepository(pool),
     availability: new AvailabilityRepository(pool),
+    transfer: new TransferRequestRepository(pool),
   };
 }
 
@@ -114,10 +116,116 @@ export async function confirmAppointment(req, res, next) {
   }
 }
 
-const stub = (_req, _res, next) => next(new AppError('Not implemented', 501, 'NOT_IMPLEMENTED'));
+export async function listAppointments(req, res, next) {
+  try {
+    const { appointment, transfer } = repos();
+    const roles = req.user.roles ?? [];
+    const therapistId = req.user.sub;
 
-export const listAppointments = stub;
-export const getAppointment = stub;
-export const updateAppointment = stub;
-export const cancelAppointment = stub;
-export const completeAppointment = stub;
+    if (!roles.includes('therapist') && !roles.includes('owner')) {
+      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+    }
+
+    const { month, client, status } = req.query;
+    const appointments = await appointment.listForTherapist({
+      therapistId,
+      month: month || null,
+      clientSearch: client || null,
+      statusFilter: status || null,
+    });
+
+    res.json({ success: true, data: appointments });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getAppointment(req, res, next) {
+  try {
+    const appt = await repos().appointment.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    const isTherapist = appt.therapist_id === req.user.sub;
+    const isClient = appt.client_id === req.user.sub;
+
+    if (!isOwner && !isTherapist && !isClient) {
+      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+    }
+
+    res.json({ success: true, data: appt });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function cancelAppointment(req, res, next) {
+  try {
+    const { appointment: apptRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    const isClient = appt.client_id === req.user.sub;
+    if (!isOwner && !isClient) {
+      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+    }
+
+    if (['cancelled', 'completed', 'no_show'].includes(appt.status)) {
+      return next(new AppError('Appointment cannot be cancelled in its current state', 400, 'BAD_REQUEST'));
+    }
+
+    const updated = await apptRepo.updateStatus(req.params.id, 'cancelled');
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function completeAppointment(req, res, next) {
+  try {
+    const { appointment: apptRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    const isTherapist = appt.therapist_id === req.user.sub;
+    if (!isOwner && !isTherapist) {
+      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+    }
+
+    const updated = await apptRepo.updateStatus(req.params.id, 'completed');
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function requestTransfer(req, res, next) {
+  try {
+    const { appointment: apptRepo, transfer } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    if (appt.therapist_id !== req.user.sub) {
+      return next(new AppError('You can only request transfers for your own appointments', 403, 'FORBIDDEN'));
+    }
+
+    if (!['pending', 'confirmed'].includes(appt.status) || new Date(appt.scheduled_at) <= new Date()) {
+      return next(new AppError('Transfers can only be requested for upcoming appointments', 400, 'BAD_REQUEST'));
+    }
+
+    const existing = await transfer.findPendingByAppointment(req.params.id);
+    if (existing) {
+      return next(new AppError('A transfer request is already pending for this appointment', 409, 'CONFLICT'));
+    }
+
+    const request = await transfer.create(req.params.id, req.user.sub, req.body.reason);
+    res.status(201).json({ success: true, data: request });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const updateAppointment = (_req, _res, next) =>
+  next(new AppError('Not implemented', 501, 'NOT_IMPLEMENTED'));

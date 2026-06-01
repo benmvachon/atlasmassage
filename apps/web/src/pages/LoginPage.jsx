@@ -31,7 +31,7 @@ export default function LoginPage() {
       ?? (user.roles?.includes('owner')
         ? '/owner/dashboard'
         : user.roles?.includes('therapist')
-          ? '/therapist/schedule'
+          ? '/therapist/bookings'
           : '/');
     navigate(dest, { replace: true });
   }, [user, navigate, location]);

@@ -3,6 +3,7 @@ import { getPool } from '../database/pool.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { BusinessRepository } from '../repositories/businessRepository.js';
 import { TherapistRepository } from '../repositories/therapistRepository.js';
+import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -14,6 +15,7 @@ function repos() {
     appointment: new AppointmentRepository(pool),
     business: new BusinessRepository(pool),
     therapist: new TherapistRepository(pool),
+    transfer: new TransferRequestRepository(pool),
     user: new UserRepository(pool),
   };
 }
@@ -244,6 +246,44 @@ export async function getRevenue(req, res, next) {
     const start = req.query.start || defaultStart;
     const data = await repos().appointment.getRevenueStats({ start, end });
     res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Transfer requests ─────────────────────────────────────────────────────────
+
+export async function listTransferRequests(req, res, next) {
+  try {
+    const [requests, therapists] = await Promise.all([
+      repos().transfer.listPending(),
+      repos().therapist.findAll(),
+    ]);
+    res.json({ success: true, data: { requests, therapists } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function approveTransferRequest(req, res, next) {
+  try {
+    const { toTherapistId } = req.body;
+    if (!toTherapistId) {
+      throw new AppError('toTherapistId is required', 400, 'BAD_REQUEST');
+    }
+    const result = await repos().transfer.approve(req.params.id, toTherapistId, req.user.sub);
+    if (!result) throw new AppError('Transfer request not found or already resolved', 404, 'NOT_FOUND');
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function denyTransferRequest(req, res, next) {
+  try {
+    const result = await repos().transfer.deny(req.params.id, req.user.sub);
+    if (!result) throw new AppError('Transfer request not found or already resolved', 404, 'NOT_FOUND');
+    res.json({ success: true, data: result });
   } catch (err) {
     next(err);
   }

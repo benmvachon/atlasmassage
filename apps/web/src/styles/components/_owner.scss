@@ -1161,6 +1161,64 @@
   vertical-align: middle;
 }
 
+// ── Transfer-requested status badge ──────────────────────────────────────────
+
+.cal-status--transfer {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+// ── Therapist bookings filters ────────────────────────────────────────────────
+
+.bookings-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-3;
+  margin-bottom: $space-6;
+
+  &__select {
+    width: auto;
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex: 1;
+    min-width: 240px;
+
+    .owner-input { flex: 1; }
+  }
+
+  &__sort {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
+
+.bookings-count {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  text-align: right;
+  margin-top: $space-3;
+}
+
+.bookings-transfer-badge {
+  display: inline-block;
+  font-family: $font-family-ui;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6d28d9;
+  background: #ede9fe;
+  border-radius: $border-radius-full;
+  padding: 2px $space-2;
+  white-space: nowrap;
+}
+
 // ── btn--ghost variant ────────────────────────────────────────────────────────
 
 .btn--ghost {

@@ -80,6 +80,61 @@ export class AppointmentRepository {
     return { appointments, therapists };
   }
 
+  async listForTherapist({ therapistId, month, clientSearch, statusFilter }) {
+    const params = [therapistId];
+    const conditions = ['a.therapist_id = $1'];
+
+    if (month) {
+      // month is YYYY-MM
+      const [y, m] = month.split('-');
+      const start = `${y}-${m}-01`;
+      const end = new Date(Number(y), Number(m), 0).toISOString().slice(0, 10);
+      params.push(start, end);
+      conditions.push(`a.scheduled_at::date >= $${params.length - 1}::date`);
+      conditions.push(`a.scheduled_at::date <= $${params.length}::date`);
+    }
+
+    if (clientSearch) {
+      params.push(`%${clientSearch}%`);
+      const n = params.length;
+      conditions.push(
+        `(COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) ILIKE $${n}
+          OR COALESCE(cl.email, a.guest_email) ILIKE $${n})`
+      );
+    }
+
+    const statusCondition = {
+      future:             `a.status IN ('pending','confirmed') AND a.scheduled_at > NOW()`,
+      past:               `(a.status IN ('completed','no_show') OR (a.status NOT IN ('cancelled') AND a.scheduled_at < NOW()))`,
+      cancelled:          `a.status = 'cancelled'`,
+      transfer_requested: `EXISTS (SELECT 1 FROM appointment_transfer_requests tr WHERE tr.appointment_id = a.id AND tr.status = 'pending')`,
+    }[statusFilter];
+
+    if (statusCondition) conditions.push(statusCondition);
+
+    const { rows } = await this.pool.query(
+      `SELECT
+         a.id, a.status, a.scheduled_at, a.duration_minutes, a.notes,
+         a.guest_name, a.guest_email, a.guest_phone,
+         s.name AS service_name, s.price_cents,
+         COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) AS client_name,
+         COALESCE(cl.email, a.guest_email) AS client_email,
+         COALESCE(cl.phone, a.guest_phone) AS client_phone,
+         tr.id AS transfer_request_id,
+         tr.status AS transfer_status,
+         tr.reason AS transfer_reason
+       FROM appointments a
+       JOIN services s ON s.id = a.service_id
+       LEFT JOIN users cl ON cl.id = a.client_id
+       LEFT JOIN appointment_transfer_requests tr
+         ON tr.appointment_id = a.id AND tr.status = 'pending'
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY a.scheduled_at DESC`,
+      params
+    );
+    return rows;
+  }
+
   async getRevenueStats({ start, end }) {
     const [dailyRows, byServiceRows, byTherapistRows, summaryRows, membershipRows] = await Promise.all([
       this.pool.query(

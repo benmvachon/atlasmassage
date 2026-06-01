@@ -14,5 +14,6 @@ router.post('/:id/cancel', authenticate, appointmentController.cancelAppointment
 // Clients confirm their own booking after successful payment; staff can also confirm
 router.post('/:id/confirm', authenticate, appointmentController.confirmAppointment);
 router.post('/:id/complete', authenticate, authorize('therapist', 'owner'), appointmentController.completeAppointment);
+router.post('/:id/transfer-request', authenticate, authorize('therapist'), appointmentController.requestTransfer);
 
 export default router;

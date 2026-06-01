@@ -2,27 +2,23 @@ import { NavLink, Outlet } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 
 const NAV_ITEMS = [
-  { to: '/owner/dashboard', label: 'Overview', end: true },
-  { to: '/owner/appointments', label: 'Calendar' },
-  { to: '/owner/transfers', label: 'Transfers' },
-  { to: '/owner/revenue', label: 'Revenue' },
-  { to: '/owner/business', label: 'Business Details' },
-  { to: '/owner/therapists', label: 'Therapists' },
+  { to: '/therapist/bookings', label: 'My Bookings' },
+  { to: '/therapist/schedule', label: 'Schedule' },
+  { to: '/therapist/settings', label: 'Settings' },
 ];
 
-export default function OwnerLayout() {
+export default function TherapistLayout() {
   return (
     <div className="layout layout--owner">
       <Header />
       <div className="layout__body">
-        <nav className="owner-sidebar" aria-label="Admin navigation">
-          <p className="owner-sidebar__heading">Admin</p>
+        <nav className="owner-sidebar" aria-label="Therapist navigation">
+          <p className="owner-sidebar__heading">Therapist</p>
           <ul className="owner-sidebar__list">
-            {NAV_ITEMS.map(({ to, label, end }) => (
+            {NAV_ITEMS.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
                   to={to}
-                  end={end}
                   className={({ isActive }) =>
                     `owner-sidebar__link${isActive ? ' owner-sidebar__link--active' : ''}`
                   }
