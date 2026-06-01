@@ -54,7 +54,7 @@
     &:hover { background-color: $color-bg-alt; color: $color-primary; }
 
     &--active {
-      background-color: rgba(44, 110, 73, 0.1);
+      background-color: $color-primary-tint-active;
       color: $color-primary;
       font-weight: 600;
     }
@@ -91,12 +91,9 @@
   &__card {
     display: block;
     padding: $space-8;
-    background: $color-white;
-    border: 1px solid $color-border;
-    border-radius: $border-radius-lg;
+    @include card;
     text-decoration: none;
     color: $color-text;
-    box-shadow: $shadow-sm;
     transition: box-shadow $transition-fast, border-color $transition-fast;
 
     &:hover {
@@ -170,12 +167,9 @@
 // ── Sections ──────────────────────────────────────────────────────────────────
 
 .owner-section {
-  background: $color-white;
-  border: 1px solid $color-border;
-  border-radius: $border-radius-lg;
+  @include card;
   padding: $space-6;
   margin-bottom: $space-6;
-  box-shadow: $shadow-sm;
 
   &__header {
     display: flex;
@@ -248,18 +242,8 @@
 
 .owner-input {
   padding: $space-2 $space-3;
-  border: 1px solid $color-border;
-  border-radius: $border-radius-sm;
-  font-family: $font-family-ui;
-  font-size: $font-size-sm;
-  background: $color-white;
+  @include input-base;
   width: 100%;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-    box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
-  }
 
   &--narrow { width: 80px; }
 
@@ -267,11 +251,6 @@
     margin-top: $space-2;
     color: $color-text-muted;
     font-size: $font-size-xs;
-  }
-
-  &:disabled {
-    background: $color-bg-alt;
-    color: $color-text-muted;
   }
 }
 
@@ -399,8 +378,8 @@
   font-weight: 600;
 
   &--active {
-    background: #dcfce7;
-    color: #15803d;
+    background: $color-badge-success-bg;
+    color: $color-badge-success-text;
   }
 
   &--inactive {
@@ -409,8 +388,8 @@
   }
 
   &--self {
-    background: #dbeafe;
-    color: #1d4ed8;
+    background: $color-badge-info-bg;
+    color: $color-badge-info-text;
     margin-left: $space-2;
   }
 }
@@ -516,8 +495,8 @@
   border-color: $color-error;
 
   &:hover:not(:disabled) {
-    background-color: darken($color-error, 8%);
-    border-color: darken($color-error, 8%);
+    background-color: $color-error-dark;
+    border-color: $color-error-dark;
   }
 }
 
@@ -677,11 +656,11 @@
   font-weight: 600;
   white-space: nowrap;
 
-  &--pending   { background: #fef9c3; color: #854d0e; }
-  &--confirmed { background: #dcfce7; color: #15803d; }
-  &--cancelled { background: #fee2e2; color: #991b1b; }
-  &--completed { background: #dbeafe; color: #1e40af; }
-  &--no_show   { background: $color-bg-alt; color: $color-text-muted; }
+  &--pending   { background: $color-badge-warning-bg;  color: $color-badge-warning-text; }
+  &--confirmed { background: $color-badge-success-bg;  color: $color-badge-success-text; }
+  &--cancelled { background: $color-badge-error-bg;    color: $color-badge-error-text; }
+  &--completed { background: $color-badge-info-bg;     color: $color-badge-info-text; }
+  &--no_show   { background: $color-bg-alt;            color: $color-text-muted; }
 }
 
 // ── Week view ─────────────────────────────────────────────────────────────────
@@ -824,11 +803,11 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    background: rgba(44, 110, 73, 0.08);
+    background: $color-primary-tint-sm;
     color: $color-text;
     transition: background-color $transition-fast;
 
-    &:hover { background: rgba(44, 110, 73, 0.18); }
+    &:hover { background: $color-primary-tint-md; }
   }
 
   &__appt-time {
@@ -861,11 +840,11 @@
   cursor: pointer;
   text-align: left;
   font-family: $font-family-ui;
-  background: rgba(44, 110, 73, 0.06);
+  background: $color-primary-tint-sm;
   transition: background-color $transition-fast, border-color $transition-fast;
 
   &:hover {
-    background: rgba(44, 110, 73, 0.12);
+    background: $color-primary-tint-md;
     border-color: $color-primary-light;
   }
 
@@ -972,7 +951,7 @@
 .cal-detail-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: $color-overlay;
   z-index: 200;
   display: flex;
   align-items: center;
@@ -1057,10 +1036,10 @@
   }
 
   &__status-btn {
-    &--confirmed { background: #dcfce7; color: #15803d; border-color: #86efac; }
-    &--cancelled { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-    &--completed { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-    &--no_show   { background: $color-bg-alt; color: $color-text-muted; border-color: $color-border; }
+    &--confirmed { background: $color-badge-success-bg;  color: $color-badge-success-text;  border-color: $color-badge-success-border; }
+    &--cancelled { background: $color-badge-error-bg;    color: $color-badge-error-text;    border-color: $color-badge-error-border; }
+    &--completed { background: $color-badge-info-bg;     color: $color-badge-info-text;     border-color: $color-badge-info-border; }
+    &--no_show   { background: $color-bg-alt;            color: $color-text-muted;          border-color: $color-border; }
 
     &:hover:not(:disabled) { opacity: 0.85; }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -1164,8 +1143,8 @@
 // ── Transfer-requested status badge ──────────────────────────────────────────
 
 .cal-status--transfer {
-  background: #ede9fe;
-  color: #6d28d9;
+  background: $color-badge-transfer-bg;
+  color: $color-badge-transfer-text;
 }
 
 // ── Therapist bookings filters ────────────────────────────────────────────────
@@ -1212,8 +1191,8 @@
   font-family: $font-family-ui;
   font-size: 11px;
   font-weight: 600;
-  color: #6d28d9;
-  background: #ede9fe;
+  color: $color-badge-transfer-text;
+  background: $color-badge-transfer-bg;
   border-radius: $border-radius-full;
   padding: 2px $space-2;
   white-space: nowrap;

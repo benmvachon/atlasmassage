@@ -2,8 +2,7 @@
 @use '../abstracts/mixins' as *;
 
 .auth-card {
-  background: $color-white;
-  border-radius: $border-radius-lg;
+  @include card;
   box-shadow: $shadow-lg;
   padding: $space-8;
   width: 100%;
@@ -27,7 +26,7 @@
 
   &__api-error {
     background-color: $color-error-bg;
-    border: 1px solid rgb(220 38 38 / 30%);
+    border: 1px solid $color-error-border-alpha;
     border-radius: $border-radius-sm;
     color: $color-error;
     font-family: $font-family-ui;
@@ -42,7 +41,6 @@
     gap: $space-4;
   }
 
-  // Side-by-side fields (first name / last name)
   &__row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -88,7 +86,6 @@
   }
 }
 
-// Auth layout background
 .layout--auth {
   background: linear-gradient(135deg, $color-accent 0%, $color-bg 60%);
 }

@@ -29,7 +29,7 @@
       font-family: $font-family-ui;
       font-size: $font-size-sm;
       color: $color-bg-alt;
-      transition: color 150ms ease;
+      transition: color $transition-fast;
 
       &:hover { color: $color-white; }
     }

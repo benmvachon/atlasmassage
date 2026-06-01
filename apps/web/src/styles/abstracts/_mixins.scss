@@ -1,11 +1,15 @@
 @use 'variables' as *;
 
+// ── Breakpoints ───────────────────────────────────────────────────────────────
+
 @mixin respond-to($bp) {
-  @if $bp == sm  { @media (min-width: $bp-sm)  { @content; } }
-  @else if $bp == md  { @media (min-width: $bp-md)  { @content; } }
-  @else if $bp == lg  { @media (min-width: $bp-lg)  { @content; } }
-  @else if $bp == xl  { @media (min-width: $bp-xl)  { @content; } }
+  @if      $bp == sm { @media (min-width: $bp-sm) { @content; } }
+  @else if $bp == md { @media (min-width: $bp-md) { @content; } }
+  @else if $bp == lg { @media (min-width: $bp-lg) { @content; } }
+  @else if $bp == xl { @media (min-width: $bp-xl) { @content; } }
 }
+
+// ── Layout helpers ────────────────────────────────────────────────────────────
 
 @mixin flex-center {
   display: flex;
@@ -31,9 +35,61 @@
   border: 0;
 }
 
+// ── Accessibility ─────────────────────────────────────────────────────────────
+
 @mixin focus-ring {
   &:focus-visible {
     outline: 3px solid $color-primary;
     outline-offset: 2px;
   }
+}
+
+// ── Card / section surface ────────────────────────────────────────────────────
+// White surface with border and shadow; used for section cards, panels,
+// calendar containers, etc. Components add their own padding.
+
+@mixin card {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+// ── Input base ────────────────────────────────────────────────────────────────
+// Shared border / focus / disabled / placeholder behaviour.
+// Components add their own width, padding, and font-size overrides.
+
+@mixin input-base($border-width: 1px) {
+  border: $border-width solid $color-border;
+  border-radius: $border-radius-sm;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  background: $color-white;
+  color: $color-text;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: $focus-shadow-sm;
+  }
+
+  &:disabled {
+    background: $color-bg-alt;
+    color: $color-text-muted;
+    cursor: not-allowed;
+  }
+
+  &::placeholder { color: $color-text-muted; }
+}
+
+// ── Modal overlay ─────────────────────────────────────────────────────────────
+
+@mixin modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: $color-overlay;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
 }

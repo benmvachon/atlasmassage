@@ -16,12 +16,8 @@
   &__input {
     width: 100%;
     padding: $space-3 $space-4;
-    border: 1.5px solid $color-border;
-    border-radius: $border-radius-sm;
-    font-family: $font-family-ui;
+    @include input-base(1.5px);
     font-size: $font-size-md;
-    color: $color-text;
-    background-color: $color-white;
     transition: border-color $transition-fast, box-shadow $transition-fast;
 
     @include focus-ring;
@@ -29,13 +25,7 @@
     &:focus {
       outline: none;
       border-color: $color-primary;
-      box-shadow: 0 0 0 3px rgb(44 110 73 / 12%);
-    }
-
-    &:disabled {
-      background-color: $color-bg-alt;
-      cursor: not-allowed;
-      opacity: 0.7;
+      box-shadow: $focus-shadow-md;
     }
 
     &::placeholder { color: $color-text-muted; }
@@ -44,7 +34,7 @@
   &--error &__input {
     border-color: $color-error;
 
-    &:focus { box-shadow: 0 0 0 3px rgb(220 38 38 / 12%); }
+    &:focus { box-shadow: $focus-shadow-error; }
   }
 
   &__error {

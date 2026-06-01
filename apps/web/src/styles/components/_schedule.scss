@@ -26,12 +26,9 @@
 // ── Availability calendar ─────────────────────────────────────────────────────
 
 .avail-calendar {
-  background: $color-white;
-  border: 1px solid $color-border;
-  border-radius: $border-radius-lg;
+  @include card;
   padding: $space-6;
   margin-bottom: $space-4;
-  box-shadow: $shadow-sm;
 
   &__header {
     display: flex;
@@ -99,7 +96,7 @@
 
     &:hover:not(:disabled):not(.avail-calendar__cell--pad) {
       border-color: $color-primary-light;
-      background: rgba(44, 110, 73, 0.03);
+      background: $color-primary-tint-xs;
     }
 
     @include focus-ring;
@@ -125,14 +122,14 @@
     }
 
     &--available {
-      border-color: rgba(44, 110, 73, 0.3);
-      background: rgba(44, 110, 73, 0.04);
+      border-color: $color-primary-border-md;
+      background: $color-primary-tint-xs;
     }
 
     &--selected {
       border-color: $color-primary !important;
-      background: rgba(44, 110, 73, 0.12) !important;
-      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+      background: $color-primary-tint-md !important;
+      box-shadow: $focus-shadow-sm;
 
       .avail-calendar__day-num { color: $color-primary; }
     }
@@ -162,7 +159,7 @@
     font-size: 10px;
     font-weight: 600;
     color: $color-primary;
-    background: rgba(44, 110, 73, 0.12);
+    background: $color-primary-tint-md;
     padding: 2px $space-2;
     border-radius: $border-radius-full;
     margin-top: auto;
@@ -206,12 +203,12 @@
     }
 
     &--available::before {
-      background: rgba(44, 110, 73, 0.12);
-      border: 1px solid rgba(44, 110, 73, 0.3);
+      background: $color-primary-tint-md;
+      border: 1px solid $color-primary-border-md;
     }
 
     &--selected::before {
-      background: rgba(44, 110, 73, 0.2);
+      background: $color-primary-tint-lg;
       border: 2px solid $color-primary;
     }
 
@@ -221,7 +218,6 @@
     }
   }
 
-  // Tighter cells on small screens
   @media (max-width: $bp-md) {
     padding: $space-4;
 
@@ -238,8 +234,8 @@
   align-items: center;
   gap: $space-3;
   padding: $space-3 $space-4;
-  background: rgba(44, 110, 73, 0.06);
-  border: 1px solid rgba(44, 110, 73, 0.2);
+  background: $color-primary-tint-sm;
+  border: 1px solid $color-primary-border-sm;
   border-radius: $border-radius-md;
   margin-bottom: $space-6;
   flex-wrap: wrap;
@@ -256,22 +252,17 @@
 // ── Availability modal ────────────────────────────────────────────────────────
 
 .avail-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  @include flex-center;
+  @include modal-overlay;
   z-index: 1000;
-  padding: $space-4;
 }
 
 .avail-modal {
-  background: $color-white;
-  border-radius: $border-radius-lg;
+  @include card;
+  box-shadow: $shadow-lg;
   padding: $space-8;
   width: 100%;
   max-width: 440px;
   position: relative;
-  box-shadow: $shadow-lg;
 
   &__close {
     position: absolute;
@@ -319,9 +310,7 @@
     gap: $space-4;
     margin-bottom: $space-6;
 
-    @media (max-width: $bp-sm) {
-      flex-direction: column;
-    }
+    @media (max-width: $bp-sm) { flex-direction: column; }
   }
 
   &__label {
@@ -336,17 +325,8 @@
 
   &__input {
     padding: $space-2 $space-3;
-    border: 1px solid $color-border;
-    border-radius: $border-radius-sm;
-    font-family: $font-family-ui;
-    font-size: $font-size-sm;
+    @include input-base;
     width: 100%;
-
-    &:focus {
-      outline: none;
-      border-color: $color-primary;
-      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
-    }
   }
 
   &__error {
@@ -369,11 +349,8 @@
 // ── Booking limits ────────────────────────────────────────────────────────────
 
 .schedule-limits {
-  background: $color-white;
-  border: 1px solid $color-border;
-  border-radius: $border-radius-lg;
+  @include card;
   padding: $space-6;
-  box-shadow: $shadow-sm;
 
   &__title {
     font-family: $font-family-ui;
@@ -408,16 +385,7 @@
   &__input {
     width: 80px;
     padding: $space-2 $space-3;
-    border: 1px solid $color-border;
-    border-radius: $border-radius-sm;
-    font-family: $font-family-ui;
-    font-size: $font-size-sm;
-
-    &:focus {
-      outline: none;
-      border-color: $color-primary;
-      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
-    }
+    @include input-base;
   }
 
   &__success {
