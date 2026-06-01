@@ -1,0 +1,286 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Booking page ──────────────────────────────────────────────────────────────
+
+.booking-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: $space-8 $space-4;
+
+  &__header {
+    margin-bottom: $space-8;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    margin-bottom: $space-2;
+  }
+
+  &__subtitle {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    color: $color-text-muted;
+  }
+}
+
+.booking-error {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-error;
+  margin-bottom: $space-4;
+}
+
+// ── Filter bar ────────────────────────────────────────────────────────────────
+
+.booking-filters {
+  display: flex;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  flex-wrap: wrap;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    min-width: 180px;
+    flex: 1;
+
+    @include respond-to(md) {
+      flex: none;
+      width: 220px;
+    }
+  }
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &__select {
+    padding: $space-2 $space-8 $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    background: $color-white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $space-3 center;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+    }
+  }
+}
+
+// ── Booking calendar (reuses avail-calendar BEM) ──────────────────────────────
+
+.booking-calendar {
+  &__loading {
+    text-align: center;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: $space-4 0;
+  }
+}
+
+// ── Time slot panel ───────────────────────────────────────────────────────────
+
+.slot-panel {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-6;
+  margin-top: $space-6;
+  box-shadow: $shadow-sm;
+
+  &__heading {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    margin-bottom: $space-6;
+  }
+
+  &__date {
+    font-weight: 400;
+    color: $color-text-muted;
+  }
+
+  &__state {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+
+    &--error { color: $color-error; }
+  }
+
+  &__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+}
+
+.slot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: $space-3 $space-4;
+  min-width: 90px;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: border-color $transition-fast, background-color $transition-fast, box-shadow $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+    background: rgba(44, 110, 73, 0.04);
+    box-shadow: $shadow-sm;
+  }
+
+  @include focus-ring;
+
+  &__time {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &__count {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}
+
+// ── Booking modal ─────────────────────────────────────────────────────────────
+
+.booking-modal {
+  max-width: 520px;
+
+  &__slot-summary {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-primary;
+    background: rgba(44, 110, 73, 0.06);
+    padding: $space-3 $space-4;
+    border-radius: $border-radius-sm;
+    margin-bottom: $space-6;
+  }
+
+  &--success {
+    text-align: center;
+    padding: $space-12 $space-8;
+  }
+
+  &__success-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $border-radius-full;
+    background: $color-primary;
+    color: $color-white;
+    font-size: $font-size-xl;
+    @include flex-center;
+    margin: 0 auto $space-6;
+  }
+
+  &__success-title {
+    font-family: $font-family-ui;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    margin-bottom: $space-3;
+  }
+
+  &__success-body {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-8;
+    line-height: 1.6;
+  }
+}
+
+.booking-divider {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  padding: $space-4 0 $space-3;
+  border-top: 1px solid $color-bg-alt;
+  margin-top: $space-2;
+}
+
+.booking-field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-bottom: $space-4;
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &__optional {
+    font-weight: 400;
+    color: $color-text-muted;
+  }
+
+  &__input {
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    background: $color-white;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+    }
+
+    &--textarea { resize: vertical; }
+
+    &[disabled] { background: $color-bg-alt; color: $color-text-muted; }
+  }
+
+  &__locked {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+    padding: $space-2 $space-3;
+    background: $color-bg-alt;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+  }
+}
+
+.booking-payment-note {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  background: $color-bg-alt;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  padding: $space-3 $space-4;
+  margin-bottom: $space-6;
+  text-align: center;
+}

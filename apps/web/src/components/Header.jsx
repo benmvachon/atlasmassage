@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const isOwner = user?.roles?.includes('owner');
+  const isTherapist = user?.roles?.includes('therapist');
 
   return (
     <header className="header">
@@ -16,6 +18,16 @@ export default function Header() {
           <NavLink to="/team">Team</NavLink>
           <NavLink to="/testimonials">Testimonials</NavLink>
           <NavLink to="/booking" className="btn btn--primary">Book Now</NavLink>
+          {isTherapist && !isOwner && (
+            <NavLink to="/therapist/schedule" className="header__schedule-link">
+              My Schedule
+            </NavLink>
+          )}
+          {isOwner && (
+            <NavLink to="/owner/dashboard" className="header__admin-link">
+              Admin
+            </NavLink>
+          )}
           {user ? (
             <button className="btn btn--ghost header__signout" onClick={logout}>
               Sign out

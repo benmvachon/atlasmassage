@@ -20,16 +20,21 @@ export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname ?? '/';
-
   const {
     values, fieldErrors, apiError,
     submitting, handleChange, setFieldErrors, setApiError, setSubmitting,
   } = useFormState({ email: '', password: '' });
 
   useEffect(() => {
-    if (user) navigate(from, { replace: true });
-  }, [user, navigate, from]);
+    if (!user) return;
+    const dest = location.state?.from?.pathname
+      ?? (user.roles?.includes('owner')
+        ? '/owner/dashboard'
+        : user.roles?.includes('therapist')
+          ? '/therapist/schedule'
+          : '/');
+    navigate(dest, { replace: true });
+  }, [user, navigate, location]);
 
   async function handleSubmit(e) {
     e.preventDefault();

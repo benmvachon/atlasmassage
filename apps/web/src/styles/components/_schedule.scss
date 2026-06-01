@@ -1,0 +1,437 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Schedule page ─────────────────────────────────────────────────────────────
+
+.schedule-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: $space-8 $space-6;
+
+  &__title {
+    font-size: $font-size-2xl;
+    margin-bottom: $space-8;
+  }
+}
+
+.schedule-loading,
+.schedule-error {
+  padding: $space-8 $space-6;
+  font-family: $font-family-ui;
+  color: $color-text-muted;
+}
+
+.schedule-error { color: $color-error; }
+
+// ── Availability calendar ─────────────────────────────────────────────────────
+
+.avail-calendar {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-6;
+  margin-bottom: $space-4;
+  box-shadow: $shadow-sm;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-6;
+  }
+
+  &__month {
+    font-family: $font-family-ui;
+    font-size: $font-size-xl;
+    font-weight: 600;
+    color: $color-text;
+    margin: 0;
+  }
+
+  &__nav {
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    width: 36px;
+    height: 36px;
+    @include flex-center;
+    cursor: pointer;
+    font-size: $font-size-lg;
+    color: $color-text;
+    transition: background-color $transition-fast;
+    line-height: 1;
+
+    &:hover { background: $color-bg-alt; }
+
+    @include focus-ring;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  &__dow {
+    padding: $space-2;
+    text-align: center;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: $space-2;
+    min-height: 84px;
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color $transition-fast, background-color $transition-fast, box-shadow $transition-fast;
+
+    &:hover:not(:disabled):not(.avail-calendar__cell--pad) {
+      border-color: $color-primary-light;
+      background: rgba(44, 110, 73, 0.03);
+    }
+
+    @include focus-ring;
+
+    &--pad {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    &--past {
+      background: $color-bg-alt;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--closed {
+      background: $color-bg-alt;
+      cursor: not-allowed;
+
+      .avail-calendar__day-num { color: $color-text-muted; }
+    }
+
+    &--available {
+      border-color: rgba(44, 110, 73, 0.3);
+      background: rgba(44, 110, 73, 0.04);
+    }
+
+    &--selected {
+      border-color: $color-primary !important;
+      background: rgba(44, 110, 73, 0.12) !important;
+      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+
+      .avail-calendar__day-num { color: $color-primary; }
+    }
+  }
+
+  &__day-num {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text;
+    margin-bottom: $space-1;
+
+    &--today {
+      width: 26px;
+      height: 26px;
+      @include flex-center;
+      background: $color-primary;
+      color: $color-white !important;
+      border-radius: $border-radius-full;
+      font-weight: 700;
+    }
+  }
+
+  &__time-badge {
+    display: inline-block;
+    font-family: $font-family-ui;
+    font-size: 10px;
+    font-weight: 600;
+    color: $color-primary;
+    background: rgba(44, 110, 73, 0.12);
+    padding: 2px $space-2;
+    border-radius: $border-radius-full;
+    margin-top: auto;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__closed-label {
+    font-family: $font-family-ui;
+    font-size: 10px;
+    color: $color-text-muted;
+    font-style: italic;
+    margin-top: auto;
+  }
+
+  &__legend {
+    display: flex;
+    gap: $space-6;
+    margin-top: $space-4;
+    padding-top: $space-4;
+    border-top: 1px solid $color-bg-alt;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    &--available::before {
+      background: rgba(44, 110, 73, 0.12);
+      border: 1px solid rgba(44, 110, 73, 0.3);
+    }
+
+    &--selected::before {
+      background: rgba(44, 110, 73, 0.2);
+      border: 2px solid $color-primary;
+    }
+
+    &--closed::before {
+      background: $color-bg-alt;
+      border: 1px solid $color-border;
+    }
+  }
+
+  // Tighter cells on small screens
+  @media (max-width: $bp-md) {
+    padding: $space-4;
+
+    &__cell { min-height: 56px; padding: $space-1; }
+    &__time-badge { display: none; }
+    &__closed-label { display: none; }
+  }
+}
+
+// ── Selection action bar ──────────────────────────────────────────────────────
+
+.schedule-action-bar {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  background: rgba(44, 110, 73, 0.06);
+  border: 1px solid rgba(44, 110, 73, 0.2);
+  border-radius: $border-radius-md;
+  margin-bottom: $space-6;
+  flex-wrap: wrap;
+
+  &__count {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-primary;
+    margin-right: auto;
+  }
+}
+
+// ── Availability modal ────────────────────────────────────────────────────────
+
+.avail-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  @include flex-center;
+  z-index: 1000;
+  padding: $space-4;
+}
+
+.avail-modal {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  padding: $space-8;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  box-shadow: $shadow-lg;
+
+  &__close {
+    position: absolute;
+    top: $space-4;
+    right: $space-4;
+    background: none;
+    border: none;
+    font-size: $font-size-xl;
+    line-height: 1;
+    cursor: pointer;
+    color: $color-text-muted;
+    padding: $space-1;
+
+    &:hover { color: $color-text; }
+
+    @include focus-ring;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    margin-bottom: $space-2;
+  }
+
+  &__dates {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-2;
+  }
+
+  &__hours-hint {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    background: $color-bg-alt;
+    padding: $space-2 $space-3;
+    border-radius: $border-radius-sm;
+    margin-bottom: $space-4;
+  }
+
+  &__form {
+    display: flex;
+    gap: $space-4;
+    margin-bottom: $space-6;
+
+    @media (max-width: $bp-sm) {
+      flex-direction: column;
+    }
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    flex: 1;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &__input {
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+    }
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    background: $color-error-bg;
+    padding: $space-3 $space-4;
+    border-radius: $border-radius-sm;
+    margin-bottom: $space-4;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Booking limits ────────────────────────────────────────────────────────────
+
+.schedule-limits {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-6;
+  box-shadow: $shadow-sm;
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    margin-bottom: $space-2;
+  }
+
+  &__desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-6;
+  }
+
+  &__form {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-4;
+    flex-wrap: wrap;
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &__input {
+    width: 80px;
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+    }
+  }
+
+  &__success {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-success;
+    align-self: center;
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    align-self: center;
+  }
+}

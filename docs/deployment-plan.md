@@ -43,7 +43,59 @@ Production `.env` must set:
 - `NODE_ENV=production`
 - `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`
 - `TWILIO_*` credentials
-- `EMAIL_*` credentials
+- `EMAIL_*` credentials (see below)
+
+## Email setup
+
+### Development
+
+Leave `EMAIL_HOST` empty (or unset) in `.env`. The email service logs all outgoing
+emails to the console via Winston. Password reset links appear in the server log
+and can be copied directly into the browser.
+
+### Production
+
+The email service uses standard SMTP and works with any provider. Recommended options:
+
+| Provider | Notes |
+|----------|-------|
+| **Postmark** | Best deliverability for transactional email; generous free tier |
+| **Resend** | Modern API-first provider; easy setup |
+| **SendGrid** | Widely used; free tier available |
+| **Gmail SMTP** | Works for low volume; requires App Password if 2FA is enabled |
+
+**Steps (using Postmark as an example):**
+
+1. Create a Postmark account and add a verified sender domain or address.
+2. Get your server API token from the Postmark dashboard.
+3. Set these values in the production `.env`:
+
+```
+EMAIL_HOST=smtp.postmarkapp.com
+EMAIL_PORT=587
+EMAIL_USER=<your-server-api-token>
+EMAIL_PASSWORD=<your-server-api-token>
+EMAIL_FROM=noreply@atlasmassage.com
+APP_URL=https://atlasmassage.com
+```
+
+> `EMAIL_FROM` must match a verified sender address in your provider account.
+> `APP_URL` is embedded in the password reset link — set it to the production domain.
+
+4. Send a test reset email to confirm delivery before going live:
+```bash
+curl -X POST https://atlasmassage.com/api/v1/auth/forgot-password \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"your-test-address@example.com"}'
+```
+
+### Currently implemented email templates
+
+| Template | Trigger | File |
+|----------|---------|------|
+| Password reset | `POST /auth/forgot-password` | `apps/api/src/services/emailService.js` |
+
+Appointment confirmation and reminder emails are planned for Phase 5.
 
 ## Database Backups
 

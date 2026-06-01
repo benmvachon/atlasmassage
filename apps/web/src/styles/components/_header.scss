@@ -46,4 +46,17 @@
     font-size: $font-size-sm;
     padding: $space-2 $space-3;
   }
+
+  &__admin-link,
+  &__schedule-link {
+    font-size: $font-size-sm !important;
+    font-weight: 600 !important;
+    color: $color-primary !important;
+    border: 1px solid $color-primary;
+    border-radius: $border-radius-md;
+    padding: $space-2 $space-4;
+
+    &:hover { background-color: $color-primary; color: $color-white !important; }
+    &.active { background-color: $color-primary; color: $color-white !important; }
+  }
 }

@@ -1,0 +1,522 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Owner layout (sidebar + content) ─────────────────────────────────────────
+
+.layout--owner {
+  .layout__body {
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+  }
+}
+
+.owner-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  padding: $space-6 $space-4;
+  border-right: 1px solid $color-border;
+  min-height: calc(100vh - $header-height);
+  position: sticky;
+  top: $header-height;
+
+  &__heading {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    padding: 0 $space-3;
+    margin-bottom: $space-3;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__link {
+    display: block;
+    padding: $space-2 $space-3;
+    border-radius: $border-radius-md;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text;
+    text-decoration: none;
+    transition: background-color $transition-fast, color $transition-fast;
+
+    &:hover { background-color: $color-bg-alt; color: $color-primary; }
+
+    &--active {
+      background-color: rgba(44, 110, 73, 0.1);
+      color: $color-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Owner hub (dashboard landing) ────────────────────────────────────────────
+
+.owner-hub {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $space-8 $space-6;
+
+  &__header {
+    margin-bottom: $space-8;
+  }
+
+  &__greeting {
+    color: $color-text-muted;
+    font-family: $font-family-ui;
+    margin-top: $space-2;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+
+    @include respond-to(md) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__card {
+    display: block;
+    padding: $space-8;
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-lg;
+    text-decoration: none;
+    color: $color-text;
+    box-shadow: $shadow-sm;
+    transition: box-shadow $transition-fast, border-color $transition-fast;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      border-color: $color-primary-light;
+    }
+
+    @include focus-ring;
+  }
+
+  &__card-title {
+    font-size: $font-size-lg;
+    font-family: $font-family-ui;
+    font-weight: 600;
+    margin-bottom: $space-3;
+    color: $color-primary;
+  }
+
+  &__card-desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-4;
+    line-height: 1.5;
+  }
+
+  &__card-cta {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-primary;
+  }
+}
+
+// ── Owner page (sub-pages) ────────────────────────────────────────────────────
+
+.owner-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: $space-6;
+
+  &__breadcrumb {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-4;
+
+    a {
+      color: $color-primary;
+      text-decoration: none;
+
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    margin-bottom: $space-8;
+  }
+}
+
+.owner-loading,
+.owner-error {
+  padding: $space-8 $space-6;
+  font-family: $font-family-ui;
+  color: $color-text-muted;
+}
+
+.owner-error { color: $color-error; }
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+
+.owner-section {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-6;
+  margin-bottom: $space-6;
+  box-shadow: $shadow-sm;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-4;
+    margin-bottom: $space-6;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-family: $font-family-ui;
+    font-weight: 600;
+    margin-bottom: $space-1;
+  }
+
+  &__meta {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}
+
+// ── Tables ────────────────────────────────────────────────────────────────────
+
+.owner-table-wrapper {
+  overflow-x: auto;
+}
+
+.owner-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+
+  th {
+    text-align: left;
+    padding: $space-3 $space-4;
+    border-bottom: 2px solid $color-border;
+    font-weight: 600;
+    color: $color-text-muted;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $space-3 $space-4;
+    border-bottom: 1px solid $color-bg-alt;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  &__actions {
+    text-align: right;
+    white-space: nowrap;
+
+    .btn + .btn { margin-left: $space-2; }
+  }
+}
+
+.owner-row--inactive td {
+  opacity: 0.55;
+}
+
+.hours-row--closed td:not(:first-child):not(:last-child) {
+  color: $color-text-muted;
+}
+
+// ── Form controls ─────────────────────────────────────────────────────────────
+
+.owner-input {
+  padding: $space-2 $space-3;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  background: $color-white;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba(44, 110, 73, 0.15);
+  }
+
+  &--narrow { width: 80px; }
+
+  &--secondary {
+    margin-top: $space-2;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+
+  &:disabled {
+    background: $color-bg-alt;
+    color: $color-text-muted;
+  }
+}
+
+.owner-textarea {
+  @extend .owner-input;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.owner-label {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  font-weight: 500;
+}
+
+.owner-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  cursor: pointer;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: $color-primary;
+    cursor: pointer;
+  }
+
+  &__label { color: $color-text; }
+}
+
+// ── Add / edit panels ─────────────────────────────────────────────────────────
+
+.owner-add-row {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4;
+  background: $color-bg-alt;
+  border-radius: $border-radius-md;
+  margin-bottom: $space-4;
+}
+
+.owner-add-panel {
+  background: $color-bg-alt;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+  margin-bottom: $space-6;
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    margin-bottom: $space-4;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+
+    &--two-col {
+      @include respond-to(md) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-top: $space-2;
+  }
+}
+
+.owner-edit-panel {
+  background: $color-accent;
+  border: 1px solid $color-secondary;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+  margin-bottom: $space-6;
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    margin-bottom: $space-4;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    margin-top: $space-2;
+  }
+}
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+
+.owner-badge {
+  display: inline-block;
+  padding: $space-1 $space-3;
+  border-radius: $border-radius-full;
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  font-weight: 600;
+
+  &--active {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  &--inactive {
+    background: $color-bg-alt;
+    color: $color-text-muted;
+  }
+
+  &--self {
+    background: #dbeafe;
+    color: #1d4ed8;
+    margin-left: $space-2;
+  }
+}
+
+// ── Specialty tags ────────────────────────────────────────────────────────────
+
+.specialty-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: $color-accent;
+  border: 1px solid $color-secondary;
+  border-radius: $border-radius-full;
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text;
+  margin: 2px;
+
+  &--sm { font-size: 11px; padding: 2px 8px; }
+
+  &__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-muted;
+    font-size: $font-size-md;
+    line-height: 1;
+    padding: 0;
+
+    &:hover { color: $color-error; }
+  }
+}
+
+.specialty-input {
+  &__tags { display: flex; flex-wrap: wrap; gap: $space-1; margin-bottom: $space-2; min-height: 28px; }
+  &__row { display: flex; gap: $space-2; }
+}
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
+.owner-empty {
+  text-align: center;
+  padding: $space-8;
+  color: $color-text-muted;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+}
+
+.owner-inline-error {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-left: $space-2;
+}
+
+.owner-form-error {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-error;
+  background: $color-error-bg;
+  padding: $space-3 $space-4;
+  border-radius: $border-radius-sm;
+}
+
+.owner-muted {
+  color: $color-text-muted;
+  font-style: italic;
+}
+
+.owner-service-name {
+  display: block;
+  font-weight: 500;
+}
+
+.owner-service-desc {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-top: 2px;
+}
+
+.owner-unit,
+.owner-currency {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-left: $space-1;
+}
+
+.therapist-name {
+  font-weight: 500;
+}
+
+.btn--sm {
+  padding: $space-2 $space-4;
+  font-size: $font-size-xs;
+}
+
+.btn--danger {
+  background-color: $color-error;
+  color: $color-white;
+  border-color: $color-error;
+
+  &:hover:not(:disabled) {
+    background-color: darken($color-error, 8%);
+    border-color: darken($color-error, 8%);
+  }
+}
