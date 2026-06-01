@@ -12,7 +12,7 @@ function createTransport() {
   });
 }
 
-async function send({ to, subject, html }) {
+export async function send({ to, subject, html }) {
   const transport = createTransport();
   if (!transport) {
     // No SMTP configured — log the email so developers can see reset links locally

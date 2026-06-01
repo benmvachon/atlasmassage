@@ -6,14 +6,15 @@ import { paymentService } from '../services/paymentService.js';
 import { membershipService } from '../services/membershipService.js';
 import { getStripePromise, stripePublishableKey } from '../services/stripe.js';
 import MembershipModal from '../components/MembershipModal.jsx';
+import NotificationPrefsSection from '../components/NotificationPrefsSection.jsx';
 
-const SECTIONS = ['profile', 'security', 'membership', 'payment'];
-const SECTION_LABELS = {
-  profile: 'Profile',
-  security: 'Security',
-  membership: 'Membership',
-  payment: 'Payment Methods',
-};
+const ALL_SECTIONS = [
+  { key: 'profile',       label: 'Profile',          clientOnly: false },
+  { key: 'security',      label: 'Security',          clientOnly: false },
+  { key: 'notifications', label: 'Notifications',     clientOnly: false },
+  { key: 'membership',    label: 'Membership',        clientOnly: true  },
+  { key: 'payment',       label: 'Payment Methods',   clientOnly: true  },
+];
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
@@ -489,18 +490,21 @@ export default function SettingsPage() {
   const { user, refreshUser } = useAuth();
   const [section, setSection] = useState('profile');
 
+  const isClient = user?.roles?.includes('client');
+  const sections = ALL_SECTIONS.filter(s => !s.clientOnly || isClient);
+
   return (
     <div className="settings-page">
       <nav className="settings-nav">
         <p className="settings-nav__heading">Account</p>
         <ul className="settings-nav__list">
-          {SECTIONS.map(s => (
-            <li key={s}>
+          {sections.map(s => (
+            <li key={s.key}>
               <button
-                className={`settings-nav__link${section === s ? ' settings-nav__link--active' : ''}`}
-                onClick={() => setSection(s)}
+                className={`settings-nav__link${section === s.key ? ' settings-nav__link--active' : ''}`}
+                onClick={() => setSection(s.key)}
               >
-                {SECTION_LABELS[s]}
+                {s.label}
               </button>
             </li>
           ))}
@@ -512,6 +516,12 @@ export default function SettingsPage() {
           <ProfileSection user={user} onSaved={refreshUser} />
         )}
         {section === 'security' && <SecuritySection />}
+        {section === 'notifications' && (
+          <section className="settings-section">
+            <h2 className="settings-section__title">Notifications</h2>
+            <NotificationPrefsSection />
+          </section>
+        )}
         {section === 'membership' && <MembershipSection />}
         {section === 'payment' && <PaymentMethodsSection />}
       </div>

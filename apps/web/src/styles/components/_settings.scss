@@ -476,6 +476,118 @@
   }
 }
 
+// ── Notification preferences ──────────────────────────────────────────────────
+
+.notif-prefs {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.notif-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  &__heading {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    margin: 0;
+  }
+
+  &__notice {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    background: $color-bg-alt;
+    border-radius: $border-radius-sm;
+    padding: $space-2 $space-3;
+    margin: 0;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    &--muted { opacity: 0.5; pointer-events: none; }
+  }
+}
+
+.notif-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-white;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+
+  &:hover { border-color: $color-primary-light; }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text;
+  }
+
+  &__desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+
+  // Custom toggle switch
+  &__switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    background: $color-border;
+    border-radius: $border-radius-full;
+    transition: background-color $transition-fast;
+
+    &--on { background: $color-primary; }
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: $color-white;
+    border-radius: $border-radius-full;
+    transition: transform $transition-fast;
+    box-shadow: $shadow-sm;
+
+    .notif-toggle__switch--on & {
+      transform: translateX(18px);
+    }
+  }
+}
+
 .membership-modal__error {
   font-family: $font-family-ui;
   font-size: $font-size-sm;

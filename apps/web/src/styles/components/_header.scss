@@ -47,6 +47,14 @@
     padding: $space-2 $space-3;
   }
 
+  &__settings-link {
+    font-size: $font-size-sm !important;
+    color: $color-text-muted !important;
+
+    &:hover { color: $color-primary !important; }
+    &.active { color: $color-primary !important; }
+  }
+
   &__admin-link,
   &__schedule-link {
     font-size: $font-size-sm !important;

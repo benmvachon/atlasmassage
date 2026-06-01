@@ -2,9 +2,11 @@ import { getPool } from '../database/pool.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { AvailabilityRepository } from '../repositories/availabilityRepository.js';
 import { PaymentService } from '../services/paymentService.js';
+import { NotificationService } from '../services/notificationService.js';
 import { generateSlots } from '../services/slotService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { config } from '../config/index.js';
+import { logger } from '../logging/logger.js';
 
 const SLOT_DURATION = 60;
 
@@ -82,6 +84,11 @@ export async function createAppointment(req, res, next) {
         clientSecret = result.clientSecret;
       }
     }
+
+    // Fire booking confirmation — don't let notification failures break the booking response
+    new NotificationService(getPool()).sendBookingConfirmation(appointment.id).catch(err => {
+      logger.error('notification_error', { appointmentId: appointment.id, message: err.message });
+    });
 
     res.status(201).json({ success: true, data: { appointment, clientSecret } });
   } catch (err) {

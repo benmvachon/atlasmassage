@@ -28,6 +28,14 @@ export default function Header() {
               Admin
             </NavLink>
           )}
+          {user && (
+            <NavLink
+              to={isTherapist && !isOwner ? '/therapist/settings' : '/settings'}
+              className="header__settings-link"
+            >
+              Settings
+            </NavLink>
+          )}
           {user ? (
             <button className="btn btn--ghost header__signout" onClick={logout}>
               Sign out

@@ -2,13 +2,17 @@ import app from './app.js';
 import { config } from './config/index.js';
 import { logger } from './logging/logger.js';
 import { closePool } from './database/pool.js';
+import { startReminderWorker } from './workers/reminderWorker.js';
 
 const server = app.listen(config.port, () => {
   logger.info('server_started', { port: config.port, env: config.env });
 });
 
+const reminderInterval = startReminderWorker();
+
 async function shutdown(signal) {
   logger.info('shutdown_signal', { signal });
+  clearInterval(reminderInterval);
   server.close(async () => {
     await closePool();
     logger.info('server_stopped');
