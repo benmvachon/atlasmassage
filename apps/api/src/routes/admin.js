@@ -16,11 +16,18 @@ const router = Router();
 
 router.use(authenticate, authorize('owner'));
 
-// ── Unimplemented stubs ───────────────────────────────────────────────────────
+// ── Dashboard ─────────────────────────────────────────────────────────────────
 router.get('/dashboard', adminController.getDashboard);
-router.get('/users', adminController.listUsers);
+
+// ── Appointments (calendar) ───────────────────────────────────────────────────
 router.get('/appointments', adminController.listAppointments);
+router.patch('/appointments/:id/status', adminController.updateAppointmentStatus);
+
+// ── Revenue ───────────────────────────────────────────────────────────────────
 router.get('/revenue', adminController.getRevenue);
+
+// ── Remaining stubs ───────────────────────────────────────────────────────────
+router.get('/users', adminController.listUsers);
 router.put('/settings', adminController.updateSettings);
 router.get('/audit-logs', adminController.getAuditLogs);
 

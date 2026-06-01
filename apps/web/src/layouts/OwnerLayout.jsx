@@ -3,6 +3,8 @@ import Header from '../components/Header.jsx';
 
 const NAV_ITEMS = [
   { to: '/owner/dashboard', label: 'Overview', end: true },
+  { to: '/owner/appointments', label: 'Calendar' },
+  { to: '/owner/revenue', label: 'Revenue' },
   { to: '/owner/business', label: 'Business Details' },
   { to: '/owner/therapists', label: 'Therapists' },
 ];

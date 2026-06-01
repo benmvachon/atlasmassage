@@ -520,3 +520,668 @@
     border-color: darken($color-error, 8%);
   }
 }
+
+// ── Dashboard hub enhancements ────────────────────────────────────────────────
+
+.owner-hub__grid--3 {
+  @include respond-to(lg) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.dash-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-8;
+}
+
+.dash-stat-link {
+  text-decoration: none;
+  color: inherit;
+  flex: 1 1 160px;
+
+  .dash-stat {
+    border: 1px solid $color-border;
+    border-radius: $border-radius-lg;
+    background: $color-white;
+    box-shadow: $shadow-sm;
+    transition: box-shadow $transition-fast, border-color $transition-fast;
+  }
+
+  &:hover .dash-stat {
+    box-shadow: $shadow-md;
+    border-color: $color-primary-light;
+  }
+}
+
+.dash-stat {
+  flex: 1 1 160px;
+  padding: $space-6;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  background: $color-white;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+
+  &__value {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    font-family: $font-family-ui;
+    color: $color-primary;
+    line-height: 1.1;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    font-family: $font-family-ui;
+    color: $color-text;
+  }
+
+  &__sub {
+    font-size: $font-size-xs;
+    font-family: $font-family-ui;
+    color: $color-text-muted;
+  }
+}
+
+// ── Owner page wide variant ───────────────────────────────────────────────────
+
+.owner-page--wide {
+  max-width: 1200px;
+}
+
+// ── Calendar toolbar ──────────────────────────────────────────────────────────
+
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-4;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text;
+  }
+}
+
+.cal-nav {
+  font-size: $font-size-xl;
+  line-height: 1;
+  padding: $space-1 $space-3;
+}
+
+.cal-filter {
+  width: auto;
+  min-width: 160px;
+}
+
+.cal-view-toggle {
+  display: flex;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+}
+
+.cal-view-btn {
+  padding: $space-2 $space-4;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  background: $color-white;
+  border: none;
+  border-right: 1px solid $color-border;
+  cursor: pointer;
+  color: $color-text-muted;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:last-child { border-right: none; }
+
+  &:hover { background: $color-bg-alt; color: $color-text; }
+
+  &--active {
+    background: $color-primary;
+    color: $color-white;
+
+    &:hover { background: $color-primary-dark; color: $color-white; }
+  }
+}
+
+// ── Appointment status badges ─────────────────────────────────────────────────
+
+.cal-status {
+  display: inline-block;
+  padding: 2px $space-2;
+  border-radius: $border-radius-full;
+  font-family: $font-family-ui;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &--pending   { background: #fef9c3; color: #854d0e; }
+  &--confirmed { background: #dcfce7; color: #15803d; }
+  &--cancelled { background: #fee2e2; color: #991b1b; }
+  &--completed { background: #dbeafe; color: #1e40af; }
+  &--no_show   { background: $color-bg-alt; color: $color-text-muted; }
+}
+
+// ── Week view ─────────────────────────────────────────────────────────────────
+
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: $color-border;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+
+  &__day {
+    background: $color-white;
+    min-height: 480px;
+
+    &--today { background: $color-accent; }
+  }
+
+  &__day-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $space-3 $space-2;
+    border-bottom: 1px solid $color-border;
+    background: $color-bg-alt;
+    gap: $space-1;
+  }
+
+  &__day-name {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    letter-spacing: 0.05em;
+  }
+
+  &__day-num {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    &--today {
+      background: $color-primary;
+      color: $color-white;
+    }
+  }
+
+  &__day-appts {
+    padding: $space-2;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__empty {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-align: center;
+    padding: $space-4 $space-2;
+  }
+}
+
+// ── Month view ────────────────────────────────────────────────────────────────
+
+.cal-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: $color-border;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+
+  &__head {
+    background: $color-bg-alt;
+    text-align: center;
+    padding: $space-2;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-muted;
+  }
+
+  &__cell {
+    background: $color-white;
+    min-height: 100px;
+    padding: $space-2;
+    vertical-align: top;
+
+    &--empty { background: $color-bg-alt; opacity: 0.4; }
+    &--today { background: $color-accent; }
+  }
+
+  &__day-num {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text-muted;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-bottom: $space-1;
+
+    &--today {
+      background: $color-primary;
+      color: $color-white;
+      font-weight: 700;
+    }
+  }
+
+  &__appt {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    width: 100%;
+    padding: 2px $space-2;
+    border-radius: $border-radius-sm;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: $font-family-ui;
+    font-size: 11px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background: rgba(44, 110, 73, 0.08);
+    color: $color-text;
+    transition: background-color $transition-fast;
+
+    &:hover { background: rgba(44, 110, 73, 0.18); }
+  }
+
+  &__appt-time {
+    font-weight: 600;
+    flex-shrink: 0;
+    color: $color-primary;
+  }
+
+  &__appt-name { overflow: hidden; text-overflow: ellipsis; }
+
+  &__more {
+    font-family: $font-family-ui;
+    font-size: 11px;
+    color: $color-text-muted;
+    display: block;
+    padding: 0 $space-1;
+  }
+}
+
+// ── Appointment card (week/list) ──────────────────────────────────────────────
+
+.cal-appt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-sm;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-family-ui;
+  background: rgba(44, 110, 73, 0.06);
+  transition: background-color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background: rgba(44, 110, 73, 0.12);
+    border-color: $color-primary-light;
+  }
+
+  &--cancelled { opacity: 0.55; }
+  &--no_show   { opacity: 0.55; }
+
+  &__time {
+    font-size: $font-size-xs;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__name {
+    font-size: $font-size-xs;
+    font-weight: 600;
+    color: $color-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__service {
+    font-size: 11px;
+    color: $color-text-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ── List view ─────────────────────────────────────────────────────────────────
+
+.cal-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+
+  &__group {}
+
+  &__date {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-muted;
+    margin-bottom: $space-3;
+    padding-bottom: $space-2;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__appt {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    width: 100%;
+    padding: $space-4;
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: $space-2;
+    transition: box-shadow $transition-fast, border-color $transition-fast;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      border-color: $color-primary-light;
+    }
+  }
+
+  &__time {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $color-primary;
+    flex-shrink: 0;
+    width: 72px;
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__client {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &__meta {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}
+
+// ── Appointment detail drawer/overlay ─────────────────────────────────────────
+
+.cal-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.cal-detail {
+  background: $color-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  width: 100%;
+  max-width: 480px;
+  padding: $space-6;
+  position: relative;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: $space-6;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-text;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: $font-size-lg;
+    cursor: pointer;
+    color: $color-text-muted;
+    line-height: 1;
+    padding: 0 $space-1;
+
+    &:hover { color: $color-text; }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: $space-2 $space-4;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    margin-bottom: $space-6;
+
+    dt {
+      font-weight: 600;
+      color: $color-text-muted;
+      white-space: nowrap;
+    }
+
+    dd {
+      color: $color-text;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    border-top: 1px solid $color-border;
+    padding-top: $space-4;
+  }
+
+  &__actions-label {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-muted;
+    margin-bottom: $space-3;
+  }
+
+  &__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__status-btn {
+    &--confirmed { background: #dcfce7; color: #15803d; border-color: #86efac; }
+    &--cancelled { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    &--completed { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+    &--no_show   { background: $color-bg-alt; color: $color-text-muted; border-color: $color-border; }
+
+    &:hover:not(:disabled) { opacity: 0.85; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+// ── Revenue dashboard ─────────────────────────────────────────────────────────
+
+.rev-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-8;
+}
+
+.rev-range-toggle {
+  display: flex;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+}
+
+.rev-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-8;
+}
+
+.rev-stat {
+  flex: 1 1 160px;
+  padding: $space-6;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  background: $color-white;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+
+  &__value {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    font-family: $font-family-ui;
+    color: $color-primary;
+    line-height: 1.1;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    font-family: $font-family-ui;
+    color: $color-text;
+  }
+
+  &__sub {
+    font-size: $font-size-xs;
+    font-family: $font-family-ui;
+    color: $color-text-muted;
+  }
+}
+
+.rev-two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+
+  @include respond-to(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.rev-tooltip {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-3 $space-4;
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  box-shadow: $shadow-md;
+
+  &__label {
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: $space-1;
+  }
+}
+
+.rev-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: $space-2;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+// ── btn--ghost variant ────────────────────────────────────────────────────────
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: $color-text;
+
+  &:hover:not(:disabled) {
+    background: $color-bg-alt;
+    border-color: $color-border;
+  }
+}
+
+.btn--outline {
+  background: $color-white;
+  border-color: $color-border;
+  color: $color-text;
+
+  &:hover:not(:disabled) {
+    background: $color-bg-alt;
+    border-color: $color-primary-light;
+    color: $color-primary;
+  }
+}

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { getPool } from '../database/pool.js';
+import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { BusinessRepository } from '../repositories/businessRepository.js';
 import { TherapistRepository } from '../repositories/therapistRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
@@ -10,6 +11,7 @@ const BCRYPT_ROUNDS = 12;
 function repos() {
   const pool = getPool();
   return {
+    appointment: new AppointmentRepository(pool),
     business: new BusinessRepository(pool),
     therapist: new TherapistRepository(pool),
     user: new UserRepository(pool),
@@ -192,13 +194,65 @@ export async function deactivateTherapist(req, res, next) {
   }
 }
 
-// ── Unimplemented stubs ───────────────────────────────────────────────────────
+// ── Dashboard summary ─────────────────────────────────────────────────────────
+
+export async function getDashboard(req, res, next) {
+  try {
+    const stats = await repos().appointment.getDashboardStats();
+    res.json({ success: true, data: stats });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Appointments (calendar) ───────────────────────────────────────────────────
+
+export async function listAppointments(req, res, next) {
+  try {
+    const { start, end, therapistId } = req.query;
+    if (!start || !end) {
+      throw new AppError('start and end query params are required', 400, 'BAD_REQUEST');
+    }
+    const data = await repos().appointment.listForOwner({ start, end, therapistId });
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateAppointmentStatus(req, res, next) {
+  try {
+    const VALID = ['pending', 'confirmed', 'cancelled', 'completed', 'no_show'];
+    const { status } = req.body;
+    if (!VALID.includes(status)) {
+      throw new AppError(`status must be one of: ${VALID.join(', ')}`, 400, 'BAD_REQUEST');
+    }
+    const appt = await repos().appointment.updateStatus(req.params.id, status);
+    if (!appt) throw new AppError('Appointment not found', 404, 'NOT_FOUND');
+    res.json({ success: true, data: appt });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Revenue ───────────────────────────────────────────────────────────────────
+
+export async function getRevenue(req, res, next) {
+  try {
+    const end = req.query.end || new Date().toISOString().slice(0, 10);
+    const defaultStart = new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+    const start = req.query.start || defaultStart;
+    const data = await repos().appointment.getRevenueStats({ start, end });
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Remaining stubs ───────────────────────────────────────────────────────────
 
 const stub = (_req, _res, next) => next(new AppError('Not implemented', 501, 'NOT_IMPLEMENTED'));
 
-export const getDashboard = stub;
 export const listUsers = stub;
-export const listAppointments = stub;
-export const getRevenue = stub;
 export const updateSettings = stub;
 export const getAuditLogs = stub;

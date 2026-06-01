@@ -21,6 +21,8 @@ import TherapistSettingsPage from '../pages/therapist/TherapistSettingsPage.jsx'
 import OwnerDashboardPage from '../pages/owner/OwnerDashboardPage.jsx';
 import BusinessDetailsPage from '../pages/owner/BusinessDetailsPage.jsx';
 import TherapistManagementPage from '../pages/owner/TherapistManagementPage.jsx';
+import AppointmentsCalendarPage from '../pages/owner/AppointmentsCalendarPage.jsx';
+import RevenueDashboardPage from '../pages/owner/RevenueDashboardPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
 
 export default function AppRoutes() {
@@ -49,6 +51,8 @@ export default function AppRoutes() {
 
       <Route element={<OwnerRoute><OwnerLayout /></OwnerRoute>}>
         <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+        <Route path="/owner/appointments" element={<AppointmentsCalendarPage />} />
+        <Route path="/owner/revenue" element={<RevenueDashboardPage />} />
         <Route path="/owner/business" element={<BusinessDetailsPage />} />
         <Route path="/owner/therapists" element={<TherapistManagementPage />} />
       </Route>

@@ -1,6 +1,9 @@
 import { api } from './api.js';
 
 export const adminService = {
+  // Dashboard summary
+  getDashboard: () => api.get('/admin/dashboard'),
+
   // Business overview
   getBusinessDetails: () => api.get('/admin/business'),
   updateBusinessHours: (dayOfWeek, data) => api.put(`/admin/business/hours/${dayOfWeek}`, data),
@@ -22,4 +25,21 @@ export const adminService = {
   createTherapist: (data) => api.post('/admin/therapists', data),
   updateTherapist: (id, data) => api.put(`/admin/therapists/${id}`, data),
   deactivateTherapist: (id) => api.delete(`/admin/therapists/${id}`),
+
+  // Appointments (calendar)
+  listAppointments: (start, end, therapistId) => {
+    const params = new URLSearchParams({ start, end });
+    if (therapistId) params.set('therapistId', therapistId);
+    return api.get(`/admin/appointments?${params}`);
+  },
+  updateAppointmentStatus: (id, status) =>
+    api.patch(`/admin/appointments/${id}/status`, { status }),
+
+  // Revenue
+  getRevenue: (start, end) => {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    return api.get(`/admin/revenue?${params}`);
+  },
 };
