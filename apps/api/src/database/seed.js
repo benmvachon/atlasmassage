@@ -22,32 +22,28 @@ const MEMBERSHIP_PLANS = [
   {
     name: 'Essentials',
     description: 'One 60-minute massage per month. Perfect for maintaining wellness.',
-    priceMonthlyCents: 7900,
+    priceMonthlyCents: 10000,
     creditsPerMonth: 1,
-    stripePriceId: 'price_1TdbGCQec936INktczEfSHnr',
+    stripePriceId: 'price_1TdbGCQec936INktczEfSHnr', // this will likely require modification when prices are updated
   },
   {
     name: 'Wellness',
     description: 'Two 60-minute massages per month. Our most popular plan.',
-    priceMonthlyCents: 13900,
+    priceMonthlyCents: 18000,
     creditsPerMonth: 2,
-    stripePriceId: 'price_1TdbGCQec936INktHP8B88JA',
+    stripePriceId: 'price_1TdbGCQec936INktHP8B88JA', // this will likely require modification when prices are updated
   },
   {
     name: 'Unlimited',
     description: 'Four 60-minute massages per month. Maximum recovery and relaxation.',
-    priceMonthlyCents: 24900,
+    priceMonthlyCents: 32000,
     creditsPerMonth: 4,
-    stripePriceId: 'price_1TdbGCQec936INktwkkXuy8M',
+    stripePriceId: 'price_1TdbGCQec936INktwkkXuy8M', // this will likely require modification when prices are updated
   },
 ];
 
 const SERVICES = [
-  { name: 'Swedish Massage', description: 'A gentle, relaxing full-body massage using long, flowing strokes.', durationMinutes: 60, priceCents: 9000 },
-  { name: 'Deep Tissue Massage', description: 'Targets deep muscle layers to relieve chronic tension and pain.', durationMinutes: 60, priceCents: 10500 },
-  { name: 'Sports Massage', description: 'Designed for athletes to improve performance and speed recovery.', durationMinutes: 60, priceCents: 10500 },
-  { name: 'Hot Stone Massage', description: 'Warm stones are used to ease muscle stiffness and improve circulation.', durationMinutes: 90, priceCents: 12500 },
-  { name: 'Prenatal Massage', description: 'Gentle massage tailored for expectant mothers to reduce discomfort.', durationMinutes: 60, priceCents: 9500 },
+  { name: 'Massage', description: 'A comprehensive massage inclusive of all services offered by the therapist and individualized to your needs.', durationMinutes: 60, priceCents: 15000 },
 ];
 
 const MASSAGE_BEDS = [

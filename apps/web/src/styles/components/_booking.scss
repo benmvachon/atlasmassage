@@ -11,12 +11,14 @@
   &__header { margin-bottom: $space-8; }
 
   &__title {
+    font-family: $font-family-logo;
     font-size: $font-size-2xl;
     margin-bottom: $space-2;
+    color: $color-primary-dark;
   }
 
   &__subtitle {
-    font-family: $font-family-ui;
+    font-family: $font-family-base;
     font-size: $font-size-md;
     color: $color-text-muted;
   }
@@ -120,7 +122,7 @@
   align-items: center;
   gap: 2px;
   padding: $space-3 $space-4;
-  min-width: 90px;
+  width: 120px;
   background: $color-white;
   border: 1px solid $color-border;
   border-radius: $border-radius-md;

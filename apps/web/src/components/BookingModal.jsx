@@ -227,14 +227,23 @@ function BookingForm({
   const [step, setStep] = useState('form'); // 'form' | 'waiver' | 'success'
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [stagedPaymentMethodId, setStagedPaymentMethodId] = useState(null);
 
   const selectedService = services.find(s => s.id === serviceId);
   const needsPayment = !!stripePublishableKey;
   const isNewCard = selectedMethodId === 'new';
 
+  const isFormReady = (() => {
+    if (!user) {
+      if (!name.trim()) return false;
+      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+    }
+    if (loadingMethods) return false;
+    if (needsPayment && !selectedMethodId) return false;
+    return true;
+  })();
+
   function validateForm() {
-    if (!therapistId) { setError('Please select a therapist.'); return false; }
-    if (!serviceId) { setError('Please select a service.'); return false; }
     if (!user) {
       if (!name.trim()) { setError('Name is required.'); return false; }
       if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -247,9 +256,27 @@ function BookingForm({
     return true;
   }
 
-  function handleContinue(e) {
+  async function handleContinue(e) {
     e.preventDefault();
     if (!validateForm()) return;
+
+    // Tokenize the new card before transitioning — the CardElement unmounts on
+    // the waiver step, so elements.getElement(CardElement) returns null there.
+    if (needsPayment && isNewCard && stripe) {
+      setSubmitting(true);
+      const cardElement = elements.getElement(CardElement);
+      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+      setSubmitting(false);
+      if (pmError) {
+        setError(pmError.message);
+        return;
+      }
+      setStagedPaymentMethodId(paymentMethod.id);
+    }
+
     setError('');
     setStep('waiver');
   }
@@ -265,7 +292,7 @@ function BookingForm({
 
     try {
       const result = await bookingService.createAppointment({
-        therapistId,
+        therapistId: therapistId || undefined,
         serviceId,
         scheduledAt,
         notes: notes.trim() || undefined,
@@ -279,9 +306,8 @@ function BookingForm({
       if (clientSecret && stripe) {
         let confirmResult;
         if (isNewCard) {
-          const cardElement = elements.getElement(CardElement);
           confirmResult = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: { card: cardElement },
+            payment_method: stagedPaymentMethodId,
           });
         } else if (savedMethod) {
           confirmResult = await stripe.confirmCardPayment(clientSecret, {
@@ -344,27 +370,9 @@ function BookingForm({
         </p>
 
         <form onSubmit={handleContinue} noValidate>
-          {/* Service */}
-          <div className="booking-field">
-            <label className="booking-field__label" htmlFor="bm-service">Service</label>
-            <select
-              id="bm-service"
-              className="booking-field__input"
-              value={serviceId}
-              onChange={e => setServiceId(e.target.value)}
-              disabled={submitting}
-            >
-              {services.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name} — ${(s.priceCents / 100).toFixed(0)}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Therapist */}
           <div className="booking-field">
-            <label className="booking-field__label" htmlFor="bm-therapist">Therapist</label>
+            <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>
             {lockedTherapist ? (
               <p className="booking-field__locked">
                 {lockedTherapist.firstName} {lockedTherapist.lastName}
@@ -377,7 +385,7 @@ function BookingForm({
                 onChange={e => setTherapistId(e.target.value)}
                 disabled={submitting}
               >
-                {therapistOptions.length > 1 && <option value="">Select a therapist…</option>}
+                <option value="">Any therapist</option>
                 {therapistOptions.map(t => (
                   <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>
                 ))}
@@ -499,7 +507,7 @@ function BookingForm({
             <button
               className="btn btn--primary"
               type="submit"
-              disabled={submitting || (needsPayment && !selectedMethodId)}
+              disabled={submitting || !isFormReady}
             >
               Continue to Consent Form →
             </button>
@@ -520,9 +528,7 @@ export default function BookingModal({
 }) {
   const { user } = useAuth();
 
-  const [therapistId, setTherapistId] = useState(
-    lockedTherapist?.id ?? (slot.availableTherapists.length === 1 ? slot.availableTherapists[0].id : '')
-  );
+  const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
   const [serviceId, setServiceId] = useState(services[0]?.id ?? '');
   const [name, setName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
   const [email, setEmail] = useState(user?.email ?? '');

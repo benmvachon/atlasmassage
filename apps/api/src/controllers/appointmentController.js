@@ -42,22 +42,31 @@ export async function createAppointment(req, res, next) {
     const dateStr = apptDate.toISOString().slice(0, 10);
 
     const [availRows, existingAppts] = await Promise.all([
-      availRepo.getForDateRange(dateStr, dateStr, therapistId),
+      availRepo.getForDateRange(dateStr, dateStr, therapistId || null),
       apptRepo.getByDateRange(dateStr, dateStr),
     ]);
 
     const slots = generateSlots(availRows, existingAppts, {});
     const slotTime = `${String(apptDate.getUTCHours()).padStart(2, '0')}:${String(apptDate.getUTCMinutes()).padStart(2, '0')}`;
-    const slotValid = slots.some(
-      s => s.startTime === slotTime && s.availableTherapists.some(t => t.id === therapistId)
-    );
-    if (!slotValid) {
-      throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
+    const matchingSlot = slots.find(s => s.startTime === slotTime);
+
+    let resolvedTherapistId = therapistId;
+    if (!resolvedTherapistId) {
+      if (!matchingSlot || matchingSlot.availableTherapists.length === 0) {
+        throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
+      }
+      const candidates = matchingSlot.availableTherapists;
+      resolvedTherapistId = candidates[Math.floor(Math.random() * candidates.length)].id;
+    } else {
+      const slotValid = matchingSlot?.availableTherapists.some(t => t.id === resolvedTherapistId);
+      if (!slotValid) {
+        throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
+      }
     }
 
     const appointment = await apptRepo.create({
       clientId,
-      therapistId,
+      therapistId: resolvedTherapistId,
       serviceId,
       scheduledAt,
       durationMinutes: SLOT_DURATION,

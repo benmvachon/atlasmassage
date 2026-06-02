@@ -341,7 +341,7 @@
 
   &__actions {
     display: flex;
-    gap: $space-3;
+    justify-content: space-between;
     flex-wrap: wrap;
   }
 }

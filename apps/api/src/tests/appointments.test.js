@@ -122,6 +122,33 @@ describe('POST /api/v1/appointments', () => {
     expect(res.status).toBe(201);
   });
 
+  it('randomly assigns a therapist when therapistId is omitted', async () => {
+    const { therapistId: _omit, ...noTherapistBody } = body;
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(noTherapistBody);
+
+    expect(res.status).toBe(201);
+    expect(mockApptRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ therapistId: THERAPIST_ID })
+    );
+  });
+
+  it('returns 409 when no therapist is available for any-therapist booking', async () => {
+    mockGenerateSlots.mockReturnValue([
+      { startTime: '10:00', endTime: '11:00', availableTherapists: [] },
+    ]);
+    const { therapistId: _omit, ...noTherapistBody } = body;
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(noTherapistBody);
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
+  });
+
   it('returns 400 when appointment is less than 24 hours away', async () => {
     const res = await request(app)
       .post('/api/v1/appointments')

@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 export { validate } from './authValidators.js';
 
 export const createAppointmentRules = [
-  body('therapistId').isUUID().withMessage('therapistId must be a valid UUID'),
+  body('therapistId').optional({ values: 'falsy' }).isUUID().withMessage('therapistId must be a valid UUID'),
   body('serviceId').isUUID().withMessage('serviceId must be a valid UUID'),
   body('scheduledAt').isISO8601().withMessage('scheduledAt must be an ISO 8601 datetime'),
   body('guestName')
