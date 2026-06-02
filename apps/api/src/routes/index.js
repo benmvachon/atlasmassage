@@ -7,6 +7,7 @@ import paymentRoutes from './payments.js';
 import membershipRoutes from './memberships.js';
 import notificationRoutes from './notifications.js';
 import adminRoutes from './admin.js';
+import businessRoutes from './business.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/payments', paymentRoutes);
 router.use('/memberships', membershipRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
+router.use('/business', businessRoutes);
 
 export default router;

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Atlas Massage practice management platform",
+  "description": "Atlas Bodywork practice management platform",
   "workspaces": [
     "apps/*",
     "packages/*"

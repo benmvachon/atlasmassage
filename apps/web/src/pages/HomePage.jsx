@@ -1,10 +1,124 @@
+import { Link } from 'react-router-dom';
+import { useAsync } from '../hooks/useAsync';
+import { businessService } from '../services/businessService';
+
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function formatTime(t) {
+  const [h, m] = t.slice(0, 5).split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return m === 0 ? `${hour} ${period}` : `${hour}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+function sameHours(a, b) {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return a.is_closed === b.is_closed && a.open_time === b.open_time && a.close_time === b.close_time;
+}
+
+function groupHours(rows) {
+  const byDay = Object.fromEntries(rows.map(r => [r.day_of_week, r]));
+  const days = Array.from({ length: 7 }, (_, i) => ({ day: i, name: DAY_NAMES[i], data: byDay[i] ?? null }));
+
+  const groups = [];
+  let i = 0;
+  while (i < 7) {
+    let j = i + 1;
+    while (j < 7 && sameHours(days[i].data, days[j].data)) j++;
+    groups.push({
+      key: days[i].name,
+      label: i === j - 1 ? days[i].name : `${days[i].name} – ${days[j - 1].name}`,
+      data: days[i].data,
+    });
+    i = j;
+  }
+  return groups;
+}
+
 export default function HomePage() {
+  const { data, loading } = useAsync(() => businessService.getHours());
+  const hours = data?.data ?? [];
+
   return (
-    <div className="page page--home">
+    <>
       <section className="hero">
-        <h1 className="hero__title">Restore. Renew. Relax.</h1>
-        <p className="hero__subtitle">Professional massage therapy tailored to you.</p>
+        <div className="hero__inner">
+          <p className="memberships-hero__eyebrow">Welcome to Atlas</p>
+          <h1 className="hero__title">Therapeutic Bodywork</h1>
+          <p className="hero__subtitle">
+            Whether you&rsquo;re recovering from training, managing chronic pain, or simply
+            carrying the weight of daily life &mdash; our licensed therapists deliver
+            personalized, evidence-informed care to help you move better, feel better,
+            and live well.
+          </p>
+          <Link to="/booking" className="btn btn--primary hero__cta">Book Now</Link>
+        </div>
       </section>
-    </div>
+
+      <div className="page">
+        <section className="location-section">
+          <div className="location-section__map">
+            <iframe
+              title="Atlas Bodywork location"
+              src="https://maps.google.com/maps?q=Boston%2C+Massachusetts&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="420"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+
+          <div className="location-section__details">
+            <div className="biz-info">
+              <h2 className="biz-info__heading">Hours</h2>
+              {loading ? (
+                <p className="biz-info__muted">Loading hours&hellip;</p>
+              ) : hours.length === 0 ? (
+                <p className="biz-info__muted">Please call or email us for current hours.</p>
+              ) : (
+                <ul className="biz-hours">
+                  {groupHours(hours).map(({ key, label, data }) => (
+                    <li key={key} className="biz-hours__row">
+                      <span className="biz-hours__days">{label}</span>
+                      <span className="biz-hours__time">
+                        {!data || data.is_closed
+                          ? 'Closed'
+                          : `${formatTime(data.open_time)} – ${formatTime(data.close_time)}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="biz-info">
+              <h2 className="biz-info__heading">Contact</h2>
+              <ul className="biz-contact">
+                <li className="biz-contact__item">
+                  <span className="biz-contact__label">Address</span>
+                  <span>
+                    123 Boylston Street<br />
+                    Boston, MA 02116
+                  </span>
+                </li>
+                <li className="biz-contact__item">
+                  <span className="biz-contact__label">Phone</span>
+                  <a href="tel:+16175550100" className="biz-contact__link">(617) 555-0100</a>
+                </li>
+                <li className="biz-contact__item">
+                  <span className="biz-contact__label">Email</span>
+                  <a href="mailto:hello@atlasmassage.com" className="biz-contact__link">
+                    hello@atlasmassage.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

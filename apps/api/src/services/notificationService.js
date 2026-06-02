@@ -23,12 +23,12 @@ function baseLayout(title, body) {
 <html><head><meta charset="utf-8"></head>
 <body style="font-family:system-ui,-apple-system,sans-serif;color:#1a1a2e;max-width:560px;margin:0 auto;padding:40px 24px">
   <div style="text-align:center;margin-bottom:32px">
-    <span style="font-size:22px;font-weight:700;color:#2c6e49">Atlas Massage</span>
+    <span style="font-size:22px;font-weight:700;color:#2c6e49">Atlas Bodywork</span>
   </div>
   <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">${title}</h2>
   ${body}
   <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0">
-  <p style="color:#9ca3af;font-size:12px;text-align:center">Atlas Massage &mdash; We&rsquo;ll see you soon!</p>
+  <p style="color:#9ca3af;font-size:12px;text-align:center">Atlas Bodywork &mdash; We&rsquo;ll see you soon!</p>
 </body></html>`;
 }
 
@@ -53,7 +53,7 @@ function clientConfirmHtml(name, appt, manageUrl = null) {
        </p>`;
   return baseLayout('Booking Confirmed ✓', `
     <p style="margin-bottom:16px">Hi ${name},</p>
-    <p style="margin-bottom:24px">Your appointment at Atlas Massage is confirmed.</p>
+    <p style="margin-bottom:24px">Your appointment at Atlas Bodywork is confirmed.</p>
     ${apptCard(appt)}
     ${manageSection}`);
 }
@@ -82,14 +82,14 @@ function feedbackRequestHtml(name, appt) {
     <p style="margin-bottom:24px">We hope you enjoyed your ${appt.service_name} yesterday. Your feedback helps us continue to improve — we&rsquo;d love to hear how it went.</p>
     ${apptCard(appt)}
     <p style="color:#6b7280;font-size:14px">
-      Feel free to reply to this email with any thoughts or suggestions. Thank you for choosing Atlas Massage!
+      Feel free to reply to this email with any thoughts or suggestions. Thank you for choosing Atlas Bodywork!
     </p>`);
 }
 
 function weekFollowupHtml(name, bookingUrl) {
   return baseLayout('Time for another session?', `
     <p style="margin-bottom:16px">Hi ${name},</p>
-    <p style="margin-bottom:24px">It&rsquo;s been a week since your last visit at Atlas Massage. Regular massage therapy delivers the best results &mdash; we&rsquo;d love to have you back!</p>
+    <p style="margin-bottom:24px">It&rsquo;s been a week since your last visit at Atlas Bodywork. Regular massage therapy delivers the best results &mdash; we&rsquo;d love to have you back!</p>
     <div style="text-align:center;margin-bottom:24px">
       <a href="${bookingUrl}" style="background:#2c6e49;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">
         Book Your Next Session
@@ -101,7 +101,7 @@ function weekFollowupHtml(name, bookingUrl) {
 function monthFollowupHtml(name, bookingUrl) {
   return baseLayout("It's been a month — you deserve it", `
     <p style="margin-bottom:16px">Hi ${name},</p>
-    <p style="margin-bottom:24px">A month has passed since your last appointment at Atlas Massage. Take a moment for yourself &mdash; you&rsquo;ve earned it.</p>
+    <p style="margin-bottom:24px">A month has passed since your last appointment at Atlas Bodywork. Take a moment for yourself &mdash; you&rsquo;ve earned it.</p>
     <div style="text-align:center;margin-bottom:24px">
       <a href="${bookingUrl}" style="background:#2c6e49;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">
         Schedule Your Next Visit
@@ -121,11 +121,11 @@ function therapistReminderHtml(therapistName, clientName, appt) {
 // ── SMS templates ──────────────────────────────────────────────────────────────
 
 function confirmSms(name, appt) {
-  return `Atlas Massage: Hi ${name}, your ${appt.service_name} is confirmed for ${fmtDate(appt.scheduled_at)} at ${fmtTime(appt.scheduled_at)} with ${appt.therapist_first_name} ${appt.therapist_last_name}.`;
+  return `Atlas Bodywork: Hi ${name}, your ${appt.service_name} is confirmed for ${fmtDate(appt.scheduled_at)} at ${fmtTime(appt.scheduled_at)} with ${appt.therapist_first_name} ${appt.therapist_last_name}.`;
 }
 
 function reminderSms(name, appt) {
-  return `Atlas Massage reminder: Hi ${name}, you have a ${appt.service_name} tomorrow at ${fmtTime(appt.scheduled_at)} with ${appt.therapist_first_name} ${appt.therapist_last_name}.`;
+  return `Atlas Bodywork reminder: Hi ${name}, you have a ${appt.service_name} tomorrow at ${fmtTime(appt.scheduled_at)} with ${appt.therapist_first_name} ${appt.therapist_last_name}.`;
 }
 
 // ── Service ────────────────────────────────────────────────────────────────────
@@ -156,7 +156,7 @@ export class NotificationService {
         await this._email({
           userId: appt.client_id,
           to: clientEmail,
-          subject: 'Your Atlas Massage appointment is confirmed',
+          subject: 'Your Atlas Bodywork appointment is confirmed',
           html: clientConfirmHtml(clientName, appt, manageUrl),
         });
       }
@@ -218,7 +218,7 @@ export class NotificationService {
         await this._email({
           userId: appt.client_id,
           to: clientEmail,
-          subject: 'Appointment reminder — Atlas Massage',
+          subject: 'Appointment reminder — Atlas Bodywork',
           html: reminderHtml(clientName, appt),
         });
       }
@@ -277,7 +277,7 @@ export class NotificationService {
           await this._email({
             userId: appt.client_id,
             to: clientEmail,
-            subject: 'How was your Atlas Massage visit?',
+            subject: 'How was your Atlas Bodywork visit?',
             html: feedbackRequestHtml(clientName, appt),
           });
         }
@@ -330,8 +330,8 @@ export class NotificationService {
       userId: appt.client_id,
       to: clientEmail,
       subject: period === 'week'
-        ? 'Time for another session at Atlas Massage?'
-        : "It's been a month — book your next Atlas Massage visit",
+        ? 'Time for another session at Atlas Bodywork?'
+        : "It's been a month — book your next Atlas Bodywork visit",
       html: period === 'week'
         ? weekFollowupHtml(clientName, bookingUrl)
         : monthFollowupHtml(clientName, bookingUrl),

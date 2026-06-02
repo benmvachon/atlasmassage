@@ -6,7 +6,7 @@
 
 ## Context
 
-Atlas Massage has three user roles — Client, Therapist, and Owner — with distinct permissions across all API endpoints. A user may hold multiple roles (e.g., an owner who also performs massages is both `owner` and `therapist`). We need a simple, auditable authorization model.
+Atlas Bodywork has three user roles — Client, Therapist, and Owner — with distinct permissions across all API endpoints. A user may hold multiple roles (e.g., an owner who also performs massages is both `owner` and `therapist`). We need a simple, auditable authorization model.
 
 ## Decision
 

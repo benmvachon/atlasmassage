@@ -23,24 +23,26 @@ $gradient-radial:       radial-gradient($lilac-ash, $dusty-mauve, $taupe, $taupe
 
 // ── Brand / semantic colors ───────────────────────────────────────────────────
 
-$color-primary:       #af3e4d;
-$color-primary-dark:  #681b25;
-$color-primary-light: #e56c7c;
-$color-secondary:     #dd9955;
-$color-accent:        #fefae0;
+$color-primary:        #af3e4d;
+$color-primary-dark:   #681b25;
+$color-primary-light:  #e56c7c;
+$color-secondary:      #dd9955;
+$color-secondary-dark: #ab6f33;
+$color-secondary-light:#f6b778;
+$color-accent:         #fefae0;
 
-$color-text:          #2e1a1a;
-$color-text-muted:    #806b6b;
-$color-bg:            #fafaf9;
-$color-bg-alt:        #f3f4f6;
-$color-white:         #ffffff;
-$color-border:        #d1d5db;
+$color-text:           #2e1a1a;
+$color-text-muted:     #806b6b;
+$color-bg:             #faf9f9;
+$color-bg-alt:         #f6f5f3;
+$color-white:          #ffffff;
+$color-border:         #d1d5db;
 
-$color-error:         #dc2626;
-$color-error-dark:    #b91c1c;
-$color-error-bg:      #fef2f2;
-$color-success:       #16a34a;
-$color-success-bg:    #f0fdf4;
+$color-error:          #dc2626;
+$color-error-dark:     #b91c1c;
+$color-error-bg:       #fef2f2;
+$color-success:        #16a34a;
+$color-success-bg:     #f0fdf4;
 
 // ── Primary color tints ───────────────────────────────────────────────────────
 // Used for hover states, selection backgrounds, and overlays.

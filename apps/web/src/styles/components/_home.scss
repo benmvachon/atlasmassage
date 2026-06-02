@@ -1,0 +1,175 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+
+.hero {
+  background: $color-primary-dark;
+  color: $color-white;
+  text-align: center;
+  // Bleed to the edges of .layout__content (which has padding: $space-8 $space-4)
+  margin: calc(-1 * $space-8) calc(-1 * $space-4) 0;
+  padding: $space-16 $space-8 $space-12;
+
+  &__inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  &__eyebrow {
+    font-family: $font-family-logo;
+    font-size: $font-size-md;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba($color-white, 0.65);
+    margin-bottom: $space-3;
+  }
+
+  &__title {
+    font-family: $font-family-logo;
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $color-white;
+    margin-bottom: $space-4;
+    line-height: 1.15;
+
+    @include respond-to(md) {
+      font-size: 2.75rem;
+    }
+  }
+
+  &__subtitle {
+    font-family: $font-family-base;
+    font-size: $font-size-lg;
+    color: rgba($color-white, 0.82);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .btn:hover:not(:disabled) {
+    background-color: $color-secondary-light;
+    border-color: $color-secondary-light;
+    color: $color-primary-dark;
+  }
+}
+
+// ── Location & Info ───────────────────────────────────────────────────────────
+
+.location-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-8;
+  padding: $space-12 0;
+  align-items: start;
+
+  @include respond-to(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &__map {
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+    box-shadow: $shadow-lg;
+
+    iframe {
+      display: block;
+      width: 100%;
+      filter: grayscale(100%);
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: $space-8;
+  }
+}
+
+// ── Business info blocks ──────────────────────────────────────────────────────
+
+.biz-info {
+  &__heading {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: $space-4;
+    padding-bottom: $space-3;
+    border-bottom: 2px solid $color-primary;
+  }
+
+  &__muted {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+}
+
+// ── Hours list ────────────────────────────────────────────────────────────────
+
+.biz-hours {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: $space-4;
+    padding: $space-3 0;
+    border-bottom: 1px solid $color-bg-alt;
+    font-size: $font-size-sm;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__days {
+    color: $color-text;
+    font-weight: 500;
+  }
+
+  &__time {
+    color: $color-text-muted;
+    white-space: nowrap;
+  }
+}
+
+// ── Contact list ──────────────────────────────────────────────────────────────
+
+.biz-contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  &__item {
+    display: flex;
+    gap: $space-4;
+    font-size: $font-size-sm;
+    align-items: flex-start;
+  }
+
+  &__label {
+    width: 4.5rem;
+    flex-shrink: 0;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &__link {
+    color: $color-primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

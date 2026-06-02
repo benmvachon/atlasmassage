@@ -62,6 +62,14 @@
           }
         }
 
+        &--outline {
+          color: $color-primary-dark;
+
+          &.active {
+            color: $color-primary-dark;
+          }
+        }
+
         &:hover { text-decoration: none; }
         &.active {
           text-decoration: none;

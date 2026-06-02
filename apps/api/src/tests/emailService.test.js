@@ -67,7 +67,7 @@ describe('emailService.sendPasswordResetEmail', () => {
     expect(mockTransport.sendMail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'user@example.com',
-        subject: 'Reset your Atlas Massage password',
+        subject: 'Reset your Atlas Bodywork password',
         html: expect.stringContaining('tok123'),
       })
     );

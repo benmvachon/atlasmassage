@@ -1,7 +1,7 @@
 {
   "name": "@atlasmassage/web",
   "version": "1.0.0",
-  "description": "Atlas Massage web client",
+  "description": "Atlas Bodywork web client",
   "type": "module",
   "scripts": {
     "dev": "vite",

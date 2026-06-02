@@ -6,7 +6,7 @@
 
 ## Context
 
-Atlas Massage requires reliable storage for relational data: users, appointments, memberships, payments, and audit logs. The data model is highly relational with foreign key constraints and transactional requirements (especially for scheduling conflict prevention). We need ACID guarantees.
+Atlas Bodywork requires reliable storage for relational data: users, appointments, memberships, payments, and audit logs. The data model is highly relational with foreign key constraints and transactional requirements (especially for scheduling conflict prevention). We need ACID guarantees.
 
 ## Decision
 

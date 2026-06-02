@@ -1,10 +1,10 @@
-# Atlas Massage — Architecture Overview
+# Atlas Bodywork — Architecture Overview
 
 > See `docs/adr/` for the Architecture Decision Records that underpin every major decision documented here.
 
 ## System Overview
 
-Atlas Massage is a full-stack practice management platform built as a monorepo. It serves three user roles — Client, Therapist, and Owner — across a React single-page application backed by a Node.js/Express REST API and a PostgreSQL database.
+Atlas Bodywork is a full-stack practice management platform built as a monorepo. It serves three user roles — Client, Therapist, and Owner — across a React single-page application backed by a Node.js/Express REST API and a PostgreSQL database.
 
 ```
 ┌─────────────────────────────────────────────────────────┐

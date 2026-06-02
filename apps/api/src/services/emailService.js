@@ -32,13 +32,13 @@ export async function sendPasswordResetEmail({ to, firstName, token }) {
   const resetUrl = `${config.app.url}/reset-password?token=${token}`;
   await send({
     to,
-    subject: 'Reset your Atlas Massage password',
+    subject: 'Reset your Atlas Bodywork password',
     html: `
       <p>Hi ${firstName},</p>
       <p>Click the link below to reset your password. This link expires in 1 hour.</p>
       <p><a href="${resetUrl}">${resetUrl}</a></p>
       <p>If you didn't request a password reset, you can safely ignore this email.</p>
-      <p>— The Atlas Massage Team</p>
+      <p>— The Atlas Bodywork Team</p>
     `,
   });
 }

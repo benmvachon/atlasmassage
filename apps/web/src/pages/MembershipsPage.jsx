@@ -65,7 +65,7 @@ export default function MembershipsPage() {
       {/* ── Hero ── */}
       <section className="memberships-hero">
         <div className="memberships-hero__inner container">
-          <p className="memberships-hero__eyebrow">Atlas Massage Membership</p>
+          <p className="memberships-hero__eyebrow">Atlas Bodywork Membership</p>
           <h1 className="memberships-hero__title">Make Self-Care a Habit</h1>
           <p className="memberships-hero__subtitle">
             Commit to your wellness with a monthly membership. Guaranteed sessions,

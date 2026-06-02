@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Setting up Atlas Massage development environment..."
+echo "Setting up Atlas Bodywork development environment..."
 
 # Check Node version
 NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)

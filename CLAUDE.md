@@ -102,7 +102,7 @@ import { jest } from '@jest/globals';
 
 The entire repository structure was generated in a single scaffolding-only session from this prompt (condensed):
 
-> You are a senior software architect and staff-level full-stack engineer. Generate the initial project architecture and repository scaffolding for a production web application called Atlas Massage.
+> You are a senior software architect and staff-level full-stack engineer. Generate the initial project architecture and repository scaffolding for a production web application called Atlas Bodywork.
 >
 > **This phase is architecture and scaffolding only.** Do NOT implement business features yet. Do NOT implement appointment booking logic, payment processing, notification delivery, or authentication flows beyond the minimum scaffolding required to support future development. The goal is to establish a clean, scalable, production-ready foundation.
 >

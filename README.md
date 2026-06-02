@@ -1,10 +1,10 @@
-# Atlas Massage
+# Atlas Bodywork
 
 A full-stack practice management platform for massage therapy practices. Built with React, Node.js/Express, and PostgreSQL.
 
 ## Project Overview
 
-Atlas Massage serves three user roles:
+Atlas Bodywork serves three user roles:
 
 | Role | Capabilities |
 |------|-------------|

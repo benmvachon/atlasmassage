@@ -4,7 +4,7 @@
 
 ## Strategy Overview
 
-Atlas Massage uses a stateless JWT access token combined with a database-tracked refresh token. This balances statelessness (no session store required for normal requests) with revocability (refresh tokens can be individually invalidated).
+Atlas Bodywork uses a stateless JWT access token combined with a database-tracked refresh token. This balances statelessness (no session store required for normal requests) with revocability (refresh tokens can be individually invalidated).
 
 ## Guest Checkout
 

@@ -6,7 +6,7 @@
 
 ## Context
 
-Atlas Massage has three distinct software concerns — a React frontend, a Node.js API, and shared type/utility code. These will be developed by the same team and deployed together. We need a repository structure that minimizes friction when sharing code between packages while keeping each app independently buildable and testable.
+Atlas Bodywork has three distinct software concerns — a React frontend, a Node.js API, and shared type/utility code. These will be developed by the same team and deployed together. We need a repository structure that minimizes friction when sharing code between packages while keeping each app independently buildable and testable.
 
 ## Decision
 

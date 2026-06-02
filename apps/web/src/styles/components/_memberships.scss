@@ -4,8 +4,9 @@
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 .memberships-hero {
-  background: $color-primary;
+  background: $color-primary-dark;
   padding: $space-16 $space-4;
+  margin: calc(-1 * $space-8) calc(-1 * $space-4) 0;
   text-align: center;
   color: $color-white;
 
@@ -14,8 +15,8 @@
   }
 
   &__eyebrow {
-    font-family: $font-family-ui;
-    font-size: $font-size-xs;
+    font-family: $font-family-logo;
+    font-size: $font-size-md;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -24,6 +25,7 @@
   }
 
   &__title {
+    font-family: $font-family-logo;
     font-size: $font-size-3xl;
     font-weight: 700;
     color: $color-white;
@@ -36,7 +38,7 @@
   }
 
   &__subtitle {
-    font-family: $font-family-ui;
+    font-family: $font-family-base;
     font-size: $font-size-lg;
     color: rgba($color-white, 0.82);
     line-height: 1.6;

@@ -1,7 +1,7 @@
 {
   "name": "@atlasmassage/api",
   "version": "1.0.0",
-  "description": "Atlas Massage API server",
+  "description": "Atlas Bodywork API server",
   "type": "module",
   "main": "src/server.js",
   "scripts": {

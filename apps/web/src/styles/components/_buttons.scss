@@ -34,14 +34,25 @@
     }
   }
 
+  &--secondary {
+    background-color: $color-secondary-light;
+    color: $color-primary-dark;
+    border-color: $color-secondary-light;
+
+    &:hover:not(:disabled) {
+      background-color: $color-secondary-dark;
+      border-color: $color-secondary-dark;
+      color: $color-white;
+    }
+  }
+
   &--outline {
     background-color: transparent;
-    color: $color-primary;
+    color: $color-primary-dark;
     border-color: $color-primary-dark;
 
     &:hover:not(:disabled) {
-      background-color: $color-primary-dark;
-      color: $color-white;
+      background-color: $color-secondary-light;
     }
   }
 
