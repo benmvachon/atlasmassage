@@ -51,8 +51,19 @@
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "src/**/*.js",
-      "!src/server.js"
+      "!src/server.js",
+      "!src/database/migrate.js",
+      "!src/database/seed.js",
+      "!src/database/pool.js"
     ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "lines": 80,
+        "functions": 80,
+        "branches": 65
+      }
+    },
     "transform": {}
   }
 }
