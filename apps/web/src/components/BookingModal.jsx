@@ -211,7 +211,7 @@ function WaiverStep({ slot, date, onBack, onSign, submitting, error }) {
 function BookingForm({
   slot, date, services, therapistOptions, lockedTherapist,
   therapistId, setTherapistId,
-  serviceId, setServiceId,
+  serviceId,
   name, setName,
   email, setEmail,
   phone, setPhone,
