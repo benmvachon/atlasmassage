@@ -76,6 +76,40 @@ function reminderHtml(name, appt) {
     </p>`);
 }
 
+function feedbackRequestHtml(name, appt) {
+  return baseLayout('How was your visit?', `
+    <p style="margin-bottom:16px">Hi ${name},</p>
+    <p style="margin-bottom:24px">We hope you enjoyed your ${appt.service_name} yesterday. Your feedback helps us continue to improve — we&rsquo;d love to hear how it went.</p>
+    ${apptCard(appt)}
+    <p style="color:#6b7280;font-size:14px">
+      Feel free to reply to this email with any thoughts or suggestions. Thank you for choosing Atlas Massage!
+    </p>`);
+}
+
+function weekFollowupHtml(name, bookingUrl) {
+  return baseLayout('Time for another session?', `
+    <p style="margin-bottom:16px">Hi ${name},</p>
+    <p style="margin-bottom:24px">It&rsquo;s been a week since your last visit at Atlas Massage. Regular massage therapy delivers the best results &mdash; we&rsquo;d love to have you back!</p>
+    <div style="text-align:center;margin-bottom:24px">
+      <a href="${bookingUrl}" style="background:#2c6e49;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">
+        Book Your Next Session
+      </a>
+    </div>
+    <p style="color:#6b7280;font-size:14px;text-align:center">We look forward to seeing you soon.</p>`);
+}
+
+function monthFollowupHtml(name, bookingUrl) {
+  return baseLayout("It's been a month — you deserve it", `
+    <p style="margin-bottom:16px">Hi ${name},</p>
+    <p style="margin-bottom:24px">A month has passed since your last appointment at Atlas Massage. Take a moment for yourself &mdash; you&rsquo;ve earned it.</p>
+    <div style="text-align:center;margin-bottom:24px">
+      <a href="${bookingUrl}" style="background:#2c6e49;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">
+        Schedule Your Next Visit
+      </a>
+    </div>
+    <p style="color:#6b7280;font-size:14px;text-align:center">We look forward to seeing you soon.</p>`);
+}
+
 function therapistReminderHtml(therapistName, clientName, appt) {
   return baseLayout('Appointment Reminder', `
     <p style="margin-bottom:16px">Hi ${therapistName},</p>
@@ -223,6 +257,85 @@ export class NotificationService {
         body: reminderSms(appt.therapist_first_name, appt),
       });
     }
+  }
+
+  async sendPendingFeedbackRequests() {
+    const appointments = await this.repo.findAppointmentsNeedingFeedback();
+    logger.info('feedback_worker_found', { count: appointments.length });
+
+    for (const appt of appointments) {
+      try {
+        const clientName = appt.client_first_name ?? appt.guest_name ?? 'there';
+        const clientEmail = appt.client_email ?? appt.guest_email;
+        if (!clientEmail) continue;
+
+        const shouldSend = appt.client_id
+          ? (await this.repo.getOrCreatePreferences(appt.client_id)).email_appointment_remind
+          : true;
+
+        if (shouldSend) {
+          await this._email({
+            userId: appt.client_id,
+            to: clientEmail,
+            subject: 'How was your Atlas Massage visit?',
+            html: feedbackRequestHtml(clientName, appt),
+          });
+        }
+        await this.repo.markFeedbackSent(appt.id);
+      } catch (err) {
+        logger.error('feedback_send_error', { appointmentId: appt.id, message: err.message });
+      }
+    }
+  }
+
+  async sendPendingWeekFollowups() {
+    const appointments = await this.repo.findAppointmentsNeedingWeekFollowup();
+    logger.info('followup_1w_worker_found', { count: appointments.length });
+
+    for (const appt of appointments) {
+      try {
+        await this._sendFollowup(appt, 'week');
+        await this.repo.markFollowup1wSent(appt.id);
+      } catch (err) {
+        logger.error('followup_1w_send_error', { appointmentId: appt.id, message: err.message });
+      }
+    }
+  }
+
+  async sendPendingMonthFollowups() {
+    const appointments = await this.repo.findAppointmentsNeedingMonthFollowup();
+    logger.info('followup_1m_worker_found', { count: appointments.length });
+
+    for (const appt of appointments) {
+      try {
+        await this._sendFollowup(appt, 'month');
+        await this.repo.markFollowup1mSent(appt.id);
+      } catch (err) {
+        logger.error('followup_1m_send_error', { appointmentId: appt.id, message: err.message });
+      }
+    }
+  }
+
+  async _sendFollowup(appt, period) {
+    const clientEmail = appt.client_email;
+    if (!clientEmail) return;
+
+    const prefs = await this.repo.getOrCreatePreferences(appt.client_id);
+    if (!prefs.email_appointment_remind) return;
+
+    const clientName = appt.client_first_name ?? 'there';
+    const bookingUrl = `${config.app.url}/booking`;
+
+    await this._email({
+      userId: appt.client_id,
+      to: clientEmail,
+      subject: period === 'week'
+        ? 'Time for another session at Atlas Massage?'
+        : "It's been a month — book your next Atlas Massage visit",
+      html: period === 'week'
+        ? weekFollowupHtml(clientName, bookingUrl)
+        : monthFollowupHtml(clientName, bookingUrl),
+    });
   }
 
   async _email({ userId, to, subject, html }) {

@@ -17,6 +17,9 @@ export const createAppointmentRules = [
   body('notes')
     .optional({ values: 'falsy' })
     .isString().isLength({ max: 1000 }).withMessage('notes must be 1000 characters or fewer'),
+  body('waiverSignature')
+    .notEmpty().withMessage('A signed waiver is required to book an appointment')
+    .isString().isLength({ max: 150000 }).withMessage('waiverSignature is too large'),
 ];
 
 export const rescheduleAppointmentRules = [

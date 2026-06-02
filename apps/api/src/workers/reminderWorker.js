@@ -6,10 +6,27 @@ const INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
 async function runReminders() {
   logger.info('reminder_worker_run');
+  const svc = new NotificationService(getPool());
+
   try {
-    await new NotificationService(getPool()).sendPendingReminders();
+    await svc.sendPendingReminders();
   } catch (err) {
     logger.error('reminder_worker_error', { message: err.message });
+  }
+  try {
+    await svc.sendPendingFeedbackRequests();
+  } catch (err) {
+    logger.error('feedback_worker_error', { message: err.message });
+  }
+  try {
+    await svc.sendPendingWeekFollowups();
+  } catch (err) {
+    logger.error('followup_1w_worker_error', { message: err.message });
+  }
+  try {
+    await svc.sendPendingMonthFollowups();
+  } catch (err) {
+    logger.error('followup_1m_worker_error', { message: err.message });
   }
 }
 

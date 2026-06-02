@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
@@ -32,6 +32,180 @@ const CARD_STYLE = {
   },
 };
 
+const WAIVER_ITEMS = [
+  'I voluntarily request and consent to receiving massage therapy.',
+  'I understand that the massage service offered is for the purposes of general wellness, stress reduction, and relief of muscular tension only.',
+  'I do not have any injuries or conditions that prevent me from receiving massage therapy. I understand the importance of informing my massage therapist of all medical conditions and medications that I am taking, and that there may be additional risks based on my physical condition.',
+  'If I experience any pain or discomfort, I will immediately inform my therapist so that the pressure or techniques used can be adjusted to my comfort level. I will not hold my massage therapist responsible for any pain or discomfort I experience during or after the session.',
+  <>I understand the risks associated with massage therapy include but are not limited to: <em>superficial bruising, short-term muscle soreness, and exacerbation of undiscovered injury.</em></>,
+  'I do not have any contagious conditions that may put my massage therapist or other clients at risk.',
+  'I understand that I or the massage therapist may terminate the session at any time.',
+  'I have been given the opportunity to ask questions about massage therapy and my questions have been answered.',
+  'I have been advised of the policies and procedures pertaining to massage and I understand these policies.',
+  'Information regarding massage in general, benefits, contraindications of massage, and possible alternative therapies have been explained to me.',
+];
+
+const WAIVER_CLOSING = 'I further understand that massage therapy is not a substitute for a medical examination or treatment, and that I should see a physician or other qualified health specialist for any mental or physical ailment of which I am aware. I understand that massage therapists do not diagnose illness or disease, and nothing said during the massage should be construed as such. My consent is informed and voluntary and I understand that I may withdraw my consent at any time except for actions already taken.';
+
+// ── Signature canvas ───────────────────────────────────────────────────────────
+
+function SignatureCanvas({ onChange }) {
+  const canvasRef = useRef(null);
+  const clearRef = useRef(null);
+  const onChangeRef = useRef(onChange);
+  useEffect(() => { onChangeRef.current = onChange; });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const dpr = window.devicePixelRatio || 1;
+    const { width: cssW, height: cssH } = canvas.getBoundingClientRect();
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    clearRef.current = () => {
+      ctx.clearRect(0, 0, cssW, cssH);
+      onChangeRef.current('');
+    };
+
+    let isDrawing = false;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [src.clientX - rect.left, src.clientY - rect.top];
+    }
+
+    function onStart(e) {
+      e.preventDefault();
+      isDrawing = true;
+      const [x, y] = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    function onMove(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const [x, y] = getPos(e);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    function onEnd(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      isDrawing = false;
+      onChangeRef.current(canvas.toDataURL());
+    }
+
+    canvas.addEventListener('mousedown', onStart);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseup', onEnd);
+    canvas.addEventListener('mouseleave', onEnd);
+    canvas.addEventListener('touchstart', onStart, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    canvas.addEventListener('touchend', onEnd);
+
+    return () => {
+      canvas.removeEventListener('mousedown', onStart);
+      canvas.removeEventListener('mousemove', onMove);
+      canvas.removeEventListener('mouseup', onEnd);
+      canvas.removeEventListener('mouseleave', onEnd);
+      canvas.removeEventListener('touchstart', onStart);
+      canvas.removeEventListener('touchmove', onMove);
+      canvas.removeEventListener('touchend', onEnd);
+    };
+  }, []);
+
+  return (
+    <div className="waiver-sig">
+      <p className="waiver-sig__label">Sign below</p>
+      <canvas ref={canvasRef} className="waiver-sig__canvas" />
+      <button
+        type="button"
+        className="waiver-sig__clear"
+        onClick={() => clearRef.current?.()}
+      >
+        Clear
+      </button>
+    </div>
+  );
+}
+
+// ── Waiver step ────────────────────────────────────────────────────────────────
+
+function WaiverStep({ slot, date, onBack, onSign, submitting, error }) {
+  const [signature, setSignature] = useState('');
+  const [agreed, setAgreed] = useState(false);
+
+  return (
+    <div className="avail-modal-overlay" role="presentation">
+      <div
+        className="avail-modal booking-modal booking-modal--waiver"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="waiver-modal-title"
+      >
+        <h3 id="waiver-modal-title" className="avail-modal__title">Massage Therapy Consent</h3>
+        <p className="booking-modal__slot-summary">
+          {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+        </p>
+
+        <div className="waiver-scroll" role="region" aria-label="Waiver text">
+          <ol className="waiver-list">
+            {WAIVER_ITEMS.map((item, i) => (
+              <li key={i} className="waiver-list__item">{item}</li>
+            ))}
+          </ol>
+          <p className="waiver-closing">{WAIVER_CLOSING}</p>
+        </div>
+
+        <SignatureCanvas onChange={setSignature} />
+
+        <label className="waiver-agree">
+          <input
+            type="checkbox"
+            className="waiver-agree__checkbox"
+            checked={agreed}
+            onChange={e => setAgreed(e.target.checked)}
+            disabled={submitting}
+          />
+          <span className="waiver-agree__text">
+            I have read and agree to the above consent form
+          </span>
+        </label>
+
+        {error && <p className="avail-modal__error">{error}</p>}
+
+        <div className="avail-modal__actions">
+          <button
+            className="btn btn--primary"
+            type="button"
+            onClick={() => onSign(signature)}
+            disabled={!signature || !agreed || submitting}
+          >
+            {submitting ? 'Booking…' : 'Sign & Book'}
+          </button>
+          <button
+            className="btn btn--ghost"
+            type="button"
+            onClick={onBack}
+            disabled={submitting}
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Inner form (must be inside <Elements> when new-card path is active) ────────
 
 function BookingForm({
@@ -50,28 +224,38 @@ function BookingForm({
   const stripe = useStripe();
   const elements = useElements();
 
+  const [step, setStep] = useState('form'); // 'form' | 'waiver' | 'success'
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [, setConfirmedAppointment] = useState(null);
 
   const selectedService = services.find(s => s.id === serviceId);
   const needsPayment = !!stripePublishableKey;
   const isNewCard = selectedMethodId === 'new';
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!therapistId) { setError('Please select a therapist.'); return; }
-    if (!serviceId) { setError('Please select a service.'); return; }
+  function validateForm() {
+    if (!therapistId) { setError('Please select a therapist.'); return false; }
+    if (!serviceId) { setError('Please select a service.'); return false; }
     if (!user) {
-      if (!name.trim()) { setError('Name is required.'); return; }
+      if (!name.trim()) { setError('Name is required.'); return false; }
       if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setError('A valid email is required.'); return;
+        setError('A valid email is required.'); return false;
       }
     }
     if (needsPayment && !selectedMethodId) {
-      setError('Please select a payment method.'); return;
+      setError('Please select a payment method.'); return false;
     }
+    return true;
+  }
+
+  function handleContinue(e) {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setError('');
+    setStep('waiver');
+  }
+
+  async function handleSign(waiverSignature) {
+    if (!waiverSignature) { setError('Please sign the consent form.'); return; }
 
     setSubmitting(true);
     setError('');
@@ -80,22 +264,20 @@ function BookingForm({
     const savedMethod = paymentMethods.find(m => m.id === selectedMethodId);
 
     try {
-      // 1. Create the appointment (backend also creates payment intent for auth clients)
       const result = await bookingService.createAppointment({
         therapistId,
         serviceId,
         scheduledAt,
         notes: notes.trim() || undefined,
         paymentMethodId: savedMethod ? savedMethod.id : undefined,
+        waiverSignature,
         ...(!user && { guestName: name.trim(), guestEmail: email.trim(), guestPhone: phone.trim() || undefined }),
       });
 
       const { appointment, clientSecret } = result;
 
-      // 2. Confirm payment with Stripe if a clientSecret was returned
       if (clientSecret && stripe) {
         let confirmResult;
-
         if (isNewCard) {
           const cardElement = elements.getElement(CardElement);
           confirmResult = await stripe.confirmCardPayment(clientSecret, {
@@ -106,25 +288,18 @@ function BookingForm({
             payment_method: savedMethod.stripe_payment_method_id,
           });
         }
-
-        if (confirmResult?.error) {
-          throw new Error(confirmResult.error.message);
-        }
-
-        // 3. Tell the backend the payment is confirmed (auth users only).
-        // Guests have no session, so the webhook handles their status update.
+        if (confirmResult?.error) throw new Error(confirmResult.error.message);
         if (user) await bookingService.confirmAppointment(appointment.id);
       }
 
-      setConfirmedAppointment(appointment);
-      setSuccess(true);
+      setStep('success');
     } catch (err) {
       setError(err.message || 'Booking failed. Please try again.');
       setSubmitting(false);
     }
   }
 
-  if (success) {
+  if (step === 'success') {
     return (
       <div className="avail-modal-overlay" onClick={onClose} role="presentation">
         <div className="avail-modal booking-modal--success" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
@@ -137,6 +312,19 @@ function BookingForm({
           <button className="btn btn--primary" onClick={() => { onComplete(); onClose(); }}>Done</button>
         </div>
       </div>
+    );
+  }
+
+  if (step === 'waiver') {
+    return (
+      <WaiverStep
+        slot={slot}
+        date={date}
+        onBack={() => { setError(''); setStep('form'); }}
+        onSign={handleSign}
+        submitting={submitting}
+        error={error}
+      />
     );
   }
 
@@ -155,7 +343,7 @@ function BookingForm({
           {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
         </p>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleContinue} noValidate>
           {/* Service */}
           <div className="booking-field">
             <label className="booking-field__label" htmlFor="bm-service">Service</label>
@@ -308,12 +496,12 @@ function BookingForm({
           {error && <p className="avail-modal__error">{error}</p>}
 
           <div className="avail-modal__actions">
-            <button className="btn btn--primary" type="submit" disabled={submitting || (needsPayment && !selectedMethodId)}>
-              {submitting
-                ? (needsPayment ? 'Processing payment…' : 'Booking…')
-                : (needsPayment && selectedService
-                    ? `Pay $${(selectedService.priceCents / 100).toFixed(0)} & Book`
-                    : 'Confirm Booking')}
+            <button
+              className="btn btn--primary"
+              type="submit"
+              disabled={submitting || (needsPayment && !selectedMethodId)}
+            >
+              Continue to Consent Form →
             </button>
             <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
               Cancel
@@ -343,7 +531,6 @@ export default function BookingModal({
 
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loadingMethods, setLoadingMethods] = useState(false);
-  // Guests always enter a new card; auth users start blank until cards load
   const [selectedMethodId, setSelectedMethodId] = useState(user ? '' : 'new');
 
   const therapistOptions = useMemo(() => {
@@ -351,7 +538,6 @@ export default function BookingModal({
     return slot.availableTherapists;
   }, [lockedTherapist, slot.availableTherapists]);
 
-  // Fetch saved cards for authenticated clients when Stripe is active
   useEffect(() => {
     if (!user || !stripePublishableKey) return;
     setLoadingMethods(true);
@@ -367,9 +553,6 @@ export default function BookingModal({
       .finally(() => setLoadingMethods(false));
   }, [user]);
 
-  // Always wrap in Elements. When Stripe isn't configured stripePromise is null,
-  // and the library returns null from useStripe()/useElements() rather than
-  // throwing — so BookingForm's hooks are always called in the same order.
   const stripePromise = getStripePromise();
   const sharedProps = {
     slot, date, services, therapistOptions, lockedTherapist,

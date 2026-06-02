@@ -115,4 +115,73 @@ export class NotificationRepository {
       [appointmentId]
     );
   }
+
+  async findAppointmentsNeedingFeedback() {
+    const { rows } = await this.pool.query(
+      `${APPT_DETAILS}
+       WHERE a.status = 'completed'
+         AND a.scheduled_at >= NOW() - INTERVAL '25 hours'
+         AND a.scheduled_at <  NOW() - INTERVAL '23 hours'
+         AND a.feedback_sent_at IS NULL
+         AND (c.email IS NOT NULL OR a.guest_email IS NOT NULL)`
+    );
+    return rows;
+  }
+
+  async markFeedbackSent(appointmentId) {
+    await this.pool.query(
+      `UPDATE appointments SET feedback_sent_at = NOW() WHERE id = $1`,
+      [appointmentId]
+    );
+  }
+
+  async findAppointmentsNeedingWeekFollowup() {
+    const { rows } = await this.pool.query(
+      `${APPT_DETAILS}
+       WHERE a.status = 'completed'
+         AND a.client_id IS NOT NULL
+         AND a.scheduled_at >= NOW() - INTERVAL '7 days 1 hour'
+         AND a.scheduled_at <  NOW() - INTERVAL '6 days 23 hours'
+         AND a.followup_1w_sent_at IS NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM appointments a2
+           WHERE a2.client_id = a.client_id
+             AND a2.status IN ('confirmed', 'pending')
+             AND a2.scheduled_at > NOW()
+         )`
+    );
+    return rows;
+  }
+
+  async markFollowup1wSent(appointmentId) {
+    await this.pool.query(
+      `UPDATE appointments SET followup_1w_sent_at = NOW() WHERE id = $1`,
+      [appointmentId]
+    );
+  }
+
+  async findAppointmentsNeedingMonthFollowup() {
+    const { rows } = await this.pool.query(
+      `${APPT_DETAILS}
+       WHERE a.status = 'completed'
+         AND a.client_id IS NOT NULL
+         AND a.scheduled_at >= NOW() - INTERVAL '30 days 1 hour'
+         AND a.scheduled_at <  NOW() - INTERVAL '29 days 23 hours'
+         AND a.followup_1m_sent_at IS NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM appointments a2
+           WHERE a2.client_id = a.client_id
+             AND a2.status IN ('confirmed', 'pending')
+             AND a2.scheduled_at > NOW()
+         )`
+    );
+    return rows;
+  }
+
+  async markFollowup1mSent(appointmentId) {
+    await this.pool.query(
+      `UPDATE appointments SET followup_1m_sent_at = NOW() WHERE id = $1`,
+      [appointmentId]
+    );
+  }
 }

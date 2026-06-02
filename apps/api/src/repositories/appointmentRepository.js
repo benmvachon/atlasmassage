@@ -270,16 +270,18 @@ export class AppointmentRepository {
 
   async create({
     clientId, therapistId, serviceId, scheduledAt, durationMinutes,
-    notes, guestName, guestEmail, guestPhone,
+    notes, guestName, guestEmail, guestPhone, waiverSignature,
   }) {
     const { rows } = await this.pool.query(
       `INSERT INTO appointments
          (client_id, therapist_id, service_id, scheduled_at, duration_minutes,
-          notes, guest_name, guest_email, guest_phone)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          notes, guest_name, guest_email, guest_phone,
+          waiver_signature, waiver_signed_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
        RETURNING *`,
       [clientId ?? null, therapistId, serviceId, scheduledAt, durationMinutes,
-       notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null]
+       notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
+       waiverSignature]
     );
     return rows[0];
   }

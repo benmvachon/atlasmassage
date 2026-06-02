@@ -25,7 +25,7 @@ export async function createAppointment(req, res, next) {
     const {
       therapistId, serviceId, scheduledAt,
       guestName, guestEmail, guestPhone,
-      notes, paymentMethodId,
+      notes, paymentMethodId, waiverSignature,
     } = req.body;
 
     const clientId = req.user?.sub ?? null;
@@ -65,6 +65,7 @@ export async function createAppointment(req, res, next) {
       guestName: clientId ? null : guestName,
       guestEmail: clientId ? null : guestEmail,
       guestPhone: clientId ? null : (guestPhone || null),
+      waiverSignature,
     });
 
     // Create a payment intent when Stripe is configured.
