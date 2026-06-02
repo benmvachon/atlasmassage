@@ -4,15 +4,12 @@ import AuthCard from '../components/AuthCard.jsx';
 import FormField from '../components/FormField.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFormState } from '../hooks/useFormState.js';
+import { isValidEmail } from '../utils/validation.js';
 
 function validate({ email, password }) {
   const errors = {};
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = 'Please enter a valid email address.';
-  }
-  if (!password) {
-    errors.password = 'Password is required.';
-  }
+  if (!isValidEmail(email)) errors.email = 'Please enter a valid email address.';
+  if (!password)            errors.password = 'Password is required.';
   return errors;
 }
 
@@ -20,19 +17,15 @@ export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    values, fieldErrors, apiError,
-    submitting, handleChange, setFieldErrors, setApiError, setSubmitting,
-  } = useFormState({ email: '', password: '' });
+  const { values, fieldErrors, apiError, submitting, handleChange, setFieldErrors, setApiError, setSubmitting } =
+    useFormState({ email: '', password: '' });
 
   useEffect(() => {
     if (!user) return;
     const dest = location.state?.from?.pathname
-      ?? (user.roles?.includes('owner')
-        ? '/owner/dashboard'
-        : user.roles?.includes('therapist')
-          ? '/therapist/bookings'
-          : '/');
+      ?? (user.roles?.includes('owner')     ? '/owner/dashboard'
+        : user.roles?.includes('therapist') ? '/therapist/bookings'
+        : '/');
     navigate(dest, { replace: true });
   }, [user, navigate, location]);
 
@@ -40,7 +33,6 @@ export default function LoginPage() {
     e.preventDefault();
     const errors = validate(values);
     if (Object.keys(errors).length) { setFieldErrors(errors); return; }
-
     setSubmitting(true);
     try {
       await login(values);
@@ -56,37 +48,20 @@ export default function LoginPage() {
       title="Sign in"
       apiError={apiError}
       onSubmit={handleSubmit}
-      footer={
-        <>
-          Don&apos;t have an account?{' '}
-          <Link to="/signup">Create one</Link>
-        </>
-      }
+      footer={<>Don&apos;t have an account? <Link to="/signup">Create one</Link></>}
     >
       <FormField
-        label="Email address"
-        id="email"
-        type="email"
-        autoComplete="email"
-        value={values.email}
-        onChange={handleChange}
-        error={fieldErrors.email}
-        disabled={submitting}
+        label="Email address" id="email" type="email" autoComplete="email"
+        value={values.email} onChange={handleChange}
+        error={fieldErrors.email} disabled={submitting}
       />
       <FormField
-        label="Password"
-        id="password"
-        type="password"
-        autoComplete="current-password"
-        value={values.password}
-        onChange={handleChange}
-        error={fieldErrors.password}
-        disabled={submitting}
+        label="Password" id="password" type="password" autoComplete="current-password"
+        value={values.password} onChange={handleChange}
+        error={fieldErrors.password} disabled={submitting}
       />
       <div className="auth-card__actions">
-        <Link to="/forgot-password" className="auth-card__forgot">
-          Forgot password?
-        </Link>
+        <Link to="/forgot-password" className="auth-card__forgot">Forgot password?</Link>
         <button type="submit" className="btn btn--primary btn--full" disabled={submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>

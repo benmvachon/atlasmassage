@@ -1,0 +1,357 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+
+.memberships-hero {
+  background: $color-primary;
+  padding: $space-16 $space-4;
+  text-align: center;
+  color: $color-white;
+
+  &__inner {
+    max-width: 680px;
+  }
+
+  &__eyebrow {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba($color-white, 0.65);
+    margin-bottom: $space-3;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $color-white;
+    margin-bottom: $space-4;
+    line-height: 1.15;
+
+    @include respond-to(md) {
+      font-size: 2.75rem;
+    }
+  }
+
+  &__subtitle {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    color: rgba($color-white, 0.82);
+    line-height: 1.6;
+    margin-bottom: $space-8;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  &__cta {
+    display: inline-block;
+  }
+}
+
+// ── Benefits strip ────────────────────────────────────────────────────────────
+
+.memberships-benefits {
+  background: $color-white;
+  border-bottom: 1px solid $color-border;
+  padding: $space-12 $space-4;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-8;
+
+    @include respond-to(md) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: $space-10;
+    }
+  }
+}
+
+.memberships-benefit {
+  text-align: center;
+
+  &__icon {
+    display: block;
+    font-size: $font-size-xl;
+    color: $color-secondary;
+    margin-bottom: $space-3;
+    line-height: 1;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 700;
+    margin-bottom: $space-2;
+    color: $color-text;
+  }
+
+  &__body {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    line-height: 1.65;
+    margin: 0;
+  }
+}
+
+// ── Plans section ─────────────────────────────────────────────────────────────
+
+.memberships-plans {
+  background: $color-bg-alt;
+  padding: $space-16 $space-4;
+
+  &__heading {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: $space-2;
+  }
+
+  &__subheading {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    margin-bottom: $space-10;
+  }
+
+  &__state {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    padding: $space-8 0;
+
+    &--error { color: $color-error; }
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    background: $color-error-bg;
+    border: 1px solid $color-error-border-alpha;
+    border-radius: $border-radius-sm;
+    padding: $space-3 $space-4;
+    margin-bottom: $space-6;
+    text-align: center;
+  }
+}
+
+// ── Success banner ────────────────────────────────────────────────────────────
+
+.memberships-success {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+  background: $color-success-bg;
+  border: 1px solid rgba($color-success, 0.3);
+  border-radius: $border-radius-md;
+  padding: $space-5 $space-6;
+  margin-bottom: $space-8;
+
+  &__icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: $border-radius-full;
+    background: $color-success;
+    color: $color-white;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    @include flex-center;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 $space-1;
+  }
+
+  &__body {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin: 0;
+
+    a {
+      color: $color-primary;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover { text-decoration: underline; }
+    }
+  }
+}
+
+// ── Plan cards grid ───────────────────────────────────────────────────────────
+
+.memberships-plan-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-6;
+
+  @include respond-to(sm) {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
+// ── Individual plan card ──────────────────────────────────────────────────────
+
+.membership-plan {
+  @include card;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: $space-8;
+  transition: box-shadow $transition-fast, transform $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &--current {
+    border-color: $color-primary;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px $color-primary-tint-md;
+
+    &:hover { transform: none; }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -1px;
+    right: $space-6;
+    background: $color-primary;
+    color: $color-white;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    padding: $space-1 $space-3;
+    border-radius: 0 0 $border-radius-sm $border-radius-sm;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    font-family: $font-family-ui;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    margin: 0 0 $space-4;
+    color: $color-text;
+  }
+
+  &__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: $space-1;
+    margin-bottom: $space-4;
+  }
+
+  &__price {
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $color-primary;
+    line-height: 1;
+  }
+
+  &__period {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    li {
+      font-family: $font-family-ui;
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      padding-left: $space-5;
+      position: relative;
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: $color-primary;
+        font-weight: 700;
+      }
+    }
+  }
+
+  &__desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    line-height: 1.6;
+    margin: 0 0 $space-5;
+    flex: 1;
+  }
+
+  &__footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__cta {
+    width: 100%;
+    text-align: center;
+  }
+
+  &__auth-note {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-align: center;
+    margin: 0;
+
+    a {
+      color: $color-primary;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  &__active-note {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-primary;
+    margin: 0;
+  }
+
+  &__manage-link,
+  &__other-note a {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-primary;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__other-note {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin: 0;
+  }
+}

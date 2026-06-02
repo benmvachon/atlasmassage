@@ -15,6 +15,7 @@ export default function Header() {
         <nav className="header__nav" aria-label="Main navigation">
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/services">Services</NavLink>
+          <NavLink to="/memberships">Memberships</NavLink>
           <NavLink to="/team">Team</NavLink>
           <NavLink to="/testimonials">Testimonials</NavLink>
           <NavLink to="/booking" className="btn btn--primary">Book Now</NavLink>

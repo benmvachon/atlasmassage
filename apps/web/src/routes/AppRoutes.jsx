@@ -16,6 +16,7 @@ import SignupPage from '../pages/SignupPage.jsx';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage.jsx';
 import ResetPasswordPage from '../pages/ResetPasswordPage.jsx';
 import BookingPage from '../pages/BookingPage.jsx';
+import MembershipsPage from '../pages/MembershipsPage.jsx';
 import SettingsPage from '../pages/SettingsPage.jsx';
 import TherapistBookingsPage from '../pages/therapist/TherapistBookingsPage.jsx';
 import TherapistSchedulePage from '../pages/therapist/TherapistSchedulePage.jsx';
@@ -37,6 +38,7 @@ export default function AppRoutes() {
         <Route path="/testimonials" element={<TestimonialsPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/memberships" element={<MembershipsPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>

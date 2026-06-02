@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useAsync } from '../hooks/useAsync.js';
 import { notificationService } from '../services/notificationService.js';
 
 function Toggle({ id, label, description, checked, onChange, disabled }) {
@@ -28,46 +29,48 @@ export default function NotificationPrefsSection() {
   const { user } = useAuth();
   const hasPhone = !!user?.phone;
 
-  const [prefs, setPrefs] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const { data: loadedPrefs, loading, error: loadError } = useAsync(
+    () => notificationService.getPreferences().then(r => r.data.preferences)
+  );
 
-  useEffect(() => {
-    notificationService.getPreferences()
-      .then(({ data }) => setPrefs(data.preferences))
-      .catch(() => setError('Could not load notification preferences.'))
-      .finally(() => setLoading(false));
-  }, []);
+  const [prefs, setPrefs]     = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  // Sync local editable state from the async load once.
+  const effectivePrefs = prefs ?? loadedPrefs;
 
   function setField(field, value) {
-    setPrefs(p => ({ ...p, [field]: value }));
+    setPrefs(p => ({ ...(p ?? loadedPrefs), [field]: value }));
     setSuccess(false);
   }
 
   async function handleSave(e) {
     e.preventDefault();
+    if (!effectivePrefs) return;
     setSaving(true);
-    setError('');
+    setSaveError('');
     setSuccess(false);
     try {
       const { data } = await notificationService.updatePreferences({
-        emailAppointmentRemind: prefs.email_appointment_remind,
-        emailBookingConfirm:    prefs.email_booking_confirm,
-        smsAppointmentRemind:   prefs.sms_appointment_remind,
-        smsBookingConfirm:      prefs.sms_booking_confirm,
+        emailAppointmentRemind: effectivePrefs.email_appointment_remind,
+        emailBookingConfirm:    effectivePrefs.email_booking_confirm,
+        smsAppointmentRemind:   effectivePrefs.sms_appointment_remind,
+        smsBookingConfirm:      effectivePrefs.sms_booking_confirm,
       });
       setPrefs(data.preferences);
       setSuccess(true);
     } catch (err) {
-      setError(err.message || 'Failed to save preferences.');
+      setSaveError(err.message || 'Failed to save preferences.');
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) return <p className="settings-muted">Loading preferences…</p>;
+  if (loadError) return <p className="settings-error" role="alert">{loadError}</p>;
+  if (!effectivePrefs) return null;
 
   return (
     <form className="notif-prefs" onSubmit={handleSave}>
@@ -78,7 +81,7 @@ export default function NotificationPrefsSection() {
             id="email-confirm"
             label="Booking confirmations"
             description="Receive an email when an appointment is booked."
-            checked={prefs.email_booking_confirm}
+            checked={effectivePrefs.email_booking_confirm}
             onChange={v => setField('email_booking_confirm', v)}
             disabled={saving}
           />
@@ -86,7 +89,7 @@ export default function NotificationPrefsSection() {
             id="email-remind"
             label="Appointment reminders"
             description="Receive a reminder email 24 hours before each appointment."
-            checked={prefs.email_appointment_remind}
+            checked={effectivePrefs.email_appointment_remind}
             onChange={v => setField('email_appointment_remind', v)}
             disabled={saving}
           />
@@ -105,7 +108,7 @@ export default function NotificationPrefsSection() {
             id="sms-confirm"
             label="Booking confirmations"
             description="Receive a text when an appointment is booked."
-            checked={prefs.sms_booking_confirm}
+            checked={effectivePrefs.sms_booking_confirm}
             onChange={v => setField('sms_booking_confirm', v)}
             disabled={saving || !hasPhone}
           />
@@ -113,18 +116,18 @@ export default function NotificationPrefsSection() {
             id="sms-remind"
             label="Appointment reminders"
             description="Receive a text reminder 24 hours before each appointment."
-            checked={prefs.sms_appointment_remind}
+            checked={effectivePrefs.sms_appointment_remind}
             onChange={v => setField('sms_appointment_remind', v)}
             disabled={saving || !hasPhone}
           />
         </div>
       </div>
 
-      {error   && <p className="settings-error">{error}</p>}
-      {success && <p className="settings-success">Preferences saved.</p>}
+      {saveError && <p className="settings-error">{saveError}</p>}
+      {success   && <p className="settings-success">Preferences saved.</p>}
 
       <div>
-        <button type="submit" className="btn btn--primary" disabled={saving || !prefs}>
+        <button type="submit" className="btn btn--primary" disabled={saving}>
           {saving ? 'Saving…' : 'Save Preferences'}
         </button>
       </div>

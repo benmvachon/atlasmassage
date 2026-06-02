@@ -35,7 +35,9 @@ export class UserRepository {
     return rows[0] ?? null;
   }
 
-  // Runs INSERT into users + user_roles in a single transaction
+  // Runs INSERT into users + user_roles + guest record linking in a single transaction.
+  // Any appointments/payments previously made as a guest with this email are
+  // retroactively associated with the new account.
   async create({ email, passwordHash, firstName, lastName, phone }) {
     const client = await this.pool.connect();
     try {
@@ -53,6 +55,28 @@ export class UserRepository {
          SELECT $1, id FROM roles WHERE name = 'client'`,
         [user.id]
       );
+
+      // Link any guest appointments booked with this email.
+      // guest_email must be nulled out to satisfy the CHECK constraint
+      // (client_id IS NOT NULL AND guest_email IS NULL). guest_name/guest_phone
+      // are kept on the row as a historical record of the original booking.
+      const { rows: linked } = await client.query(
+        `UPDATE appointments
+         SET client_id = $1, guest_email = NULL
+         WHERE guest_email = $2 AND client_id IS NULL
+         RETURNING id`,
+        [user.id, email]
+      );
+
+      if (linked.length > 0) {
+        const appointmentIds = linked.map(r => r.id);
+        await client.query(
+          `UPDATE payments
+           SET client_id = $1
+           WHERE client_id IS NULL AND appointment_id = ANY($2)`,
+          [user.id, appointmentIds]
+        );
+      }
 
       await client.query('COMMIT');
       return { ...user, roles: ['client'] };

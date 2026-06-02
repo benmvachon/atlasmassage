@@ -3,18 +3,17 @@ import { Link } from 'react-router-dom';
 import AuthCard from '../components/AuthCard.jsx';
 import FormField from '../components/FormField.jsx';
 import { useFormState } from '../hooks/useFormState.js';
+import { isValidEmail } from '../utils/validation.js';
 import { authService } from '../services/authService.js';
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
-  const {
-    values, fieldErrors, apiError,
-    submitting, handleChange, setFieldErrors, setApiError, setSubmitting,
-  } = useFormState({ email: '' });
+  const { values, fieldErrors, apiError, submitting, handleChange, setFieldErrors, setApiError, setSubmitting } =
+    useFormState({ email: '' });
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!values.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    if (!isValidEmail(values.email)) {
       setFieldErrors({ email: 'Please enter a valid email address.' });
       return;
     }
@@ -48,14 +47,9 @@ export default function ForgotPasswordPage() {
       footer={<Link to="/login">Back to sign in</Link>}
     >
       <FormField
-        label="Email address"
-        id="email"
-        type="email"
-        autoComplete="email"
-        value={values.email}
-        onChange={handleChange}
-        error={fieldErrors.email}
-        disabled={submitting}
+        label="Email address" id="email" type="email" autoComplete="email"
+        value={values.email} onChange={handleChange}
+        error={fieldErrors.email} disabled={submitting}
       />
       <button type="submit" className="btn btn--primary btn--full" disabled={submitting}>
         {submitting ? 'Sending…' : 'Send reset link'}
