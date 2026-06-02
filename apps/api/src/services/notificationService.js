@@ -2,6 +2,7 @@ import { NotificationRepository } from '../repositories/notificationRepository.j
 import { sendSms } from './smsService.js';
 import { send as sendEmail } from './emailService.js';
 import { logger } from '../logging/logger.js';
+import { config } from '../config/index.js';
 
 function fmtDate(dt) {
   return new Date(dt).toLocaleDateString('en-US', {
@@ -41,14 +42,20 @@ function apptCard(appt) {
     </div>`;
 }
 
-function clientConfirmHtml(name, appt) {
+function clientConfirmHtml(name, appt, manageUrl = null) {
+  const manageSection = manageUrl
+    ? `<p style="margin-top:4px;font-size:14px">
+         <a href="${manageUrl}" style="color:#2c6e49;font-weight:600">Cancel or reschedule your appointment</a>
+         &mdash; this link works up to 24 hours before your appointment.
+       </p>`
+    : `<p style="color:#6b7280;font-size:14px">
+         Need to cancel or reschedule? Log into your account at least 24 hours in advance.
+       </p>`;
   return baseLayout('Booking Confirmed ✓', `
     <p style="margin-bottom:16px">Hi ${name},</p>
     <p style="margin-bottom:24px">Your appointment at Atlas Massage is confirmed.</p>
     ${apptCard(appt)}
-    <p style="color:#6b7280;font-size:14px">
-      Need to cancel or reschedule? Please contact us at least 24 hours in advance.
-    </p>`);
+    ${manageSection}`);
 }
 
 function therapistNewBookingHtml(therapistName, clientName, appt) {
@@ -109,11 +116,14 @@ export class NotificationService {
         : (await this.repo.getOrCreatePreferences(appt.client_id)).email_booking_confirm;
 
       if (sendClientEmail) {
+        const manageUrl = isGuest && appt.cancel_token
+          ? `${config.app.url}/booking/manage?id=${appt.id}&token=${appt.cancel_token}`
+          : null;
         await this._email({
           userId: appt.client_id,
           to: clientEmail,
           subject: 'Your Atlas Massage appointment is confirmed',
-          html: clientConfirmHtml(clientName, appt),
+          html: clientConfirmHtml(clientName, appt, manageUrl),
         });
       }
 

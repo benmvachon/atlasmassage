@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
@@ -53,7 +53,7 @@ function BookingForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [confirmedAppointment, setConfirmedAppointment] = useState(null);
+  const [, setConfirmedAppointment] = useState(null);
 
   const selectedService = services.find(s => s.id === serviceId);
   const needsPayment = !!stripePublishableKey;
@@ -328,7 +328,7 @@ function BookingForm({
 // ── Shell — fetches payment methods, wraps in <Elements> when needed ───────────
 
 export default function BookingModal({
-  slot, date, services, allTherapists, lockedTherapist, onComplete, onClose,
+  slot, date, services, _allTherapists, lockedTherapist, onComplete, onClose,
 }) {
   const { user } = useAuth();
 

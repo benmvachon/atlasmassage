@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { adminService } from '../../services/adminService.js';
 
@@ -49,7 +49,7 @@ function CountDollarTooltip({ active, payload, label }) {
   );
 }
 
-function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, name, percent }) {
+function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, _name, percent }) {
   if (percent < 0.05) return null;
   const RADIAN = Math.PI / 180;
   const r = innerRadius + (outerRadius - innerRadius) * 0.5;

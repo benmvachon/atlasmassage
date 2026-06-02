@@ -68,10 +68,6 @@ function TransferModal({ appt, onClose, onSubmit, saving, error }) {
   );
 }
 
-function getCurrentMonthValue() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
 
 function generateMonthOptions() {
   const options = [{ value: '', label: 'All Time' }];

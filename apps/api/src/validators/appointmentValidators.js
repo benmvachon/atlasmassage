@@ -18,3 +18,9 @@ export const createAppointmentRules = [
     .optional({ values: 'falsy' })
     .isString().isLength({ max: 1000 }).withMessage('notes must be 1000 characters or fewer'),
 ];
+
+export const rescheduleAppointmentRules = [
+  body('scheduledAt').isISO8601().withMessage('scheduledAt must be an ISO 8601 datetime'),
+  body('therapistId').optional().isUUID().withMessage('therapistId must be a valid UUID'),
+  body('cancelToken').optional().isUUID().withMessage('cancelToken must be a valid UUID'),
+];

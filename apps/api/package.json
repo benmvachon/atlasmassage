@@ -12,6 +12,7 @@
     "test:watch": "node --experimental-vm-modules ../../node_modules/.bin/jest --watch",
     "test:coverage": "node --experimental-vm-modules ../../node_modules/.bin/jest --coverage",
     "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "migrate": "node src/database/migrate.js",
     "migrate:rollback": "node src/database/migrate.js rollback",
     "seed": "node src/database/seed.js"

@@ -29,7 +29,7 @@ function scheduledAtToMinutes(scheduledAt) {
  * appointments: [{ therapist_id, scheduled_at, duration_minutes }]
  * Returns sorted [{ startTime, endTime, availableTherapists: [{id, firstName, lastName}] }]
  */
-export function generateSlots(availability, appointments, { timeOfDay } = {}) {
+export function generateSlots(availability, appointments, { timeOfDay, notBefore } = {}) {
   const todBounds = timeOfDay ? TOD_BOUNDS[timeOfDay] : null;
 
   const apptsByTherapist = {};
@@ -50,6 +50,11 @@ export function generateSlots(availability, appointments, { timeOfDay } = {}) {
 
     for (let t = availStart; t <= lastStart; t += INCREMENT) {
       if (todBounds && (t < todBounds[0] || t >= todBounds[1])) continue;
+
+      if (notBefore && avail.specific_date) {
+        const slotDatetime = new Date(`${avail.specific_date}T${minutesToTime(t)}:00Z`);
+        if (slotDatetime < notBefore) continue;
+      }
 
       const slotEnd = t + SLOT_DURATION;
       // Slot is blocked if [t, slotEnd] and any existing [a.startMin, a.endMin]

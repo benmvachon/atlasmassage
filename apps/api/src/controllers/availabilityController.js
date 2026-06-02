@@ -172,7 +172,8 @@ export async function getBookingCalendar(req, res, next) {
       apptsByDate[ds].push(row);
     }
 
-    const availableDays = availableDaysForMonth(availByDate, apptsByDate, { timeOfDay });
+    const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const availableDays = availableDaysForMonth(availByDate, apptsByDate, { timeOfDay, notBefore });
 
     res.json({
       success: true,
@@ -205,7 +206,8 @@ export async function getBookingSlots(req, res, next) {
       apptRepo.getByDateRange(date, date),
     ]);
 
-    const slots = generateSlots(availRows, apptRows, { timeOfDay });
+    const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const slots = generateSlots(availRows, apptRows, { timeOfDay, notBefore });
     res.json({ success: true, data: { slots } });
   } catch (err) {
     next(err);

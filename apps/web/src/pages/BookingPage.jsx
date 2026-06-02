@@ -98,7 +98,7 @@ export default function BookingPage() {
       <div className="booking-page__header">
         <h1 className="booking-page__title">Book an Appointment</h1>
         <p className="booking-page__subtitle">
-          Select a date, choose your preferred time, and we'll take care of the rest.
+          Select a date, choose your preferred time, and we&apos;ll take care of the rest.
         </p>
       </div>
 

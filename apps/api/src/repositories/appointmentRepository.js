@@ -3,15 +3,18 @@ export class AppointmentRepository {
     this.pool = pool;
   }
 
-  async getByDateRange(startDate, endDate) {
+  async getByDateRange(startDate, endDate, { excludeId = null } = {}) {
+    const params = [startDate, endDate];
+    const excludeClause = excludeId ? `AND id != $${params.push(excludeId)}` : '';
     const { rows } = await this.pool.query(
       `SELECT therapist_id, bed_id, scheduled_at, duration_minutes
        FROM appointments
        WHERE scheduled_at::date >= $1::date
          AND scheduled_at::date <= $2::date
          AND status NOT IN ('cancelled')
+         ${excludeClause}
        ORDER BY scheduled_at`,
-      [startDate, endDate]
+      params
     );
     return rows;
   }
@@ -251,6 +254,18 @@ export class AppointmentRepository {
       active_memberships:   activeMemberships.rows[0].count,
       pending_appointments: pendingAppts.rows[0].count,
     };
+  }
+
+  async reschedule(id, { scheduledAt, therapistId }) {
+    const params = [id, scheduledAt, therapistId];
+    const { rows } = await this.pool.query(
+      `UPDATE appointments
+       SET scheduled_at = $2, therapist_id = $3, reminded_at = NULL, updated_at = NOW()
+       WHERE id = $1
+       RETURNING *`,
+      params
+    );
+    return rows[0] ?? null;
   }
 
   async create({

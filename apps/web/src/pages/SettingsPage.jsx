@@ -302,7 +302,7 @@ function MembershipSection() {
 
       {!loading && !activeMembership && (
         <div className="settings-empty">
-          <p>You don't have an active membership.</p>
+          <p>You don&apos;t have an active membership.</p>
           <button className="btn btn--primary" onClick={() => setShowModal(true)}>
             Choose a Plan
           </button>

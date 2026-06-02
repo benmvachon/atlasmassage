@@ -36,6 +36,9 @@ export async function createAppointment(req, res, next) {
     const { appointment: apptRepo, availability: availRepo } = repos();
 
     const apptDate = new Date(scheduledAt);
+    if (apptDate < new Date(Date.now() + 24 * 60 * 60 * 1000)) {
+      throw new AppError('Bookings must be made at least 24 hours in advance', 400, 'TOO_SOON');
+    }
     const dateStr = apptDate.toISOString().slice(0, 10);
 
     const [availRows, existingAppts] = await Promise.all([
@@ -118,7 +121,7 @@ export async function confirmAppointment(req, res, next) {
 
 export async function listAppointments(req, res, next) {
   try {
-    const { appointment, transfer } = repos();
+    const { appointment } = repos();
     const roles = req.user.roles ?? [];
     const therapistId = req.user.sub;
 
@@ -159,16 +162,24 @@ export async function getAppointment(req, res, next) {
   }
 }
 
+function checkModificationAuth(appt, user, cancelToken) {
+  const isOwner = user?.roles?.includes('owner');
+  const isAuthClient = user?.sub && appt.client_id === user.sub;
+  const isGuestWithToken = !user && !appt.client_id && cancelToken && cancelToken === appt.cancel_token;
+  return { isOwner, isAuthClient, isGuestWithToken, allowed: isOwner || isAuthClient || isGuestWithToken };
+}
+
 export async function cancelAppointment(req, res, next) {
   try {
     const { appointment: apptRepo } = repos();
     const appt = await apptRepo.findById(req.params.id);
     if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
 
-    const isOwner = req.user.roles?.includes('owner');
-    const isClient = appt.client_id === req.user.sub;
-    if (!isOwner && !isClient) {
-      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+    const { isOwner, allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
+    if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+
+    if (!isOwner && new Date(appt.scheduled_at) <= new Date(Date.now() + 24 * 60 * 60 * 1000)) {
+      return next(new AppError('Appointments cannot be cancelled within 24 hours of the scheduled time', 400, 'MODIFICATION_WINDOW_CLOSED'));
     }
 
     if (['cancelled', 'completed', 'no_show'].includes(appt.status)) {
@@ -177,6 +188,51 @@ export async function cancelAppointment(req, res, next) {
 
     const updated = await apptRepo.updateStatus(req.params.id, 'cancelled');
     res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function rescheduleAppointment(req, res, next) {
+  try {
+    const { scheduledAt, therapistId, cancelToken } = req.body;
+    const { appointment: apptRepo, availability: availRepo } = repos();
+
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const { isOwner, allowed } = checkModificationAuth(appt, req.user, cancelToken);
+    if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+
+    if (!isOwner && new Date(appt.scheduled_at) <= new Date(Date.now() + 24 * 60 * 60 * 1000)) {
+      return next(new AppError('Appointments cannot be rescheduled within 24 hours of the scheduled time', 400, 'MODIFICATION_WINDOW_CLOSED'));
+    }
+
+    if (['cancelled', 'completed', 'no_show'].includes(appt.status)) {
+      return next(new AppError('Appointment cannot be rescheduled in its current state', 400, 'BAD_REQUEST'));
+    }
+
+    const newDate = new Date(scheduledAt);
+    if (newDate < new Date(Date.now() + 24 * 60 * 60 * 1000)) {
+      throw new AppError('New appointment time must be at least 24 hours in the future', 400, 'TOO_SOON');
+    }
+
+    const targetTherapistId = therapistId || appt.therapist_id;
+    const dateStr = newDate.toISOString().slice(0, 10);
+
+    const [availRows, existingAppts] = await Promise.all([
+      availRepo.getForDateRange(dateStr, dateStr, targetTherapistId),
+      apptRepo.getByDateRange(dateStr, dateStr, { excludeId: appt.id }),
+    ]);
+
+    const slots = generateSlots(availRows, existingAppts, {});
+    const slotTime = `${String(newDate.getUTCHours()).padStart(2, '0')}:${String(newDate.getUTCMinutes()).padStart(2, '0')}`;
+    if (!slots.some(s => s.startTime === slotTime && s.availableTherapists.some(t => t.id === targetTherapistId))) {
+      throw new AppError('The requested time slot is not available', 409, 'SLOT_UNAVAILABLE');
+    }
+
+    const updated = await apptRepo.reschedule(appt.id, { scheduledAt, therapistId: targetTherapistId });
+    res.json({ success: true, data: { appointment: updated } });
   } catch (err) {
     next(err);
   }
