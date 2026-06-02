@@ -97,12 +97,13 @@ export class MembershipRepository {
     return membership;
   }
 
-  async updateMembership(id, { status, endDate }) {
+  async updateMembership(id, { status, endDate, creditsRemaining }) {
     const sets = ['updated_at = NOW()'];
     const vals = [];
     let i = 1;
-    if (status !== undefined)  { sets.push(`status = $${i++}`);   vals.push(status); }
-    if (endDate !== undefined) { sets.push(`end_date = $${i++}`); vals.push(endDate); }
+    if (status !== undefined)           { sets.push(`status = $${i++}`);            vals.push(status); }
+    if (endDate !== undefined)          { sets.push(`end_date = $${i++}`);          vals.push(endDate); }
+    if (creditsRemaining !== undefined) { sets.push(`credits_remaining = $${i++}`); vals.push(creditsRemaining); }
     vals.push(id);
 
     const { rows: [membership] } = await this.pool.query(
@@ -110,5 +111,59 @@ export class MembershipRepository {
       vals
     );
     return membership;
+  }
+
+  async findMembershipByStripeSubscriptionId(stripeSubscriptionId) {
+    const { rows } = await this.pool.query(
+      `SELECT m.*, mp.name AS plan_name, mp.price_monthly_cents, mp.credits_per_month
+       FROM memberships m
+       JOIN membership_plans mp ON mp.id = m.plan_id
+       WHERE m.stripe_subscription_id = $1
+       LIMIT 1`,
+      [stripeSubscriptionId]
+    );
+    return rows[0] ?? null;
+  }
+
+  async consumeCredit(membershipId, appointmentId) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const { rows } = await client.query(
+        `UPDATE memberships
+         SET credits_remaining = credits_remaining - 1, updated_at = NOW()
+         WHERE id = $1 AND credits_remaining > 0
+         RETURNING credits_remaining`,
+        [membershipId]
+      );
+
+      if (rows.length === 0) {
+        await client.query('ROLLBACK');
+        return null;
+      }
+
+      await client.query(
+        `INSERT INTO membership_credits (membership_id, type, amount, appointment_id)
+         VALUES ($1, 'use', 1, $2)`,
+        [membershipId, appointmentId]
+      );
+
+      await client.query('COMMIT');
+      return rows[0].credits_remaining;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async addCreditTransaction({ membershipId, type, amount, appointmentId = null, notes = null }) {
+    await this.pool.query(
+      `INSERT INTO membership_credits (membership_id, type, amount, appointment_id, notes)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [membershipId, type, amount, appointmentId, notes]
+    );
   }
 }

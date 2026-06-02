@@ -3,6 +3,7 @@ import { AppointmentRepository } from '../repositories/appointmentRepository.js'
 import { AvailabilityRepository } from '../repositories/availabilityRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { PaymentService } from '../services/paymentService.js';
+import { MembershipService } from '../services/membershipService.js';
 import { NotificationService } from '../services/notificationService.js';
 import { generateSlots } from '../services/slotService.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -64,7 +65,7 @@ export async function createAppointment(req, res, next) {
       }
     }
 
-    const appointment = await apptRepo.create({
+    let appointment = await apptRepo.create({
       clientId,
       therapistId: resolvedTherapistId,
       serviceId,
@@ -77,9 +78,27 @@ export async function createAppointment(req, res, next) {
       waiverSignature,
     });
 
+    // Check if the booking is covered by a membership credit.
+    let clientSecret = null;
+    if (clientId) {
+      const membershipSvc = new MembershipService(getPool());
+      const status = await membershipSvc.getMyStatus(clientId);
+      if (status.active && status.creditsRemaining > 0) {
+        await membershipSvc.consumeCredit(status.membershipId, appointment.id);
+        await apptRepo.setMembership(appointment.id, status.membershipId);
+        await apptRepo.updateStatus(appointment.id, 'confirmed');
+        appointment = { ...appointment, status: 'confirmed', membership_id: status.membershipId };
+
+        new NotificationService(getPool()).sendBookingConfirmation(appointment.id).catch(err => {
+          logger.error('notification_error', { appointmentId: appointment.id, message: err.message });
+        });
+
+        return res.status(201).json({ success: true, data: { appointment, clientSecret: null } });
+      }
+    }
+
     // Create a payment intent when Stripe is configured.
     // Service price is authoritative — never trust client-provided amounts.
-    let clientSecret = null;
     if (config.stripe.secretKey) {
       const service = await apptRepo.findServiceById(serviceId);
       if (service?.price_cents > 0) {

@@ -3,6 +3,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
 import { paymentService } from '../services/paymentService.js';
+import { membershipService } from '../services/membershipService.js';
 import { getStripePromise, stripePublishableKey } from '../services/stripe.js';
 
 function formatDate(dateStr) {
@@ -218,6 +219,7 @@ function BookingForm({
   notes, setNotes,
   paymentMethods, loadingMethods,
   selectedMethodId, setSelectedMethodId,
+  membershipStatus,
   onClose, onComplete,
 }) {
   const { user } = useAuth();
@@ -230,7 +232,8 @@ function BookingForm({
   const [stagedPaymentMethodId, setStagedPaymentMethodId] = useState(null);
 
   const selectedService = services.find(s => s.id === serviceId);
-  const needsPayment = !!stripePublishableKey;
+  const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
+  const needsPayment = !!stripePublishableKey && !membershipCoversBooking;
   const isNewCard = selectedMethodId === 'new';
 
   const isFormReady = (() => {
@@ -437,7 +440,17 @@ function BookingForm({
           </div>
 
           {/* Payment */}
-          {needsPayment ? (
+          {membershipCoversBooking ? (
+            <div className="booking-membership-banner">
+              <span className="booking-membership-banner__icon">★</span>
+              <div>
+                <strong>Covered by {membershipStatus.planName}</strong>
+                <p className="booking-membership-banner__credits">
+                  {membershipStatus.creditsRemaining} of {membershipStatus.creditsPerMonth} monthly session{membershipStatus.creditsPerMonth !== 1 ? 's' : ''} remaining — no payment required
+                </p>
+              </div>
+            </div>
+          ) : needsPayment ? (
             <>
               <div className="booking-divider">
                 Payment
@@ -521,7 +534,7 @@ function BookingForm({
   );
 }
 
-// ── Shell — fetches payment methods, wraps in <Elements> when needed ───────────
+// ── Shell — fetches payment methods + membership status, wraps in <Elements> ───
 
 export default function BookingModal({
   slot, date, services, _allTherapists, lockedTherapist, onComplete, onClose,
@@ -538,6 +551,7 @@ export default function BookingModal({
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loadingMethods, setLoadingMethods] = useState(false);
   const [selectedMethodId, setSelectedMethodId] = useState(user ? '' : 'new');
+  const [membershipStatus, setMembershipStatus] = useState(null);
 
   const therapistOptions = useMemo(() => {
     if (lockedTherapist) return [lockedTherapist];
@@ -545,18 +559,27 @@ export default function BookingModal({
   }, [lockedTherapist, slot.availableTherapists]);
 
   useEffect(() => {
-    if (!user || !stripePublishableKey) return;
-    setLoadingMethods(true);
-    paymentService.listPaymentMethods()
-      .then(({ data }) => {
-        setPaymentMethods(data.methods);
-        const def = data.methods.find(m => m.is_default);
-        if (def) setSelectedMethodId(def.id);
-        else if (data.methods.length > 0) setSelectedMethodId(data.methods[0].id);
-        else setSelectedMethodId('new');
-      })
-      .catch(() => setSelectedMethodId('new'))
-      .finally(() => setLoadingMethods(false));
+    if (!user) return;
+
+    const fetches = [membershipService.getMyStatus().then(({ data }) => setMembershipStatus(data))];
+
+    if (stripePublishableKey) {
+      setLoadingMethods(true);
+      fetches.push(
+        paymentService.listPaymentMethods()
+          .then(({ data }) => {
+            setPaymentMethods(data.methods);
+            const def = data.methods.find(m => m.is_default);
+            if (def) setSelectedMethodId(def.id);
+            else if (data.methods.length > 0) setSelectedMethodId(data.methods[0].id);
+            else setSelectedMethodId('new');
+          })
+          .catch(() => setSelectedMethodId('new'))
+          .finally(() => setLoadingMethods(false))
+      );
+    }
+
+    Promise.allSettled(fetches);
   }, [user]);
 
   const stripePromise = getStripePromise();
@@ -565,6 +588,7 @@ export default function BookingModal({
     therapistId, setTherapistId, serviceId, setServiceId,
     name, setName, email, setEmail, phone, setPhone, notes, setNotes,
     paymentMethods, loadingMethods, selectedMethodId, setSelectedMethodId,
+    membershipStatus,
     onClose, onComplete,
   };
 

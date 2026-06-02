@@ -88,3 +88,12 @@ export async function pauseMembership(req, res, next) {
     next(err);
   }
 }
+
+export async function getMyStatus(req, res, next) {
+  try {
+    const status = await service().getMyStatus(req.user.sub);
+    res.json({ success: true, data: status });
+  } catch (err) {
+    next(err);
+  }
+}

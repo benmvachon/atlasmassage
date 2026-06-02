@@ -146,4 +146,24 @@ export class MembershipService {
 
     return this.memberships.updateMembership(membershipId, { status: 'paused' });
   }
+
+  async getMyStatus(userId) {
+    const membership = await this.memberships.findActiveMembershipByClient(userId);
+    if (!membership) return { active: false };
+    return {
+      active: true,
+      membershipId: membership.id,
+      planName: membership.plan_name,
+      creditsRemaining: membership.credits_remaining,
+      creditsPerMonth: membership.credits_per_month,
+    };
+  }
+
+  async consumeCredit(membershipId, appointmentId) {
+    const remaining = await this.memberships.consumeCredit(membershipId, appointmentId);
+    if (remaining === null) {
+      throw new AppError('No membership credits remaining', 402, 'NO_CREDITS');
+    }
+    return remaining;
+  }
 }

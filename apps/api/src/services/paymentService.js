@@ -3,6 +3,7 @@ import { config } from '../config/index.js';
 import { PaymentRepository } from '../repositories/paymentRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
+import { MembershipRepository } from '../repositories/membershipRepository.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 function getStripe() {
@@ -17,6 +18,7 @@ export class PaymentService {
     this.payments = new PaymentRepository(pool);
     this.users = new UserRepository(pool);
     this.appointments = new AppointmentRepository(pool);
+    this.memberships = new MembershipRepository(pool);
   }
 
   async ensureStripeCustomer(userId) {
@@ -200,6 +202,36 @@ export class PaymentService {
         const intent = event.data.object;
         const payment = await this.payments.findPaymentByStripeIntentId(intent.id);
         if (payment) await this.payments.updatePaymentStatus(payment.id, 'failed', intent.id);
+        break;
+      }
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object;
+        if (invoice.subscription) {
+          const membership = await this.memberships.findMembershipByStripeSubscriptionId(invoice.subscription);
+          if (membership && membership.status === 'active') {
+            await this.memberships.updateMembership(membership.id, {
+              creditsRemaining: membership.credits_per_month,
+            });
+            await this.memberships.addCreditTransaction({
+              membershipId: membership.id,
+              type: 'grant',
+              amount: membership.credits_per_month,
+              notes: `Monthly renewal — invoice ${invoice.id}`,
+            });
+          }
+        }
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        const membership = await this.memberships.findMembershipByStripeSubscriptionId(sub.id);
+        if (membership && membership.status !== 'cancelled') {
+          const today = new Date().toISOString().split('T')[0];
+          await this.memberships.updateMembership(membership.id, {
+            status: 'cancelled',
+            endDate: today,
+          });
+        }
         break;
       }
     }

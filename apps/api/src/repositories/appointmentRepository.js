@@ -43,6 +43,14 @@ export class AppointmentRepository {
     return appt;
   }
 
+  async setMembership(id, membershipId) {
+    const { rows: [appt] } = await this.pool.query(
+      `UPDATE appointments SET membership_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [membershipId, id]
+    );
+    return appt;
+  }
+
   async listForOwner({ start, end, therapistId }) {
     const params = [start, end];
     const therapistClause = therapistId

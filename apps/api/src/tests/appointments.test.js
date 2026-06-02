@@ -30,6 +30,14 @@ await jest.unstable_mockModule('../services/notificationService.js', () => ({
   })),
 }));
 
+const mockMembershipSvc = {
+  getMyStatus: jest.fn().mockResolvedValue({ active: false }),
+  consumeCredit: jest.fn().mockResolvedValue(0),
+};
+await jest.unstable_mockModule('../services/membershipService.js', () => ({
+  MembershipService: jest.fn(() => mockMembershipSvc),
+}));
+
 // Mock slotService so we control which slots are valid
 const mockGenerateSlots = jest.fn();
 await jest.unstable_mockModule('../services/slotService.js', () => ({
@@ -72,11 +80,15 @@ beforeEach(() => {
     { startTime: '10:00', endTime: '11:00', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
   ]);
 
+  mockMembershipSvc.getMyStatus.mockResolvedValue({ active: false });
+  mockMembershipSvc.consumeCredit.mockResolvedValue(0);
+
   Object.assign(mockApptRepo, {
     create: jest.fn().mockResolvedValue(APPT),
     findById: jest.fn().mockResolvedValue(APPT),
     findServiceById: jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 0, duration_minutes: 60 }),
     updateStatus: jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
+    setMembership: jest.fn().mockResolvedValue({ ...APPT }),
     getByDateRange: jest.fn().mockResolvedValue([]),
     listForTherapist: jest.fn().mockResolvedValue([]),
     reschedule: jest.fn().mockResolvedValue(APPT),
