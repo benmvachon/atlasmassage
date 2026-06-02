@@ -14,3 +14,9 @@ coverage/
 *.tgz
 .cache/
 .vite/
+
+# IDE / AI tooling
+.claude/
+.agents/
+.windsurf/
+skills-lock.json
