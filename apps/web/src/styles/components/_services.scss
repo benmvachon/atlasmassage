@@ -1,0 +1,162 @@
+@use '../abstracts/variables' as *;
+
+// ── Services page ─────────────────────────────────────────────────────────────
+
+.page--services {
+  max-width: $container-max-width;
+  margin: 0 auto;
+}
+
+// ── Intro ─────────────────────────────────────────────────────────────────────
+
+.services__intro {
+  max-width: 680px;
+  margin: 0 auto $space-16;
+  text-align: center;
+}
+
+.services__heading {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  margin-bottom: $space-6;
+  letter-spacing: 0.04em;
+}
+
+.services__tagline {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.75;
+  color: $color-text-muted;
+}
+
+// ── Three-column graphic ──────────────────────────────────────────────────────
+
+.services__graphic {
+  display: grid;
+  grid-template-columns: 1fr 280px 1fr;
+  gap: $space-10;
+  align-items: start;
+
+  @media (max-width: $bp-lg) {
+    grid-template-columns: 1fr 220px 1fr;
+    gap: $space-8;
+  }
+
+  @media (max-width: $bp-md) {
+    grid-template-columns: 1fr;
+    gap: $space-8;
+  }
+}
+
+// ── Center image column ───────────────────────────────────────────────────────
+
+.services__body-map {
+  position: sticky;
+  top: calc(#{$header-height} + #{$space-8});
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    display: block;
+
+    @media (max-width: $bp-md) {
+      max-width: 240px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: $bp-md) {
+    position: static;
+    order: -1;
+  }
+}
+
+// ── Side columns ──────────────────────────────────────────────────────────────
+
+.services__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+
+  &--left {
+    align-items: flex-end;
+
+    .service-blurb {
+      text-align: right;
+    }
+
+    @media (max-width: $bp-md) {
+      align-items: stretch;
+
+      .service-blurb {
+        text-align: left;
+      }
+    }
+  }
+
+  &--right {
+    align-items: flex-start;
+
+    @media (max-width: $bp-md) {
+      align-items: stretch;
+    }
+  }
+}
+
+// ── Individual blurb ──────────────────────────────────────────────────────────
+
+.service-blurb {
+  max-width: 340px;
+  padding: $space-6;
+  border-radius: $border-radius-md;
+  background-color: $color-bg-alt;
+  border: 1px solid $color-border;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.service-blurb__name {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  font-weight: 700;
+  color: $color-primary-dark;
+  margin-bottom: $space-3;
+
+  // Decorative rule under the name
+  &::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2px;
+    background-color: $color-secondary;
+    margin-top: $space-2;
+  }
+
+  .services__col--left & {
+    &::after {
+      margin-left: auto;
+    }
+
+    @media (max-width: $bp-md) {
+      &::after {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+.service-blurb__description {
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  line-height: 1.75;
+  color: $color-text-muted;
+  margin: 0;
+}

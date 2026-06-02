@@ -22,21 +22,21 @@ const MEMBERSHIP_PLANS = [
   {
     name: 'Essentials',
     description: 'One 60-minute massage per month. Perfect for maintaining wellness.',
-    priceMonthlyCents: 10000,
+    priceMonthlyCents: 12000,
     creditsPerMonth: 1,
     stripePriceId: 'price_1TdbGCQec936INktczEfSHnr', // this will likely require modification when prices are updated
   },
   {
     name: 'Wellness',
     description: 'Two 60-minute massages per month. Our most popular plan.',
-    priceMonthlyCents: 18000,
+    priceMonthlyCents: 20000,
     creditsPerMonth: 2,
     stripePriceId: 'price_1TdbGCQec936INktHP8B88JA', // this will likely require modification when prices are updated
   },
   {
     name: 'Unlimited',
     description: 'Four 60-minute massages per month. Maximum recovery and relaxation.',
-    priceMonthlyCents: 32000,
+    priceMonthlyCents: 36000,
     creditsPerMonth: 4,
     stripePriceId: 'price_1TdbGCQec936INktwkkXuy8M', // this will likely require modification when prices are updated
   },
@@ -267,7 +267,7 @@ async function seed() {
 
     // Seed a few upcoming appointments to exercise buffer-checking logic
     const { rows: [swedish] } = await client.query(
-      "SELECT id FROM services WHERE name = 'Swedish Massage'"
+      "SELECT id FROM services WHERE name = 'Massage'"
     );
     const clientUserId = seededUserIds['client1@example.com'];
 
