@@ -37,10 +37,10 @@
   &--outline {
     background-color: transparent;
     color: $color-primary;
-    border-color: $color-primary;
+    border-color: $color-primary-dark;
 
     &:hover:not(:disabled) {
-      background-color: $color-primary;
+      background-color: $color-primary-dark;
       color: $color-white;
     }
   }

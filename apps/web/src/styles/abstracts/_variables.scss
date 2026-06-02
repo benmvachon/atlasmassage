@@ -23,14 +23,14 @@ $gradient-radial:       radial-gradient($lilac-ash, $dusty-mauve, $taupe, $taupe
 
 // ── Brand / semantic colors ───────────────────────────────────────────────────
 
-$color-primary:       #2c6e49;
-$color-primary-dark:  #1a4a30;
-$color-primary-light: #4c956c;
-$color-secondary:     #d4a373;
+$color-primary:       #af3e4d;
+$color-primary-dark:  #681b25;
+$color-primary-light: #e56c7c;
+$color-secondary:     #dd9955;
 $color-accent:        #fefae0;
 
-$color-text:          #1a1a2e;
-$color-text-muted:    #6b7280;
+$color-text:          #2e1a1a;
+$color-text-muted:    #806b6b;
 $color-bg:            #fafaf9;
 $color-bg-alt:        #f3f4f6;
 $color-white:         #ffffff;
@@ -94,6 +94,7 @@ $color-badge-transfer-text:  #6d28d9;
 
 $font-family-base: 'Georgia', 'Times New Roman', serif;
 $font-family-ui:   system-ui, -apple-system, sans-serif;
+$font-family-logo: 'CapitalisTypOasis', serif;
 $font-size-base:   16px;
 $line-height-base: 1.6;
 

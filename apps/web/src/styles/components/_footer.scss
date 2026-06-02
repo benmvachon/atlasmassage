@@ -2,7 +2,7 @@
 
 .footer {
   margin-top: auto;
-  padding: $space-8 0;
+  padding: $space-4 0;
   background-color: $color-text;
   color: $color-bg;
 
@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: $space-4;
+    gap: $space-2;
   }
 
   &__copy {

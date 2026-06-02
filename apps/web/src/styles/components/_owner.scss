@@ -1200,25 +1200,25 @@
 
 // ── btn--ghost variant ────────────────────────────────────────────────────────
 
-.btn--ghost {
-  background: transparent;
-  border-color: transparent;
-  color: $color-text;
+// .btn--ghost {
+//   background: transparent;
+//   border-color: transparent;
+//   color: $color-text;
 
-  &:hover:not(:disabled) {
-    background: $color-bg-alt;
-    border-color: $color-border;
-  }
-}
+//   &:hover:not(:disabled) {
+//     background: $color-bg-alt;
+//     border-color: $color-border;
+//   }
+// }
 
-.btn--outline {
-  background: $color-white;
-  border-color: $color-border;
-  color: $color-text;
+// .btn--outline {
+//   background: $color-white;
+//   border-color: $color-border;
+//   color: $color-text;
 
-  &:hover:not(:disabled) {
-    background: $color-bg-alt;
-    border-color: $color-primary-light;
-    color: $color-primary;
-  }
-}
+//   &:hover:not(:disabled) {
+//     background: $color-bg-alt;
+//     border-color: $color-primary-light;
+//     color: $color-primary;
+//   }
+// }

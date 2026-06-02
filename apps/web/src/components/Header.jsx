@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import logoSvg from '../assets/atlas.svg';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -10,7 +11,8 @@ export default function Header() {
     <header className="header">
       <div className="header__inner container">
         <Link to="/" className="header__logo">
-          Atlas Massage
+          <img src={logoSvg} alt="" className="header__logo-icon" aria-hidden="true" />
+          <span className="header__logo-text">ATLAS</span>
         </Link>
         <nav className="header__nav" aria-label="Main navigation">
           <NavLink to="/" end>Home</NavLink>
