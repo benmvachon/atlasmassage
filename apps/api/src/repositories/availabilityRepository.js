@@ -6,7 +6,7 @@ export class AvailabilityRepository {
   // Used by booking calendar: joins user name, optionally filtered to one therapist.
   async getForDateRange(startDate, endDate, therapistId = null) {
     const params = [startDate, endDate];
-    let where = 'a.specific_date >= $1 AND a.specific_date <= $2 AND u.is_active = TRUE';
+    let where = "a.specific_date >= $1 AND a.specific_date <= $2 AND u.is_active = TRUE AND (a.specific_date + a.start_time) >= NOW() + INTERVAL '24 hours'";
     if (therapistId) {
       params.push(therapistId);
       where += ` AND a.therapist_id = $${params.length}`;
