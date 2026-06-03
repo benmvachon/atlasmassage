@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { config } from '../config/index.js';
 import authRoutes from './auth.js';
 import userRoutes from './users.js';
 import appointmentRoutes from './appointments.js';
@@ -10,6 +11,7 @@ import adminRoutes from './admin.js';
 import businessRoutes from './business.js';
 import teamRoutes from './team.js';
 import testimonialsRoutes from './testimonials.js';
+import debugRoutes from './debug.js';
 
 const router = Router();
 
@@ -24,5 +26,9 @@ router.use('/admin', adminRoutes);
 router.use('/business', businessRoutes);
 router.use('/team', teamRoutes);
 router.use('/testimonials', testimonialsRoutes);
+
+if (config.env !== 'production') {
+  router.use('/debug', debugRoutes);
+}
 
 export default router;
