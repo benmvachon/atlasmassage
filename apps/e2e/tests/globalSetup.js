@@ -1,7 +1,7 @@
 /**
  * Playwright global setup — runs once before all workers start.
  * Logs in as each test account and writes tokens to .auth-state.json.
- * This reduces login calls across the suite to exactly 3.
+ * This reduces login calls across the suite to exactly 4.
  */
 import { request as playwrightRequest } from '@playwright/test';
 import { writeFileSync } from 'fs';
@@ -26,15 +26,16 @@ export default async function globalSetup(config) {
     return { token: body.data.accessToken, userId: body.data.user.id };
   }
 
-  const [owner, sarah, marcus] = await Promise.all([
+  const [owner, sarah, marcus, client] = await Promise.all([
     login('owner@atlasmassage.com',  'atlas-owner-2024'),
     login('sarah@atlasmassage.com',  'atlas-therapist-2024'),
     login('marcus@atlasmassage.com', 'atlas-therapist-2024'),
+    login('client1@example.com',     'atlas-client-2024'),
   ]);
 
   writeFileSync(
     resolve(__dirname, '.auth-state.json'),
-    JSON.stringify({ owner, sarah, marcus }, null, 2)
+    JSON.stringify({ owner, sarah, marcus, client }, null, 2)
   );
 
   await context.dispose();

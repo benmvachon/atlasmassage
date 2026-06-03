@@ -13,6 +13,8 @@
   &__header { margin-bottom: $space-6; }
 
   &__title {
+    font-family: $font-family-logo;
+    color: $color-primary-dark;
     font-size: $font-size-2xl;
     margin-bottom: $space-1;
   }
@@ -87,5 +89,5 @@
 }
 
 .layout--auth {
-  background: linear-gradient(135deg, $color-accent 0%, $color-bg 60%);
+  background: linear-gradient(135deg, $color-secondary-light 0%, $color-bg 60%);
 }
