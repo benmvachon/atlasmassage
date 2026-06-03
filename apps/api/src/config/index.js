@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const optional = (key, defaultValue = undefined) => process.env[key] ?? defaultValue;
+const optional = (key, defaultValue) => process.env[key] ?? defaultValue;
 
 export const config = {
   env: optional('NODE_ENV', 'development'),

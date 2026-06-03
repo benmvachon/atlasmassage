@@ -21,6 +21,34 @@ function timeToMinutes(s) {
   return h * 60 + m;
 }
 
+function buildCountsByTherapist(apptRows) {
+  const counts = {};
+  for (const appt of apptRows) {
+    counts[appt.therapist_id] = (counts[appt.therapist_id] || 0) + 1;
+  }
+  return counts;
+}
+
+function weekBoundsFor(dateStr) {
+  const d = new Date(`${dateStr}T12:00:00Z`);
+  const dow = d.getUTCDay(); // 0=Sun
+  const start = new Date(d);
+  start.setUTCDate(d.getUTCDate() - dow);
+  const end = new Date(start);
+  end.setUTCDate(start.getUTCDate() + 6);
+  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+}
+
+function filterByCapacity(availRows, dailyCounts, weeklyCounts, therapistMap) {
+  return availRows.filter(avail => {
+    const t = therapistMap[avail.therapist_id];
+    if (!t) return true;
+    if ((dailyCounts[avail.therapist_id] || 0) >= t.daily_booking_limit) return false;
+    if (weeklyCounts && (weeklyCounts[avail.therapist_id] || 0) >= t.weekly_booking_limit) return false;
+    return true;
+  });
+}
+
 // ── Therapist schedule (owner/therapist-facing) ───────────────────────────────
 
 export async function listAvailableTherapists(req, res, next) {
@@ -172,8 +200,15 @@ export async function getBookingCalendar(req, res, next) {
       apptsByDate[ds].push(row);
     }
 
+    const therapistMap = Object.fromEntries(allTherapists.map(t => [t.id, t]));
+    const filteredAvailByDate = {};
+    for (const [ds, dayAvails] of Object.entries(availByDate)) {
+      const dailyCounts = buildCountsByTherapist(apptsByDate[ds] ?? []);
+      filteredAvailByDate[ds] = filterByCapacity(dayAvails, dailyCounts, null, therapistMap);
+    }
+
     const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const availableDays = availableDaysForMonth(availByDate, apptsByDate, { timeOfDay, notBefore });
+    const availableDays = availableDaysForMonth(filteredAvailByDate, apptsByDate, { timeOfDay, notBefore });
 
     res.json({
       success: true,
@@ -200,14 +235,23 @@ export async function getBookingSlots(req, res, next) {
       throw new AppError('date query param required (YYYY-MM-DD)', 400, 'BAD_REQUEST');
     }
 
-    const { availability: availRepo, appointment: apptRepo } = repos();
-    const [availRows, apptRows] = await Promise.all([
+    const { availability: availRepo, appointment: apptRepo, therapist: therapistRepo } = repos();
+    const [weekStart, weekEnd] = weekBoundsFor(date);
+
+    const [availRows, apptRows, weekApptRows, therapists] = await Promise.all([
       availRepo.getForDateRange(date, date, therapistId || null),
       apptRepo.getByDateRange(date, date),
+      apptRepo.getByDateRange(weekStart, weekEnd),
+      therapistRepo.findAll(),
     ]);
 
+    const therapistMap = Object.fromEntries(therapists.map(t => [t.id, t]));
+    const dailyCounts = buildCountsByTherapist(apptRows);
+    const weeklyCounts = buildCountsByTherapist(weekApptRows);
+    const filteredAvailRows = filterByCapacity(availRows, dailyCounts, weeklyCounts, therapistMap);
+
     const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const slots = generateSlots(availRows, apptRows, { timeOfDay, notBefore });
+    const slots = generateSlots(filteredAvailRows, apptRows, { timeOfDay, notBefore });
     res.json({ success: true, data: { slots } });
   } catch (err) {
     next(err);

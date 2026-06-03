@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 app.use(compression());
 
-// Rate limiting
+// Rate limiting — skip in development so E2E tests and local tooling are not throttled
 app.use(
   '/api',
   rateLimit({
@@ -41,6 +41,7 @@ app.use(
     max: config.rateLimit.max,
     standardHeaders: true,
     legacyHeaders: false,
+    skip: () => config.env === 'development',
   })
 );
 
