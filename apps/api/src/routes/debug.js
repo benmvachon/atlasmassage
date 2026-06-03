@@ -11,6 +11,7 @@ import { config } from '../config/index.js';
 import { getPool } from '../database/pool.js';
 import { generateResetToken } from '../services/tokenService.js';
 import { PaymentService } from '../services/paymentService.js';
+import { NotificationService } from '../services/notificationService.js';
 
 const router = Router();
 
@@ -150,6 +151,113 @@ router.delete('/appointments/:therapistId/:date', async (req, res, next) => {
       [therapistId, date]
     );
     res.json({ success: true, data: { cancelled: rows.length } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/v1/debug/send-booking-confirmation/:appointmentId
+ * Triggers the booking-confirmation notification for an existing appointment.
+ * Used to test the confirmation flow without going through the full booking UI.
+ */
+router.post('/send-booking-confirmation/:appointmentId', async (req, res, next) => {
+  try {
+    const svc = new NotificationService(getPool());
+    await svc.sendBookingConfirmation(req.params.appointmentId);
+    res.json({ success: true, data: { sent: true } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/v1/debug/trigger-notifications
+ * Runs all four cron notification jobs synchronously.
+ * Used by E2E tests to exercise the reminder worker without waiting an hour.
+ */
+router.post('/trigger-notifications', async (req, res, next) => {
+  try {
+    const svc = new NotificationService(getPool());
+    await svc.sendPendingReminders();
+    await svc.sendPendingFeedbackRequests();
+    await svc.sendPendingWeekFollowups();
+    await svc.sendPendingMonthFollowups();
+    res.json({ success: true, data: { ran: true } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/v1/debug/appointments/backdated
+ * Body: { therapistId, serviceId, clientId?, scheduledAt, status? }
+ * Inserts an appointment directly with an arbitrary scheduledAt timestamp,
+ * bypassing booking validations and availability checks.
+ */
+router.post('/appointments/backdated', async (req, res, next) => {
+  try {
+    const { therapistId, serviceId, clientId, scheduledAt, status = 'confirmed' } = req.body;
+    if (!therapistId || !serviceId || !scheduledAt) {
+      return res.status(400).json({ success: false, error: 'therapistId, serviceId, scheduledAt required' });
+    }
+    const pool = getPool();
+    const { rows: [service] } = await pool.query(
+      'SELECT duration_minutes FROM services WHERE id = $1',
+      [serviceId]
+    );
+    if (!service) return res.status(404).json({ success: false, error: 'service not found' });
+    const { rows: [appt] } = await pool.query(
+      `INSERT INTO appointments
+         (therapist_id, service_id, client_id, scheduled_at, status, duration_minutes)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [therapistId, serviceId, clientId ?? null, scheduledAt, status, service.duration_minutes]
+    );
+    res.json({ success: true, data: { appointment: appt } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * DELETE /api/v1/debug/appointments/client/:clientId/future
+ * Cancels all future non-cancelled appointments for a client.
+ * Used by notification E2E tests to ensure no pending appointments suppress followup emails.
+ */
+router.delete('/appointments/client/:clientId/future', async (req, res, next) => {
+  try {
+    const { clientId } = req.params;
+    const pool = getPool();
+    const { rows } = await pool.query(
+      `UPDATE appointments SET status = 'cancelled', updated_at = NOW()
+       WHERE client_id = $1
+         AND scheduled_at > NOW()
+         AND status NOT IN ('cancelled', 'completed')
+       RETURNING id`,
+      [clientId]
+    );
+    res.json({ success: true, data: { cancelled: rows.length } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * DELETE /api/v1/debug/appointments/:appointmentId
+ * Cancels a single appointment by ID, bypassing business-logic guards.
+ * Handles backdated test appointments that the normal cancel endpoint rejects.
+ */
+router.delete('/appointments/:appointmentId', async (req, res, next) => {
+  try {
+    const { appointmentId } = req.params;
+    const pool = getPool();
+    await pool.query(
+      `UPDATE appointments SET status = 'cancelled', updated_at = NOW() WHERE id = $1`,
+      [appointmentId]
+    );
+    res.json({ success: true, data: { cancelled: true } });
   } catch (err) {
     next(err);
   }
