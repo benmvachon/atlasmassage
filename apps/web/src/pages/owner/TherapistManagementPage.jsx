@@ -65,16 +65,31 @@ function EditPanel({ therapist, onSave, onCancel }) {
     specialties: therapist.specialties ?? [],
     isAcceptingClients: therapist.is_accepting_clients,
   });
+  const [headshotFile, setHeadshotFile] = useState(null);
+  const [headshotPreview, setHeadshotPreview] = useState(therapist.headshot_url ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setHeadshotFile(file);
+    setHeadshotPreview(URL.createObjectURL(file));
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
-      const res = await adminService.updateTherapist(therapist.id, form);
-      onSave(res.data);
+      const [profileRes] = await Promise.all([
+        adminService.updateTherapist(therapist.id, form),
+        headshotFile ? adminService.uploadTherapistHeadshot(therapist.id, headshotFile) : Promise.resolve(null),
+      ]);
+      const updated = headshotFile
+        ? await adminService.listTherapists().then(r => r.data.find(t => t.id === therapist.id))
+        : profileRes.data;
+      onSave(updated);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,6 +103,26 @@ function EditPanel({ therapist, onSave, onCancel }) {
         Edit {therapist.first_name} {therapist.last_name}
       </h3>
       <form onSubmit={handleSubmit} className="owner-edit-panel__form">
+        <div className="owner-headshot-upload">
+          <div className="owner-headshot-upload__preview">
+            {headshotPreview
+              ? <img src={headshotPreview} alt="Headshot preview" />
+              : <span className="owner-headshot-upload__placeholder">No photo</span>}
+          </div>
+          <label className="owner-label owner-headshot-upload__label">
+            Headshot photo
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              className="owner-headshot-upload__input"
+            />
+            <span className="btn btn--outline btn--sm owner-headshot-upload__btn">
+              Choose photo
+            </span>
+          </label>
+        </div>
+
         <label className="owner-label">
           Bio
           <textarea
@@ -255,6 +290,13 @@ function TherapistRow({ therapist, currentUserId, onEdit, onDeactivate }) {
     <tr className={!therapist.is_active ? 'owner-row--inactive' : ''}>
       <td>
         <span className="therapist-name">
+          {therapist.headshot_url && (
+            <img
+              src={therapist.headshot_url}
+              alt=""
+              className="therapist-name__thumb"
+            />
+          )}
           {therapist.first_name} {therapist.last_name}
           {isSelf && <span className="owner-badge owner-badge--self">You</span>}
         </span>

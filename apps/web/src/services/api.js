@@ -6,15 +6,16 @@ export function setAccessToken(token) {
   accessToken = token;
 }
 
-async function request(method, path, body) {
-  const headers = { 'Content-Type': 'application/json' };
+async function request(method, path, body, { multipart = false } = {}) {
+  const headers = {};
+  if (!multipart) headers['Content-Type'] = 'application/json';
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers,
     credentials: 'include',
-    ...(body !== undefined && { body: JSON.stringify(body) }),
+    ...(body !== undefined && { body: multipart ? body : JSON.stringify(body) }),
   });
 
   // Vite's proxy-error responses are plain text, not JSON.
@@ -44,4 +45,5 @@ export const api = {
   put: (path, body) => request('PUT', path, body),
   patch: (path, body) => request('PATCH', path, body),
   delete: (path, body) => request('DELETE', path, body),
+  upload: (path, formData) => request('POST', path, formData, { multipart: true }),
 };

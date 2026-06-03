@@ -3,6 +3,7 @@ const SELECT_THERAPIST = `
     u.id, u.email, u.first_name, u.last_name, u.phone, u.is_active,
     u.created_at, u.updated_at,
     t.bio, t.specialties, t.is_accepting_clients,
+    t.headshot_url,
     t.daily_booking_limit, t.weekly_booking_limit,
     COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') AS roles
   FROM users u
@@ -74,6 +75,14 @@ export class TherapistRepository {
        SET bio = $1, specialties = $2, is_accepting_clients = $3, updated_at = NOW()
        WHERE user_id = $4 RETURNING user_id`,
       [bio ?? null, specialties ?? [], isAcceptingClients, id]
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateHeadshot(id, headshotUrl) {
+    const { rows } = await this.pool.query(
+      'UPDATE therapists SET headshot_url = $1, updated_at = NOW() WHERE user_id = $2 RETURNING user_id',
+      [headshotUrl, id]
     );
     return rows[0] ?? null;
   }

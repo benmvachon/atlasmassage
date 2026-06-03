@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import multer from 'multer';
 import * as adminController from '../controllers/adminController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import {
@@ -11,6 +14,24 @@ import {
   therapistUpdateRules,
   validate,
 } from '../validators/adminValidators.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const headshotStorage = multer.diskStorage({
+  destination: path.join(__dirname, '..', '..', 'public', 'headshots'),
+  filename(_req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+  },
+});
+
+const uploadHeadshot = multer({
+  storage: headshotStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    cb(null, /^image\/(jpeg|png|webp)$/.test(file.mimetype));
+  },
+}).single('headshot');
 
 const router = Router();
 
@@ -57,6 +78,7 @@ router.get('/therapists', adminController.listTherapists);
 router.post('/therapists', therapistCreateRules, validate, adminController.createTherapist);
 router.get('/therapists/:id', adminController.getTherapist);
 router.put('/therapists/:id', therapistUpdateRules, validate, adminController.updateTherapist);
+router.post('/therapists/:id/headshot', uploadHeadshot, adminController.uploadTherapistHeadshot);
 router.delete('/therapists/:id', adminController.deactivateTherapist);
 
 export default router;

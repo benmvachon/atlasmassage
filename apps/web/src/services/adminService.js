@@ -24,6 +24,11 @@ export const adminService = {
   listTherapists: () => api.get('/admin/therapists'),
   createTherapist: (data) => api.post('/admin/therapists', data),
   updateTherapist: (id, data) => api.put(`/admin/therapists/${id}`, data),
+  uploadTherapistHeadshot: (id, file) => {
+    const fd = new FormData();
+    fd.append('headshot', file);
+    return api.upload(`/admin/therapists/${id}/headshot`, fd);
+  },
   deactivateTherapist: (id) => api.delete(`/admin/therapists/${id}`),
 
   // Appointments (calendar)

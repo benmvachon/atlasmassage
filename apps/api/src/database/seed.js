@@ -71,9 +71,10 @@ const USERS = [
     lastName: 'Rivera',
     roles: ['owner', 'therapist'],
     therapist: {
-      bio: 'Practice owner and senior therapist.',
+      bio: 'Practice owner and senior therapist with over a decade of experience in deep tissue and sports massage. Alex founded Atlas Massage with a commitment to individualized care and lasting results.',
       specialties: ['deep tissue', 'sports massage'],
       isAcceptingClients: true,
+      headshotUrl: '/headshots/generic-male-headshot.png',
     },
   },
   {
@@ -83,9 +84,10 @@ const USERS = [
     lastName: 'Chen',
     roles: ['therapist'],
     therapist: {
-      bio: 'Specializing in relaxation and prenatal massage.',
+      bio: 'Sarah specializes in relaxation and prenatal massage, creating a nurturing environment for clients at every stage of wellness. She brings warmth and attentiveness to every session.',
       specialties: ['swedish', 'prenatal'],
       isAcceptingClients: true,
+      headshotUrl: '/headshots/generic-female-headshot.png',
     },
   },
   {
@@ -95,9 +97,10 @@ const USERS = [
     lastName: 'Johnson',
     roles: ['therapist'],
     therapist: {
-      bio: 'Sports massage and injury recovery specialist.',
+      bio: 'Marcus focuses on sports massage and injury recovery, working closely with athletes and active individuals to reduce pain, improve range of motion, and optimize performance.',
       specialties: ['sports massage', 'trigger point'],
       isAcceptingClients: true,
+      headshotUrl: '/headshots/generic-male-headshot.png',
     },
   },
   {
@@ -222,9 +225,9 @@ async function seed() {
 
       if (u.therapist) {
         await client.query(
-          `INSERT INTO therapists (user_id, bio, specialties, is_accepting_clients)
-           VALUES ($1, $2, $3, $4)`,
-          [user.id, u.therapist.bio, u.therapist.specialties, u.therapist.isAcceptingClients]
+          `INSERT INTO therapists (user_id, bio, specialties, is_accepting_clients, headshot_url)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [user.id, u.therapist.bio, u.therapist.specialties, u.therapist.isAcceptingClients, u.therapist.headshotUrl ?? null]
         );
       }
 

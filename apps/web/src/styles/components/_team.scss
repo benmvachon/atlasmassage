@@ -1,0 +1,212 @@
+@use '../abstracts/variables' as *;
+
+// ── Team page ─────────────────────────────────────────────────────────────────
+
+.page--team {
+  max-width: $container-max-width;
+  margin: 0 auto;
+}
+
+// ── Intro ─────────────────────────────────────────────────────────────────────
+
+.team__intro {
+  max-width: 680px;
+  margin: 0 auto $space-16;
+  text-align: center;
+}
+
+.team__heading {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  margin-bottom: $space-6;
+  letter-spacing: 0.04em;
+}
+
+.team__tagline {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.75;
+  color: $color-text-muted;
+}
+
+.team__loading,
+.team__error {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-16 0;
+}
+
+// ── Grid ──────────────────────────────────────────────────────────────────────
+
+.team__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $space-10;
+
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Therapist card ────────────────────────────────────────────────────────────
+
+.therapist-card {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.therapist-card__photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: $color-bg-alt;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.therapist-card__photo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, $color-bg-alt, $lilac-ash);
+}
+
+.therapist-card__body {
+  padding: $space-6;
+}
+
+.therapist-card__name {
+  font-family: $font-family-base;
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-primary-dark;
+  margin: 0 0 $space-3;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2px;
+    background-color: $color-secondary;
+    margin-top: $space-2;
+  }
+}
+
+.therapist-card__specialties {
+  list-style: none;
+  margin: 0 0 $space-4;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.therapist-card__specialty {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background-color: $color-primary-tint-sm;
+  border: 1px solid $color-primary-border-sm;
+  border-radius: $border-radius-full;
+  padding: $space-1 $space-3;
+  text-transform: capitalize;
+}
+
+.therapist-card__bio {
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  line-height: 1.75;
+  color: $color-text-muted;
+  margin: 0 0 $space-3;
+}
+
+.therapist-card__status {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  font-style: italic;
+  margin: 0;
+}
+
+// ── Owner dashboard: headshot upload ─────────────────────────────────────────
+
+.owner-headshot-upload {
+  display: flex;
+  align-items: center;
+  gap: $space-6;
+  margin-bottom: $space-4;
+}
+
+.owner-headshot-upload__preview {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: $border-radius-full;
+  overflow: hidden;
+  border: 2px solid $color-border;
+  background-color: $color-bg-alt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.owner-headshot-upload__placeholder {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  text-align: center;
+  padding: $space-2;
+}
+
+.owner-headshot-upload__label {
+  flex: 1;
+  cursor: pointer;
+}
+
+.owner-headshot-upload__input {
+  display: none;
+}
+
+.owner-headshot-upload__btn {
+  display: inline-block;
+  margin-top: $space-2;
+  cursor: pointer;
+}
+
+// ── Owner table: headshot thumbnail in therapist row ──────────────────────────
+
+.therapist-name {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.therapist-name__thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: $border-radius-full;
+  object-fit: cover;
+  border: 1px solid $color-border;
+  flex-shrink: 0;
+}

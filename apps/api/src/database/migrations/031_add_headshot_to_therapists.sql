@@ -1,0 +1,1 @@
+ALTER TABLE therapists ADD COLUMN IF NOT EXISTS headshot_url TEXT;

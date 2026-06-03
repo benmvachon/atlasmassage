@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url';
+import path from 'path';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -9,11 +11,18 @@ import { requestLogger } from './middleware/requestLogger.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 import apiRoutes from './routes/index.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 
 // Security
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(cors({ origin: config.cors.origin, credentials: true }));
+
+// Static headshots (uploaded + seed images)
+app.use('/headshots', express.static(path.join(__dirname, '..', 'public', 'headshots')));
 
 // Raw body for Stripe webhooks — must precede express.json()
 app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));

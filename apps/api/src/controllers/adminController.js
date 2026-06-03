@@ -183,6 +183,19 @@ export async function updateTherapist(req, res, next) {
   }
 }
 
+export async function uploadTherapistHeadshot(req, res, next) {
+  try {
+    if (!req.file) throw new AppError('No image file provided', 400, 'BAD_REQUEST');
+    const therapist = await repos().therapist.findById(req.params.id);
+    if (!therapist) throw new AppError('Therapist not found', 404, 'NOT_FOUND');
+    const headshotUrl = `/headshots/${req.file.filename}`;
+    await repos().therapist.updateHeadshot(req.params.id, headshotUrl);
+    res.json({ success: true, data: { headshotUrl } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function deactivateTherapist(req, res, next) {
   try {
     if (req.params.id === req.user.sub) {
