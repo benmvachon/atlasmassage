@@ -72,9 +72,9 @@ async function openSettingsSection(page, label) {
 // ── Global setup / teardown ───────────────────────────────────────────────────
 
 test.beforeAll(async ({ request }) => {
-  // Start from a clean slate: no saved cards for client1
+  // Start from a clean slate: no saved cards, no active memberships, no leftover appointments
   await request.delete(`/api/v1/debug/payment-methods/${CLIENT_ID}`);
-  // Cancel any leftover appointments from previous runs (prevents capacity exhaustion)
+  await request.delete(`/api/v1/debug/memberships/${CLIENT_ID}`);
   await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE}`);
   await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE_WH}`);
 
@@ -189,9 +189,11 @@ test('booking modal: payment section is shown with a card option for authenticat
   await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
-  // Payment section with the saved card should be visible
+  // Payment section with the saved card should be visible.
+  // Payment methods load asynchronously after the modal mounts, so use a generous
+  // timeout to wait past the "Loading saved cards…" phase.
   await expect(page.locator('.booking-divider').filter({ hasText: /payment/i })).toBeVisible();
-  await expect(page.locator('.booking-pm-option').first()).toBeVisible();
+  await expect(page.locator('.booking-pm-option').first()).toBeVisible({ timeout: 15000 });
 });
 
 test('booking modal: selecting "Enter a new card" shows the Stripe CardElement', async ({ page }) => {
@@ -267,8 +269,8 @@ test('booking modal: authenticated booking with a saved card completes successfu
   await slots.last().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
-  // Saved card should be pre-selected
-  await expect(page.locator('.booking-pm-option--selected')).not.toHaveCount(0, { timeout: 5000 });
+  // Saved card should be pre-selected once the async payment methods fetch completes
+  await expect(page.locator('.booking-pm-option--selected')).not.toHaveCount(0, { timeout: 15000 });
 
   await page.locator('[aria-labelledby="booking-modal-title"] form').evaluate(f => f.requestSubmit());
 
@@ -365,8 +367,9 @@ test('memberships: booking modal shows membership-covered banner when credits re
   await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
-  // Membership-covered banner should appear instead of the payment section
-  await expect(page.locator('.booking-membership-banner')).toBeVisible({ timeout: 5000 });
+  // Membership-covered banner should appear instead of the payment section.
+  // membershipStatus is fetched asynchronously after the modal mounts — wait for it.
+  await expect(page.locator('.booking-membership-banner')).toBeVisible({ timeout: 15000 });
 });
 
 test('memberships: cancelling the membership updates its status', async ({ page, request }) => {

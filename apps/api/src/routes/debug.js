@@ -156,6 +156,30 @@ router.delete('/appointments/:therapistId/:date', async (req, res, next) => {
   }
 });
 
+// ── Memberships ───────────────────────────────────────────────────────────────
+
+/**
+ * DELETE /api/v1/debug/memberships/:userId
+ * Cancels all active/paused memberships for a user.
+ * Used by payments E2E beforeAll to prevent stale memberships from
+ * causing membershipCoversBooking=true during payment flow tests.
+ */
+router.delete('/memberships/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const pool = getPool();
+    const { rows } = await pool.query(
+      `UPDATE memberships SET status = 'cancelled', updated_at = NOW()
+       WHERE client_id = $1 AND status IN ('active', 'paused')
+       RETURNING id`,
+      [userId]
+    );
+    res.json({ success: true, data: { cancelled: rows.length } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ── Notifications ─────────────────────────────────────────────────────────────
 
 /**
