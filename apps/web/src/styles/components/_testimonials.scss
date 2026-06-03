@@ -1,0 +1,206 @@
+@use '../abstracts/variables' as *;
+
+// ── Testimonials page ─────────────────────────────────────────────────────────
+
+.page--testimonials {
+  max-width: $container-max-width;
+  margin: 0 auto;
+}
+
+// ── Intro ─────────────────────────────────────────────────────────────────────
+
+.testimonials__intro {
+  max-width: 680px;
+  margin: 0 auto $space-16;
+  text-align: center;
+}
+
+.testimonials__heading {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  margin-bottom: $space-6;
+  letter-spacing: 0.04em;
+}
+
+.testimonials__tagline {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.75;
+  color: $color-text-muted;
+}
+
+.testimonials__loading,
+.testimonials__error,
+.testimonials__empty {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-16 0;
+}
+
+// ── Grid ──────────────────────────────────────────────────────────────────────
+
+.testimonials__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $space-8;
+
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.testimonial-card {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-8;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.testimonial-card__stars {
+  font-size: $font-size-lg;
+  color: $color-secondary;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.testimonial-card__body {
+  flex: 1;
+  margin: 0;
+
+  p {
+    font-family: $font-family-base;
+    font-size: $font-size-md;
+    line-height: 1.8;
+    color: $color-text;
+    margin: 0;
+
+    &::before { content: '\201C'; }
+    &::after  { content: '\201D'; }
+  }
+}
+
+.testimonial-card__author {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-primary-dark;
+  border-top: 1px solid $color-border;
+  padding-top: $space-4;
+}
+
+// ── Admin: testimonial table ──────────────────────────────────────────────────
+
+.testimonial-table__order {
+  width: 56px;
+  text-align: center;
+  color: $color-text-muted;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+}
+
+.testimonial-table__author {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.testimonial-table__body {
+  max-width: 360px;
+}
+
+.testimonial-table__excerpt {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  line-height: 1.5;
+}
+
+.testimonial-table__rating {
+  white-space: nowrap;
+  color: $color-secondary;
+  letter-spacing: 0.05em;
+  font-size: $font-size-sm;
+}
+
+// ── Admin: testimonial form ───────────────────────────────────────────────────
+
+.testimonial-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  max-width: 640px;
+}
+
+.testimonial-form__row {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+  flex-wrap: wrap;
+}
+
+.testimonial-form__actions {
+  display: flex;
+  gap: $space-3;
+  padding-top: $space-2;
+}
+
+.owner-input--sm {
+  max-width: 80px;
+}
+
+// ── Star picker ───────────────────────────────────────────────────────────────
+
+.star-picker {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  margin-top: $space-2;
+}
+
+.star-picker__star {
+  background: none;
+  border: none;
+  font-size: $font-size-xl;
+  color: $color-border;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color $transition-fast, transform $transition-fast;
+
+  &--filled {
+    color: $color-secondary;
+  }
+
+  &:hover {
+    color: $color-secondary;
+    transform: scale(1.15);
+  }
+}
+
+.star-picker__clear {
+  background: none;
+  border: none;
+  font-size: $font-size-lg;
+  color: $color-text-muted;
+  cursor: pointer;
+  padding: 0 $space-2;
+  line-height: 1;
+  margin-left: $space-2;
+
+  &:hover {
+    color: $color-error;
+  }
+}

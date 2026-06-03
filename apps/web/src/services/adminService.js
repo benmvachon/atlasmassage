@@ -48,6 +48,12 @@ export const adminService = {
     return api.get(`/admin/revenue?${params}`);
   },
 
+  // Testimonials
+  listTestimonials: () => api.get('/admin/testimonials'),
+  createTestimonial: (data) => api.post('/admin/testimonials', data),
+  updateTestimonial: (id, data) => api.put(`/admin/testimonials/${id}`, data),
+  deleteTestimonial: (id) => api.delete(`/admin/testimonials/${id}`),
+
   // Transfer requests
   listTransferRequests: () => api.get('/admin/transfer-requests'),
   approveTransferRequest: (id, toTherapistId) =>

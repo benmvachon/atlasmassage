@@ -9,6 +9,7 @@ import notificationRoutes from './notifications.js';
 import adminRoutes from './admin.js';
 import businessRoutes from './business.js';
 import teamRoutes from './team.js';
+import testimonialsRoutes from './testimonials.js';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
 router.use('/business', businessRoutes);
 router.use('/team', teamRoutes);
+router.use('/testimonials', testimonialsRoutes);
 
 export default router;

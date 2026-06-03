@@ -18,6 +18,44 @@ if (process.env.NODE_ENV === 'production') {
 
 const BCRYPT_ROUNDS = 10; // lower cost than production for dev speed
 
+const TESTIMONIALS = [
+  {
+    authorName: 'Jamie T.',
+    body: 'I\'ve been coming to Atlas for six months and my chronic neck pain has improved dramatically. Alex takes the time to understand what\'s going on and adjusts every session accordingly. I leave feeling like a different person.',
+    rating: 5,
+    isPublished: true,
+    displayOrder: 1,
+  },
+  {
+    authorName: 'Morgan L.',
+    body: 'Sarah is absolutely wonderful. I was nervous about prenatal massage but she made me feel completely at ease and comfortable throughout. Highly recommend to any expecting moms.',
+    rating: 5,
+    isPublished: true,
+    displayOrder: 2,
+  },
+  {
+    authorName: 'Taylor K.',
+    body: 'Marcus helped me recover from a hamstring strain way faster than I expected. He really knows his stuff when it comes to sports massage and injury recovery. Back to running in half the time my doctor predicted.',
+    rating: 5,
+    isPublished: true,
+    displayOrder: 3,
+  },
+  {
+    authorName: 'Casey R.',
+    body: 'The atmosphere here is calm and professional without feeling clinical. My therapist listened to every concern and the session was exactly what I needed after a stressful few weeks at work.',
+    rating: 5,
+    isPublished: true,
+    displayOrder: 4,
+  },
+  {
+    authorName: 'Jordan M.',
+    body: 'I\'ve tried a handful of massage studios in the area and Atlas is by far the best. The booking process is easy, the space is beautiful, and the quality is consistently excellent.',
+    rating: 5,
+    isPublished: true,
+    displayOrder: 5,
+  },
+];
+
 const MEMBERSHIP_PLANS = [
   {
     name: 'Essentials',
@@ -166,7 +204,7 @@ async function seed() {
     // TRUNCATE ... CASCADE follows all FKs. The roles lookup table is left
     // intact (seeded by migration 001).
     await client.query(
-      'TRUNCATE users, services, massage_beds, business_hours, membership_plans RESTART IDENTITY CASCADE'
+      'TRUNCATE users, services, massage_beds, business_hours, membership_plans, testimonials RESTART IDENTITY CASCADE'
     );
     logger.info('seed_truncated');
 
@@ -178,6 +216,15 @@ async function seed() {
       );
     }
     logger.info('seed_membership_plans', { count: MEMBERSHIP_PLANS.length });
+
+    for (const t of TESTIMONIALS) {
+      await client.query(
+        `INSERT INTO testimonials (author_name, body, rating, is_published, display_order)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [t.authorName, t.body, t.rating, t.isPublished, t.displayOrder]
+      );
+    }
+    logger.info('seed_testimonials', { count: TESTIMONIALS.length });
 
     for (const s of SERVICES) {
       await client.query(

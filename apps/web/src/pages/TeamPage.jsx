@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api.js';
 
 export default function TeamPage() {
@@ -37,17 +38,17 @@ export default function TeamPage() {
               <h2 className="therapist-card__name">
                 {therapist.first_name} {therapist.last_name}
               </h2>
-              {therapist.specialties?.length > 0 && (
-                <ul className="therapist-card__specialties">
-                  {therapist.specialties.map(s => (
-                    <li key={s} className="therapist-card__specialty">{s}</li>
-                  ))}
-                </ul>
-              )}
               {therapist.bio && (
                 <p className="therapist-card__bio">{therapist.bio}</p>
               )}
-              {!therapist.is_accepting_clients && (
+              {therapist.is_accepting_clients ? (
+                <Link
+                  to={`/booking?therapistId=${therapist.id}`}
+                  className="btn btn--primary btn--sm therapist-card__cta"
+                >
+                  View availability
+                </Link>
+              ) : (
                 <p className="therapist-card__status">Not currently accepting new clients</p>
               )}
             </div>

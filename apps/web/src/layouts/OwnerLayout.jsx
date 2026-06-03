@@ -1,12 +1,13 @@
 import SidebarLayout from './SidebarLayout.jsx';
 
 const NAV_ITEMS = [
-  { to: '/owner/dashboard',   label: 'Overview',        end: true },
-  { to: '/owner/appointments',label: 'Calendar' },
-  { to: '/owner/transfers',   label: 'Transfers' },
-  { to: '/owner/revenue',     label: 'Revenue' },
-  { to: '/owner/business',    label: 'Business Details' },
-  { to: '/owner/therapists',  label: 'Therapists' },
+  { to: '/owner/dashboard',      label: 'Overview',        end: true },
+  { to: '/owner/appointments',   label: 'Calendar' },
+  { to: '/owner/transfers',      label: 'Transfers' },
+  { to: '/owner/revenue',        label: 'Revenue' },
+  { to: '/owner/business',       label: 'Business Details' },
+  { to: '/owner/therapists',     label: 'Therapists' },
+  { to: '/owner/testimonials',   label: 'Testimonials' },
 ];
 
 export default function OwnerLayout() {

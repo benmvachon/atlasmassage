@@ -61,6 +61,8 @@
   overflow: hidden;
   box-shadow: $shadow-sm;
   transition: box-shadow $transition-base;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
     box-shadow: $shadow-md;
@@ -89,6 +91,9 @@
 
 .therapist-card__body {
   padding: $space-6;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .therapist-card__name {
@@ -136,12 +141,18 @@
   margin: 0 0 $space-3;
 }
 
+.therapist-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
 .therapist-card__status {
   font-family: $font-family-ui;
   font-size: $font-size-xs;
   color: $color-text-muted;
   font-style: italic;
-  margin: 0;
+  margin-top: auto;
+  padding-top: $space-4;
 }
 
 // ── Owner dashboard: headshot upload ─────────────────────────────────────────

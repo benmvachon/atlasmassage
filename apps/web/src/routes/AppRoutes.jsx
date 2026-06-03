@@ -27,6 +27,7 @@ import TherapistManagementPage from '../pages/owner/TherapistManagementPage.jsx'
 import AppointmentsCalendarPage from '../pages/owner/AppointmentsCalendarPage.jsx';
 import RevenueDashboardPage from '../pages/owner/RevenueDashboardPage.jsx';
 import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
+import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
 
 export default function AppRoutes() {
@@ -65,6 +66,7 @@ export default function AppRoutes() {
         <Route path="/owner/revenue" element={<RevenueDashboardPage />} />
         <Route path="/owner/business" element={<BusinessDetailsPage />} />
         <Route path="/owner/therapists" element={<TherapistManagementPage />} />
+        <Route path="/owner/testimonials" element={<TestimonialsManagementPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

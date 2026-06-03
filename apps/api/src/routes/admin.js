@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import multer from 'multer';
 import * as adminController from '../controllers/adminController.js';
+import * as testimonialController from '../controllers/testimonialController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import {
   businessHoursRules,
@@ -12,6 +13,8 @@ import {
   serviceUpdateRules,
   therapistCreateRules,
   therapistUpdateRules,
+  testimonialCreateRules,
+  testimonialUpdateRules,
   validate,
 } from '../validators/adminValidators.js';
 
@@ -80,5 +83,11 @@ router.get('/therapists/:id', adminController.getTherapist);
 router.put('/therapists/:id', therapistUpdateRules, validate, adminController.updateTherapist);
 router.post('/therapists/:id/headshot', uploadHeadshot, adminController.uploadTherapistHeadshot);
 router.delete('/therapists/:id', adminController.deactivateTherapist);
+
+// ── Testimonials ──────────────────────────────────────────────────────────────
+router.get('/testimonials', testimonialController.listAll);
+router.post('/testimonials', testimonialCreateRules, validate, testimonialController.createTestimonial);
+router.put('/testimonials/:id', testimonialUpdateRules, validate, testimonialController.updateTestimonial);
+router.delete('/testimonials/:id', testimonialController.deleteTestimonial);
 
 export default router;

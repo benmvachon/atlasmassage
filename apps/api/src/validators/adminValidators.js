@@ -72,3 +72,33 @@ export const therapistUpdateRules = [
   body('isAcceptingClients')
     .isBoolean().withMessage('isAcceptingClients is required and must be a boolean'),
 ];
+
+export const testimonialCreateRules = [
+  body('authorName')
+    .trim().notEmpty().withMessage('Author name is required')
+    .isLength({ max: 100 }).withMessage('Author name must be 100 characters or fewer'),
+  body('body')
+    .trim().notEmpty().withMessage('Testimonial text is required'),
+  body('rating')
+    .optional({ nullable: true })
+    .isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
+  body('isPublished')
+    .optional().isBoolean().withMessage('isPublished must be a boolean'),
+  body('displayOrder')
+    .optional().isInt({ min: 0 }).withMessage('displayOrder must be a non-negative integer'),
+];
+
+export const testimonialUpdateRules = [
+  body('authorName')
+    .trim().notEmpty().withMessage('Author name is required')
+    .isLength({ max: 100 }).withMessage('Author name must be 100 characters or fewer'),
+  body('body')
+    .trim().notEmpty().withMessage('Testimonial text is required'),
+  body('rating')
+    .optional({ nullable: true })
+    .isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
+  body('isPublished')
+    .isBoolean().withMessage('isPublished is required and must be a boolean'),
+  body('displayOrder')
+    .optional().isInt({ min: 0 }).withMessage('displayOrder must be a non-negative integer'),
+];
