@@ -20,14 +20,17 @@ export default function LoginPage() {
   const { values, fieldErrors, apiError, submitting, handleChange, setFieldErrors, setApiError, setSubmitting } =
     useFormState({ email: '', password: '' });
 
+  const redirectTo = new URLSearchParams(location.search).get('redirect');
+
   useEffect(() => {
     if (!user) return;
     const dest = location.state?.from?.pathname
+      ?? redirectTo
       ?? (user.roles?.includes('owner')     ? '/owner/dashboard'
         : user.roles?.includes('therapist') ? '/therapist/bookings'
         : '/');
     navigate(dest, { replace: true });
-  }, [user, navigate, location]);
+  }, [user, navigate, location, redirectTo]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -48,7 +51,7 @@ export default function LoginPage() {
       title="Sign in"
       apiError={apiError}
       onSubmit={handleSubmit}
-      footer={<>Don&apos;t have an account? <Link to="/signup">Create one</Link></>}
+      footer={<>Don&apos;t have an account? <Link to={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : '/signup'}>Create one</Link></>}
     >
       <FormField
         label="Email address" id="email" type="email" autoComplete="email"

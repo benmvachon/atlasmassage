@@ -86,7 +86,7 @@ describe('MembershipProvider — subscribe', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
     });
     expect(screen.getByTestId('count')).toHaveTextContent('1');
-    expect(membershipService.subscribe).toHaveBeenCalledWith('plan-id');
+    expect(membershipService.subscribe).toHaveBeenCalledWith('plan-id', undefined);
   });
 });
 

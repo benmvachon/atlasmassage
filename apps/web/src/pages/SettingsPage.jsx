@@ -202,15 +202,10 @@ function SecuritySection() {
 // ── Membership section ────────────────────────────────────────────────────────
 
 function MembershipSection() {
-  const { activeMembership, loading, error, subscribe, cancel } = useMembership();
+  const { activeMembership, loading, error, cancel } = useMembership();
   const [showModal, setShowModal]   = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState('');
-
-  async function handleSubscribe(planId) {
-    await subscribe(planId);
-    setShowModal(false);
-  }
 
   async function handleCancel() {
     if (!activeMembership) return;
@@ -280,7 +275,7 @@ function MembershipSection() {
       {showModal && (
         <MembershipModal
           activeMembership={activeMembership}
-          onSubscribe={handleSubscribe}
+          onSuccess={() => setShowModal(false)}
           onClose={() => setShowModal(false)}
         />
       )}

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthCard from '../components/AuthCard.jsx';
 import FormField from '../components/FormField.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -18,12 +18,14 @@ function validate({ firstName, lastName, email, password }) {
 export default function SignupPage() {
   const { user, register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get('redirect');
   const { values, fieldErrors, apiError, submitting, handleChange, setFieldErrors, setApiError, setSubmitting } =
     useFormState({ firstName: '', lastName: '', email: '', password: '' });
 
   useEffect(() => {
-    if (user) navigate('/', { replace: true });
-  }, [user, navigate]);
+    if (user) navigate(redirectTo ?? '/', { replace: true });
+  }, [user, navigate, redirectTo]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -45,7 +47,7 @@ export default function SignupPage() {
       subtitle="Book and manage your appointments."
       apiError={apiError}
       onSubmit={handleSubmit}
-      footer={<>Already have an account? <Link to="/login">Sign in</Link></>}
+      footer={<>Already have an account? <Link to={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : '/login'}>Sign in</Link></>}
     >
       <div className="auth-card__row">
         <FormField

@@ -5,6 +5,7 @@ import { useMembership } from '../context/MembershipContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
 import PageState from '../components/PageState.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
+import MembershipModal from '../components/MembershipModal.jsx';
 import { membershipService } from '../services/membershipService.js';
 
 const BENEFITS = [
@@ -31,32 +32,22 @@ function perSessionLabel(priceCents, creditsPerMonth) {
 
 export default function MembershipsPage() {
   const { user } = useAuth();
-  const { activeMembership, subscribe } = useMembership();
+  const { activeMembership } = useMembership();
   const navigate = useNavigate();
 
   const { data: plans, loading: plansLoading, error: plansError } = useAsync(
     () => membershipService.getPlans().then(r => r.data.plans)
   );
 
-  const [subscribing, setSubscribing]       = useState(null);
-  const [subscribeError, setSubscribeError] = useState('');
-  const [joinedPlan, setJoinedPlan]         = useState(null);
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
+  const [joinedPlan, setJoinedPlan]     = useState(null);
 
-  async function handleJoin(plan) {
+  function handleJoin(plan) {
     if (!user) {
       navigate('/login?redirect=/memberships');
       return;
     }
-    setSubscribing(plan.id);
-    setSubscribeError('');
-    try {
-      await subscribe(plan.id);
-      setJoinedPlan(plan);
-    } catch (err) {
-      setSubscribeError(err.message || 'Subscription failed. Please try again.');
-    } finally {
-      setSubscribing(null);
-    }
+    setCheckoutPlan(plan);
   }
 
   return (
@@ -108,8 +99,6 @@ export default function MembershipsPage() {
               </div>
             </div>
           )}
-
-          {subscribeError && <p className="memberships-plans__error">{subscribeError}</p>}
 
           <PageState
             loading={plansLoading}
@@ -169,9 +158,8 @@ export default function MembershipsPage() {
                           <button
                             className="btn btn--primary membership-plan__cta"
                             onClick={() => handleJoin(plan)}
-                            disabled={subscribing === plan.id}
                           >
-                            {subscribing === plan.id ? 'Subscribing…' : user ? 'Join Now' : 'Get Started'}
+                            {user ? 'Join Now' : 'Get Started'}
                           </button>
                           {!user && (
                             <p className="membership-plan__auth-note">
@@ -191,6 +179,15 @@ export default function MembershipsPage() {
           )}
         </div>
       </section>
+
+      {checkoutPlan && (
+        <MembershipModal
+          initialPlan={checkoutPlan}
+          activeMembership={activeMembership}
+          onSuccess={() => { setJoinedPlan(checkoutPlan); setCheckoutPlan(null); }}
+          onClose={() => setCheckoutPlan(null)}
+        />
+      )}
 
     </div>
   );

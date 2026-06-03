@@ -34,9 +34,8 @@ export function MembershipProvider({ children }) {
 
   const activeMembership = memberships.find(m => m.status === 'active') ?? null;
 
-  const subscribe = useCallback(async planId => {
-    const { data } = await membershipService.subscribe(planId);
-    // Optimistically add the new membership and reload for server state.
+  const subscribe = useCallback(async (planId, stripePaymentMethodId) => {
+    const { data } = await membershipService.subscribe(planId, stripePaymentMethodId);
     setMemberships(prev => [...prev, data.membership]);
     return data.membership;
   }, []);

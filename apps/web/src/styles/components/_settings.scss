@@ -446,6 +446,63 @@
     font-weight: 500;
     margin: 0;
   }
+
+  &__no-payment {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin: 0;
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    margin: $space-2 0 0;
+  }
+}
+
+// ── Membership checkout modal ─────────────────────────────────────────────────
+
+.membership-checkout {
+  &__plan {
+    display: flex;
+    align-items: baseline;
+    gap: $space-3;
+    padding: $space-4;
+    background: $color-primary-tint-xs;
+    border-radius: $border-radius-md;
+    margin-bottom: $space-4;
+    flex-wrap: wrap;
+  }
+
+  &__plan-name {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: $color-text;
+  }
+
+  &__plan-price {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__plan-credits {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-left: auto;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-top: $space-6;
 }
 
 // ── Notification preferences ──────────────────────────────────────────────────
