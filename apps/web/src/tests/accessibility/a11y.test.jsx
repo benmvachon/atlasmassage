@@ -88,7 +88,7 @@ describe('Modal — accessibility', () => {
         <button>Last</button>
       </Modal>
     );
-    const [first, last] = screen.getAllByRole('button').filter(b => b.textContent !== '×');
+    const [, last] = screen.getAllByRole('button').filter(b => b.textContent !== '×');
     // Focus the close button (×), then last button
     const closeBtn = screen.getByRole('button', { name: /close/i });
 
