@@ -190,7 +190,7 @@ function PaymentStep({ plan, onBack, onSuccess }) {
           </p>
         )}
 
-        {error && <p className="plan-card__error">{error}</p>}
+        {error && <p className="plan-card__error" role="alert">{error}</p>}
 
         <div className="modal-actions">
           <button

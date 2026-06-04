@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap.js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
@@ -127,7 +128,7 @@ function SignatureCanvas({ onChange }) {
   return (
     <div className="waiver-sig">
       <p className="waiver-sig__label">Sign below</p>
-      <canvas ref={canvasRef} className="waiver-sig__canvas" />
+      <canvas ref={canvasRef} className="waiver-sig__canvas" aria-label="Signature pad — draw your signature with a mouse or touch" />
       <button
         type="button"
         className="waiver-sig__clear"
@@ -144,10 +145,13 @@ function SignatureCanvas({ onChange }) {
 function WaiverStep({ slot, date, onBack, onSign, submitting, error }) {
   const [signature, setSignature] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, { onEscape: onBack });
 
   return (
     <div className="avail-modal-overlay" role="presentation">
       <div
+        ref={dialogRef}
         className="avail-modal booking-modal booking-modal--waiver"
         role="dialog"
         aria-modal="true"
@@ -182,7 +186,7 @@ function WaiverStep({ slot, date, onBack, onSign, submitting, error }) {
           </span>
         </label>
 
-        {error && <p className="avail-modal__error">{error}</p>}
+        {error && <p className="avail-modal__error" role="alert">{error}</p>}
 
         <div className="avail-modal__actions">
           <button
@@ -230,6 +234,8 @@ function BookingForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [stagedPaymentMethodId, setStagedPaymentMethodId] = useState(null);
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, { onEscape: onClose });
 
   const selectedService = services.find(s => s.id === serviceId);
   const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
@@ -331,9 +337,9 @@ function BookingForm({
   if (step === 'success') {
     return (
       <div className="avail-modal-overlay" onClick={onClose} role="presentation">
-        <div className="avail-modal booking-modal--success" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
-          <div className="booking-modal__success-icon">✓</div>
-          <h3 className="booking-modal__success-title">Booking Confirmed!</h3>
+        <div className="avail-modal booking-modal--success" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="booking-success-title">
+          <div className="booking-modal__success-icon" aria-hidden="true">✓</div>
+          <h3 id="booking-success-title" className="booking-modal__success-title">Booking Confirmed!</h3>
           <p className="booking-modal__success-body">
             Your appointment has been booked for {formatDate(date)} at {formatTime(slot.startTime)}.
             {!user && email && ` A confirmation will be sent to ${email}.`}
@@ -360,6 +366,7 @@ function BookingForm({
   return (
     <div className="avail-modal-overlay" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="avail-modal booking-modal"
         onClick={e => e.stopPropagation()}
         role="dialog"
@@ -514,7 +521,7 @@ function BookingForm({
             </div>
           )}
 
-          {error && <p className="avail-modal__error">{error}</p>}
+          {error && <p className="avail-modal__error" role="alert">{error}</p>}
 
           <div className="avail-modal__actions">
             <button

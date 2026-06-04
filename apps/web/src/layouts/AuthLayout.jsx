@@ -6,7 +6,7 @@ export default function AuthLayout() {
   return (
     <div className="layout layout--auth">
       <Header />
-      <main className="layout__content layout__content--centered">
+      <main id="main-content" className="layout__content layout__content--centered">
         <Outlet />
       </main>
       <Footer />

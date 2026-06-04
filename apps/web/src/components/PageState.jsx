@@ -18,7 +18,7 @@ export default function PageState({
   emptyClass = 'settings-muted',
   children,
 }) {
-  if (loading) return <p className={loadingClass}>{loadingMessage}</p>;
+  if (loading) return <p className={loadingClass} role="status" aria-live="polite">{loadingMessage}</p>;
   if (error)   return <p className={errorClass} role="alert">{error}</p>;
   if (empty)   return <p className={emptyClass}>{emptyMessage}</p>;
   return children ?? null;

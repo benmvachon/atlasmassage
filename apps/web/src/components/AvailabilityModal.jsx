@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap.js';
 
 function formatDateLabel(dateStr) {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', {
@@ -23,14 +24,14 @@ export default function AvailabilityModal({
 }) {
   const sorted = [...selectedDates].sort();
 
-  // Use the first selected date's existing availability as the default, or 09:00–17:00
   const firstAvail = availabilityMap[sorted[0]];
   const [startTime, setStartTime] = useState(firstAvail?.start_time?.slice(0, 5) ?? '09:00');
   const [endTime, setEndTime] = useState(firstAvail?.end_time?.slice(0, 5) ?? '17:00');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, { onEscape: onClose });
 
-  // Compute the most restrictive business-hours window across all selected dates
   const timeBounds = useMemo(() => {
     let latestOpen = null;
     let earliestClose = null;
@@ -48,7 +49,6 @@ export default function AvailabilityModal({
 
   const hasExisting = sorted.some(d => availabilityMap[d]);
 
-  // Build a summary label for the selected dates
   let datesLabel;
   if (sorted.length === 1) {
     datesLabel = formatDateLabel(sorted[0]);
@@ -95,6 +95,7 @@ export default function AvailabilityModal({
   return (
     <div className="avail-modal-overlay" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="avail-modal"
         onClick={e => e.stopPropagation()}
         role="dialog"
@@ -137,7 +138,7 @@ export default function AvailabilityModal({
           </label>
         </div>
 
-        {error && <p className="avail-modal__error">{error}</p>}
+        {error && <p className="avail-modal__error" role="alert">{error}</p>}
 
         <div className="avail-modal__actions">
           <button className="btn btn--primary" onClick={handleSave} disabled={saving}>

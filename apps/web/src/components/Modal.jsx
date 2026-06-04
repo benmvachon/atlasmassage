@@ -1,11 +1,14 @@
-/**
- * Generic modal overlay + panel.
- * Clicking the backdrop calls onClose. The panel stops propagation.
- */
+import { useRef } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap.js';
+
 export default function Modal({ title, onClose, children, maxWidth, labelId = 'modal-title' }) {
+  const panelRef = useRef(null);
+  useFocusTrap(panelRef, { onEscape: onClose });
+
   return (
     <div className="modal-overlay" onClick={onClose} role="presentation">
       <div
+        ref={panelRef}
         className="modal-panel"
         style={maxWidth ? { maxWidth } : undefined}
         onClick={e => e.stopPropagation()}

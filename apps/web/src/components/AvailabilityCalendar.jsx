@@ -64,14 +64,14 @@ export default function AvailabilityCalendar({
         <button className="avail-calendar__nav" onClick={nextMonth} aria-label="Next month">›</button>
       </div>
 
-      <div className="avail-calendar__grid">
+      <div className="avail-calendar__grid" role="group" aria-label={`Calendar for ${monthLabel}`}>
         {DOW_LABELS.map(l => (
-          <div key={l} className="avail-calendar__dow">{l}</div>
+          <div key={l} className="avail-calendar__dow" aria-hidden="true">{l}</div>
         ))}
 
         {cells.map((cell, i) => {
           if (!cell) {
-            return <div key={`pad-${i}`} className="avail-calendar__cell avail-calendar__cell--pad" />;
+            return <div key={`pad-${i}`} className="avail-calendar__cell avail-calendar__cell--pad" aria-hidden="true" />;
           }
 
           const { day, dateStr, dayOfWeek, isPast, avail } = cell;

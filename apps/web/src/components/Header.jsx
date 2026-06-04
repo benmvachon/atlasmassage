@@ -9,6 +9,7 @@ export default function Header() {
 
   return (
     <header className="header">
+      <a href="#main-content" className="skip-nav">Skip to main content</a>
       <div className="header__inner container">
         <Link to="/" className="header__logo">
           <img src={logoSvg} alt="" className="header__logo-icon" aria-hidden="true" />

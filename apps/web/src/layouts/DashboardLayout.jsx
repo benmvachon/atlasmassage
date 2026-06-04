@@ -6,7 +6,7 @@ export default function DashboardLayout() {
     <div className="layout layout--dashboard">
       <Header />
       <div className="layout__body">
-        <main className="layout__content">
+        <main id="main-content" className="layout__content">
           <Outlet />
         </main>
       </div>

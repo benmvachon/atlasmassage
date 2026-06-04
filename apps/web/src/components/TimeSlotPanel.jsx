@@ -20,7 +20,7 @@ export default function TimeSlotPanel({ date, slots, loading, error, onSelectSlo
       </h3>
 
       {loading && <p className="slot-panel__state">Loading times…</p>}
-      {error && <p className="slot-panel__state slot-panel__state--error">{error}</p>}
+      {error && <p className="slot-panel__state slot-panel__state--error" role="alert">{error}</p>}
 
       {!loading && !error && slots.length === 0 && (
         <p className="slot-panel__state">No available times match your filters for this day.</p>

@@ -67,7 +67,7 @@ function AddCardForm({ onSuccess, onCancel }) {
       <div className="settings-card-element">
         <CardElement options={CARD_ELEMENT_OPTIONS} />
       </div>
-      {error && <p className="settings-error">{error}</p>}
+      {error && <p className="settings-error" role="alert">{error}</p>}
       <div className="settings-row settings-row--gap">
         <button type="submit" className="btn btn--primary btn--sm" disabled={loading || !stripe}>
           {loading ? 'Saving…' : 'Save Card'}
@@ -131,8 +131,8 @@ function ProfileSection({ user, onSaved }) {
           <input className="settings-input" type="tel" value={form.phone} placeholder="Optional"
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
         </label>
-        {error   && <p className="settings-error">{error}</p>}
-        {success && <p className="settings-success">Profile updated.</p>}
+        {error   && <p className="settings-error" role="alert">{error}</p>}
+        {success && <p className="settings-success" role="status">Profile updated.</p>}
         <div>
           <button type="submit" className="btn btn--primary" disabled={saving}>
             {saving ? 'Saving…' : 'Save Changes'}
@@ -187,8 +187,8 @@ function SecuritySection() {
           <input className="settings-input" type="password" value={form.confirmPassword} required
             onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))} />
         </label>
-        {error   && <p className="settings-error">{error}</p>}
-        {success && <p className="settings-success">Password updated successfully.</p>}
+        {error   && <p className="settings-error" role="alert">{error}</p>}
+        {success && <p className="settings-success" role="status">Password updated successfully.</p>}
         <div>
           <button type="submit" className="btn btn--primary" disabled={saving}>
             {saving ? 'Updating…' : 'Update Password'}
@@ -404,14 +404,15 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      <nav className="settings-nav">
-        <p className="settings-nav__heading">Account</p>
+      <nav className="settings-nav" aria-label="Account settings">
+        <p className="settings-nav__heading" aria-hidden="true">Account</p>
         <ul className="settings-nav__list">
           {sections.map(s => (
             <li key={s.key}>
               <button
                 className={`settings-nav__link${section === s.key ? ' settings-nav__link--active' : ''}`}
                 onClick={() => setSection(s.key)}
+                aria-current={section === s.key ? 'true' : undefined}
               >
                 {s.label}
               </button>

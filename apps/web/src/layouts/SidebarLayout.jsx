@@ -28,7 +28,7 @@ export default function SidebarLayout({ heading, navItems }) {
             ))}
           </ul>
         </nav>
-        <main className="layout__content">
+        <main id="main-content" className="layout__content">
           <Outlet />
         </main>
       </div>
