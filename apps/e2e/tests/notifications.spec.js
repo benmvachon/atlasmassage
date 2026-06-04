@@ -25,7 +25,7 @@
 import { test, expect } from '@playwright/test';
 import {
   ACCOUNTS, getAuthState, loginInBrowser,
-  setAvailability, deleteAvailability, getServiceId,
+  setAvailability, deleteAvailability, getServiceId, debugHeaders,
 } from './helpers.js';
 
 test.describe.configure({ mode: 'serial' });
@@ -69,13 +69,14 @@ async function setPreferences(request, token, prefs) {
 }
 
 async function triggerNotifications(request) {
-  const res = await request.post('/api/v1/debug/trigger-notifications');
+  const res = await request.post('/api/v1/debug/trigger-notifications', { headers: debugHeaders() });
   expect(res.ok()).toBe(true);
 }
 
 async function createBackdatedAppt(request, { therapistId, serviceId: svcId, clientId, scheduledAt, status = 'confirmed' }) {
   const res  = await request.post('/api/v1/debug/appointments/backdated', {
     data: { therapistId, serviceId: svcId, clientId, scheduledAt, status },
+    headers: debugHeaders(),
   });
   const body = await res.json();
   expect(body.success).toBe(true);
@@ -83,11 +84,11 @@ async function createBackdatedAppt(request, { therapistId, serviceId: svcId, cli
 }
 
 async function cancelApptById(request, appointmentId) {
-  await request.delete(`/api/v1/debug/appointments/${appointmentId}`);
+  await request.delete(`/api/v1/debug/appointments/${appointmentId}`, { headers: debugHeaders() });
 }
 
 async function cancelClientFutureAppts(request, clientId) {
-  await request.delete(`/api/v1/debug/appointments/client/${clientId}/future`);
+  await request.delete(`/api/v1/debug/appointments/client/${clientId}/future`, { headers: debugHeaders() });
 }
 
 // Polls GET /notifications until matcher returns truthy or timeout expires.
@@ -278,7 +279,7 @@ test('booking confirmation email is logged for client when email_booking_confirm
   createdApptIds.push(appt.id);
 
   // Trigger booking confirmation via the debug endpoint (bypasses the booking UI / Stripe)
-  const res = await request.post(`/api/v1/debug/send-booking-confirmation/${appt.id}`);
+  const res = await request.post(`/api/v1/debug/send-booking-confirmation/${appt.id}`, { headers: debugHeaders() });
   expect(res.ok()).toBe(true);
 
   const notifications   = await getNotifications(request, CLIENT_TOKEN);
@@ -305,7 +306,7 @@ test('booking confirmation email is suppressed when email_booking_confirm is dis
   const before = await getNotifications(request, CLIENT_TOKEN);
   const countBefore = before.filter(n => n.subject?.includes('appointment is confirmed')).length;
 
-  await request.post(`/api/v1/debug/send-booking-confirmation/${appt.id}`);
+  await request.post(`/api/v1/debug/send-booking-confirmation/${appt.id}`, { headers: debugHeaders() });
 
   const after = await getNotifications(request, CLIENT_TOKEN);
   // No new confirmation logged for client (preference is off)

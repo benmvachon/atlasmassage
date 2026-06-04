@@ -12,6 +12,12 @@
  *   client1@example.com      / atlas-client-2024     (client)
  */
 
+// ── Debug secret ─────────────────────────────────────────────────────────────
+
+export function debugHeaders() {
+  return { 'x-debug-secret': process.env.DEBUG_SECRET ?? 'dev-debug-secret' };
+}
+
 // ── Seeded credentials ────────────────────────────────────────────────────────
 
 export const ACCOUNTS = {

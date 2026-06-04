@@ -19,7 +19,7 @@
  *   - cvc         : input[name="cvc"]
  */
 import { test, expect } from '@playwright/test';
-import { ACCOUNTS, DATES, getAuthState, loginInBrowser, setAvailability, deleteAvailability, cancelAppointment, drawSignature } from './helpers.js';
+import { ACCOUNTS, DATES, getAuthState, loginInBrowser, setAvailability, deleteAvailability, cancelAppointment, drawSignature, debugHeaders } from './helpers.js';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -73,10 +73,10 @@ async function openSettingsSection(page, label) {
 
 test.beforeAll(async ({ request }) => {
   // Start from a clean slate: no saved cards, no active memberships, no leftover appointments
-  await request.delete(`/api/v1/debug/payment-methods/${CLIENT_ID}`);
-  await request.delete(`/api/v1/debug/memberships/${CLIENT_ID}`);
-  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE}`);
-  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE_WH}`);
+  await request.delete(`/api/v1/debug/payment-methods/${CLIENT_ID}`, { headers: debugHeaders() });
+  await request.delete(`/api/v1/debug/memberships/${CLIENT_ID}`, { headers: debugHeaders() });
+  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE}`, { headers: debugHeaders() });
+  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${PAY_DATE_WH}`, { headers: debugHeaders() });
 
   // Give Sarah availability for both test dates
   await setAvailability(request, SARAH_ID, SARAH_TOKEN, [
@@ -99,7 +99,7 @@ test.afterAll(async ({ request }) => {
     }).catch(() => {});
   }
   // Remove all saved cards and delete test availability
-  await request.delete(`/api/v1/debug/payment-methods/${CLIENT_ID}`);
+  await request.delete(`/api/v1/debug/payment-methods/${CLIENT_ID}`, { headers: debugHeaders() });
   await deleteAvailability(request, SARAH_ID, SARAH_TOKEN, [PAY_DATE, PAY_DATE_WH]);
 });
 
@@ -146,7 +146,7 @@ test('settings: adding a test card saves it and shows the last four digits', asy
 
 test('settings: a second card can be added and set as the default', async ({ request, page }) => {
   // Attach a second test card via the debug API
-  const res = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID } });
+  const res = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID }, headers: debugHeaders() });
   expect(res.ok()).toBe(true);
 
   await openSettingsSection(page, 'Payment Methods');
@@ -179,7 +179,7 @@ test('settings: clicking Remove removes the card from the list', async ({ page }
 
 test('booking modal: payment section is shown with a card option for authenticated users', async ({ request, page }) => {
   // Ensure client1 has a saved card
-  await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID } });
+  await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID }, headers: debugHeaders() });
 
   await loginInBrowser(page, ACCOUNTS.client);
   await page.goto(`/booking?year=${PAY_YEAR}&month=${PAY_MONTH}&therapistId=${SARAH_ID}`);
@@ -255,7 +255,7 @@ test('booking modal: guest booking with a new test card completes successfully',
 
 test('booking modal: authenticated booking with a saved card completes successfully', async ({ page, request }) => {
   // Ensure there's a saved card for client1
-  const cardRes = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID } });
+  const cardRes = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID }, headers: debugHeaders() });
   expect(cardRes.ok()).toBe(true);
 
   await loginInBrowser(page, ACCOUNTS.client);
@@ -444,6 +444,7 @@ test('webhook: payment_intent.succeeded confirms a pending appointment', async (
         },
       },
     },
+    headers: debugHeaders(),
   });
 
   // Appointment should now be confirmed
@@ -456,7 +457,7 @@ test('webhook: payment_intent.succeeded confirms a pending appointment', async (
 
 test('webhook: invoice.payment_succeeded resets membership credits to the monthly amount', async ({ request }) => {
   // Subscribe to a plan via API (using the saved test card or a fresh one)
-  const attachRes = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID } });
+  const attachRes = await request.post('/api/v1/debug/attach-test-card', { data: { userId: CLIENT_ID }, headers: debugHeaders() });
   const { data: { method } } = await attachRes.json();
 
   const loginRes = await request.post('/api/v1/auth/login', { data: ACCOUNTS.client });
@@ -487,6 +488,7 @@ test('webhook: invoice.payment_succeeded resets membership credits to the monthl
         },
       },
     },
+    headers: debugHeaders(),
   });
 
   // Credits should be reset to credits_per_month
@@ -523,6 +525,7 @@ test('webhook: customer.subscription.deleted cancels the membership', async ({ r
         data: { object: { id: activeSub.stripe_subscription_id } },
       },
     },
+    headers: debugHeaders(),
   });
 
   const statusAfter = await request.get('/api/v1/memberships/status', {

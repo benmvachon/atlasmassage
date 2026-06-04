@@ -8,7 +8,7 @@
  * and the afterAll must restore it before the next run.
  */
 import { test, expect } from '@playwright/test';
-import { ACCOUNTS, getAuthState, loginInBrowser } from './helpers.js';
+import { ACCOUNTS, getAuthState, loginInBrowser, debugHeaders } from './helpers.js';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -25,6 +25,7 @@ test.afterAll(async ({ request }) => {
   if (!clientPasswordChanged) return;
   const res = await request.post('/api/v1/debug/issue-reset-token', {
     data: { email: ACCOUNTS.client.email },
+    headers: debugHeaders(),
   });
   const { data: { token } } = await res.json();
   await request.post('/api/v1/auth/reset-password', {
@@ -267,6 +268,7 @@ test('reset-password - full flow: issue token → reset → success → sign in'
   // Step 1: Issue a reset token via the dev debug endpoint
   const tokenRes = await request.post('/api/v1/debug/issue-reset-token', {
     data: { email: ACCOUNTS.client.email },
+    headers: debugHeaders(),
   });
   expect(tokenRes.ok()).toBe(true);
   const { data: { token } } = await tokenRes.json();

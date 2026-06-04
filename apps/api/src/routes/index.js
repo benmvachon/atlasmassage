@@ -28,7 +28,12 @@ router.use('/team', teamRoutes);
 router.use('/testimonials', testimonialsRoutes);
 
 if (config.env !== 'production') {
-  router.use('/debug', debugRoutes);
+  router.use('/debug', (req, res, next) => {
+    if (req.headers['x-debug-secret'] !== config.debugSecret) {
+      return res.status(404).end();
+    }
+    next();
+  }, debugRoutes);
 }
 
 export default router;

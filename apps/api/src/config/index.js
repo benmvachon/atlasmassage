@@ -4,6 +4,7 @@ const optional = (key, defaultValue) => process.env[key] ?? defaultValue;
 
 export const config = {
   env: optional('NODE_ENV', 'development'),
+  debugSecret: optional('DEBUG_SECRET', 'dev-debug-secret'),
   port: parseInt(optional('PORT', '3001'), 10),
   apiVersion: 'v1',
 
