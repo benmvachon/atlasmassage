@@ -19,12 +19,16 @@ export function AuthProvider({ children }) {
     setAccessToken(null);
   }, []);
 
-  // Silently restore session from the HttpOnly refresh-token cookie on mount
+  // Silently restore session from the HttpOnly refresh-token cookie on mount.
+  // The `active` flag prevents stale callbacks from running if the effect fires
+  // twice (React 18 StrictMode) and the first invocation is superseded.
   useEffect(() => {
+    let active = true;
     authService.refresh()
-      .then(applySession)
-      .catch(clearSession)
-      .finally(() => setLoading(false));
+      .then(session => { if (active) applySession(session); })
+      .catch(() => { if (active) clearSession(); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [applySession, clearSession]);
 
   const login = useCallback(async credentials => {

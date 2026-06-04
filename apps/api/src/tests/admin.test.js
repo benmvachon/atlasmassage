@@ -6,16 +6,23 @@ await jest.unstable_mockModule('../database/pool.js', () => ({
   closePool: jest.fn(),
 }));
 
+// Closure-captured mock instances — implementation set in the factory so it
+// survives jest.clearAllMocks() between tests (mockClear does not reset the
+// default implementation set via jest.fn(impl)).
+const mockBusiness = {};
+const mockTherapistRepo = {};
+const mockUserRepo = {};
+
 await jest.unstable_mockModule('../repositories/businessRepository.js', () => ({
-  BusinessRepository: jest.fn(),
+  BusinessRepository: jest.fn(() => mockBusiness),
 }));
 
 await jest.unstable_mockModule('../repositories/therapistRepository.js', () => ({
-  TherapistRepository: jest.fn(),
+  TherapistRepository: jest.fn(() => mockTherapistRepo),
 }));
 
 await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
-  UserRepository: jest.fn(),
+  UserRepository: jest.fn(() => mockUserRepo),
 }));
 
 await jest.unstable_mockModule('bcrypt', () => ({
@@ -25,9 +32,6 @@ await jest.unstable_mockModule('bcrypt', () => ({
 const { default: request } = await import('supertest');
 const { default: app } = await import('../app.js');
 const { issueAccessToken } = await import('../services/tokenService.js');
-const { BusinessRepository } = await import('../repositories/businessRepository.js');
-const { TherapistRepository } = await import('../repositories/therapistRepository.js');
-const { UserRepository } = await import('../repositories/userRepository.js');
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const ownerBearer = () =>
@@ -70,12 +74,10 @@ const THERAPIST = {
 
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
-let mockBusiness, mockTherapistRepo, mockUserRepo;
-
 beforeEach(() => {
   jest.clearAllMocks();
 
-  mockBusiness = {
+  Object.assign(mockBusiness, {
     getBusinessHours: jest.fn().mockResolvedValue(HOURS),
     getMassageBeds: jest.fn().mockResolvedValue(BEDS),
     getServices: jest.fn().mockResolvedValue(SERVICES),
@@ -86,23 +88,19 @@ beforeEach(() => {
     createService: jest.fn(),
     updateService: jest.fn(),
     deactivateService: jest.fn(),
-  };
+  });
 
-  mockTherapistRepo = {
+  Object.assign(mockTherapistRepo, {
     findAll: jest.fn().mockResolvedValue([THERAPIST]),
     findById: jest.fn().mockResolvedValue(THERAPIST),
     create: jest.fn().mockResolvedValue('therapist-1'),
     updateProfile: jest.fn().mockResolvedValue({ user_id: 'therapist-1' }),
     deactivate: jest.fn().mockResolvedValue({ id: 'therapist-1' }),
-  };
+  });
 
-  mockUserRepo = {
+  Object.assign(mockUserRepo, {
     findByEmail: jest.fn().mockResolvedValue(null),
-  };
-
-  BusinessRepository.mockImplementation(() => mockBusiness);
-  TherapistRepository.mockImplementation(() => mockTherapistRepo);
-  UserRepository.mockImplementation(() => mockUserRepo);
+  });
 });
 
 // ── Authorization (all admin routes require owner role) ───────────────────────

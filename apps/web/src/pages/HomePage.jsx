@@ -48,9 +48,8 @@ export default function HomePage() {
           <h1 className="hero__title">Therapeutic Bodywork</h1>
           <p className="hero__subtitle">
             Whether you&rsquo;re recovering from training, managing chronic pain, or simply
-            carrying the weight of daily life &mdash; our licensed therapists deliver
-            personalized, evidence-informed care to help you move better, feel better,
-            and live well.
+            aching from the ever-growing burden of modern life, our licensed therapists deliver
+            personalized, evidence-informed care to give you lasting health and relief.
           </p>
           <Link to="/booking" className="btn btn--primary hero__cta">Book Now</Link>
         </div>

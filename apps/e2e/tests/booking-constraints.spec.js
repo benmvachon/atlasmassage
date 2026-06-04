@@ -32,6 +32,12 @@ test.describe('15-minute buffer time', () => {
   test.beforeAll(async ({ request }) => {
     serviceId = await getServiceId(request);
 
+    // Reset limits to defaults first — a previous run's weekly-capacity afterAll
+    // may have failed, leaving Sarah's weekly limit at 2 with leftover appointments
+    // from that same week (2030-09-05/06).  With those 2 leftover appointments
+    // plus the one created below, filterByCapacity would hide all of Sarah's slots.
+    await setBookingLimits(request, sarahUserId, ownerToken, 5, 25);
+
     // Give Sarah availability 09:00–17:00 on our test date
     await setAvailability(request, sarahUserId, sarahToken, [
       { date: testDate, startTime: '09:00', endTime: '17:00' },
@@ -54,7 +60,8 @@ test.describe('15-minute buffer time', () => {
   test('slots within the 15-minute buffer window around an existing appointment are not shown', async ({ page }) => {
     await page.goto(`/booking?year=2030&month=9`);
     await page.click(`button[aria-label*="${testDate}"][aria-label*="available"]`);
-    await page.waitForSelector('.slot-panel');
+    // Wait for the grid (not just the panel container) so the async slot fetch has resolved.
+    await page.waitForSelector('.slot-panel__grid');
 
     const times = await page.locator('button.slot-btn').evaluateAll(btns =>
       btns.map(b => b.getAttribute('aria-label')?.match(/^(\d+:\d+ [AP]M)/)?.[1])
@@ -151,7 +158,10 @@ test.describe('Daily booking limit', () => {
     await setBookingLimits(request, sarahUserId, ownerToken, 5, 25);
   });
 
-  test('a therapist at their daily limit does not appear in available slots', async ({ page }) => {
+  test('a therapist at their daily limit does not appear in available slots', async ({ page, request }) => {
+    // Re-assert limits in case a concurrent spec file reset them between beforeAll and here.
+    await setBookingLimits(request, sarahUserId, ownerToken, 2, 25);
+
     await page.goto(`/booking?year=2030&month=9`);
 
     // The date might still show in the calendar if another therapist has availability
@@ -231,7 +241,11 @@ test.describe('Weekly booking limit', () => {
     await setBookingLimits(request, sarahUserId, ownerToken, 5, 25);
   });
 
-  test('a therapist at weekly capacity has no slots when the date is selected', async ({ page }) => {
+  test('a therapist at weekly capacity has no slots when the date is selected', async ({ page, request }) => {
+    // Re-assert the limits here in case a concurrent spec file (e.g. therapist-schedule
+    // afterAll) reset them to defaults between our beforeAll and this test body.
+    await setBookingLimits(request, sarahUserId, ownerToken, 10, 2);
+
     // Note: the calendar endpoint applies only daily capacity filtering.
     // Day1 (Thu 2030-09-05) has 1 appointment — under the daily limit of 10 — so the
     // calendar may still show the date as available. The SLOTS endpoint checks both

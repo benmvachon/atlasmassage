@@ -1,5 +1,12 @@
 import { api } from './api.js';
 
+// Single-flight guard: React 18 StrictMode invokes effects twice in dev mode,
+// which would fire two concurrent POST /auth/refresh calls with the same
+// rotating token. The second call fails (token already rotated) and triggers
+// clearSession(), leaving user=null. Deduplicating ensures only one network
+// request is in-flight at a time.
+let _refreshInFlight = null;
+
 export const authService = {
   register: ({ email, password, firstName, lastName, phone }) =>
     api.post('/auth/register', { email, password, firstName, lastName, phone })
@@ -11,9 +18,14 @@ export const authService = {
 
   logout: () => api.post('/auth/logout'),
 
-  refresh: () =>
-    api.post('/auth/refresh')
-      .then(res => res.data),
+  refresh: () => {
+    if (!_refreshInFlight) {
+      _refreshInFlight = api.post('/auth/refresh')
+        .then(res => res.data)
+        .finally(() => { _refreshInFlight = null; });
+    }
+    return _refreshInFlight;
+  },
 
   forgotPassword: ({ email }) =>
     api.post('/auth/forgot-password', { email }),
