@@ -113,6 +113,7 @@ function WeekView({ weekStart, appointments, onSelectAppt }) {
   });
 
   return (
+    <div className="cal-scroll-wrapper">
     <div className="cal-week">
       {days.map(day => {
         const key = toISODate(day);
@@ -147,6 +148,7 @@ function WeekView({ weekStart, appointments, onSelectAppt }) {
         );
       })}
     </div>
+    </div>
   );
 }
 
@@ -169,6 +171,7 @@ function MonthView({ monthStart, appointments, onSelectAppt }) {
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
 
   return (
+    <div className="cal-scroll-wrapper">
     <div className="cal-month">
       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
         <div key={d} className="cal-month__head">{d}</div>
@@ -199,6 +202,7 @@ function MonthView({ monthStart, appointments, onSelectAppt }) {
           </div>
         );
       })}
+    </div>
     </div>
   );
 }

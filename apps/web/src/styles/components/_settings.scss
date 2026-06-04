@@ -260,6 +260,11 @@
   margin-bottom: $space-3;
   gap: $space-4;
 
+  @media (max-width: #{$bp-sm - 1px}) {
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
   &--default {
     border-color: $color-primary-light;
     background: $color-primary-tint-xs;
@@ -283,6 +288,11 @@
     display: flex;
     gap: $space-2;
     flex-shrink: 0;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      width: 100%;
+      justify-content: flex-end;
+    }
   }
 }
 
@@ -325,6 +335,11 @@
 .modal-overlay {
   @include modal-overlay;
   z-index: 200;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    align-items: flex-end;
+    padding: 0;
+  }
 }
 
 .modal-panel {
@@ -335,6 +350,12 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: $space-5 $space-4 $space-8;
+    max-height: 92dvh;
+    border-radius: $border-radius-lg $border-radius-lg 0 0;
+  }
 }
 
 .modal-header {
@@ -558,6 +579,9 @@
   background: $color-white;
   cursor: pointer;
   transition: border-color $transition-fast;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 52px;
 
   &:hover { border-color: $color-primary-light; }
 

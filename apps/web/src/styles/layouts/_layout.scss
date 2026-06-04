@@ -1,10 +1,15 @@
 @use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 .container {
   width: 100%;
   max-width: $container-max-width;
   margin: 0 auto;
   padding: 0 $space-4;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: 0 $space-3;
+  }
 }
 
 .layout {
@@ -15,6 +20,10 @@
   &__content {
     flex: 1;
     padding: $space-8 $space-4;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      padding: $space-6 $space-3;
+    }
 
     &--centered {
       @extend .container;

@@ -92,6 +92,7 @@
 
     @media (max-width: $bp-md) {
       align-items: stretch;
+      gap: $space-8;
 
       .service-blurb {
         text-align: left;
@@ -104,6 +105,7 @@
 
     @media (max-width: $bp-md) {
       align-items: stretch;
+      gap: $space-8;
     }
   }
 }
@@ -117,6 +119,14 @@
   background-color: $color-bg-alt;
   border: 1px solid $color-border;
   transition: box-shadow $transition-base;
+
+  @media (max-width: $bp-md) {
+    max-width: 100%;
+  }
+
+  @media (max-width: $bp-sm) {
+    padding: $space-4;
+  }
 
   &:hover {
     box-shadow: $shadow-md;

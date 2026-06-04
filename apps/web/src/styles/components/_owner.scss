@@ -8,6 +8,10 @@
     display: flex;
     flex: 1;
     align-items: flex-start;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      flex-direction: column;
+    }
   }
 }
 
@@ -20,6 +24,17 @@
   position: sticky;
   top: $header-height;
 
+  @media (max-width: #{$bp-md - 1px}) {
+    width: 100%;
+    min-height: auto;
+    position: static;
+    padding: $space-3 $space-3 0;
+    border-right: none;
+    border-bottom: 1px solid $color-border;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   &__heading {
     font-family: $font-family-ui;
     font-size: $font-size-xs;
@@ -29,6 +44,10 @@
     color: $color-text-muted;
     padding: 0 $space-3;
     margin-bottom: $space-3;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      display: none;
+    }
   }
 
   &__list {
@@ -38,6 +57,16 @@
     display: flex;
     flex-direction: column;
     gap: $space-1;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: $space-1;
+      padding-bottom: $space-3;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar { display: none; }
+    }
   }
 
   &__link {
@@ -50,6 +79,8 @@
     color: $color-text;
     text-decoration: none;
     transition: background-color $transition-fast, color $transition-fast;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover { background-color: $color-bg-alt; color: $color-primary; }
 
@@ -57,6 +88,11 @@
       background-color: $color-primary-tint-active;
       color: $color-primary;
       font-weight: 600;
+    }
+
+    @media (max-width: #{$bp-md - 1px}) {
+      white-space: nowrap;
+      padding: $space-2 $space-4;
     }
   }
 }
@@ -67,6 +103,10 @@
   max-width: 800px;
   margin: 0 auto;
   padding: $space-8 $space-6;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: $space-4 $space-3;
+  }
 
   &__header {
     margin-bottom: $space-8;
@@ -135,6 +175,10 @@
   margin: 0 auto;
   padding: $space-6;
 
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: $space-4 $space-3;
+  }
+
   &__breadcrumb {
     font-family: $font-family-ui;
     font-size: $font-size-sm;
@@ -177,6 +221,11 @@
     justify-content: space-between;
     gap: $space-4;
     margin-bottom: $space-6;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      flex-direction: column;
+      gap: $space-3;
+    }
   }
 
   &__title {
@@ -276,12 +325,16 @@
   cursor: pointer;
   font-family: $font-family-ui;
   font-size: $font-size-sm;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
 
   input[type='checkbox'] {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     accent-color: $color-primary;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
   &__label { color: $color-text; }
@@ -297,6 +350,7 @@
   background: $color-bg-alt;
   border-radius: $border-radius-md;
   margin-bottom: $space-4;
+  flex-wrap: wrap;
 }
 
 .owner-add-panel {
@@ -583,6 +637,10 @@
   gap: $space-4;
   margin-bottom: $space-4;
 
+  @media (max-width: #{$bp-sm - 1px}) {
+    gap: $space-2;
+  }
+
   &__left {
     display: flex;
     align-items: center;
@@ -593,6 +651,11 @@
     display: flex;
     align-items: center;
     gap: $space-3;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 
   &__title {
@@ -607,6 +670,10 @@
   font-size: $font-size-xl;
   line-height: 1;
   padding: $space-1 $space-3;
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cal-filter {
@@ -663,6 +730,18 @@
   &--no_show   { background: $color-bg-alt;            color: $color-text-muted; }
 }
 
+// ── Calendar scroll wrapper (mobile) ─────────────────────────────────────────
+
+.cal-scroll-wrapper {
+  @media (max-width: #{$bp-md - 1px}) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 calc(-1 * $space-4);
+    padding: 0 $space-4;
+    scrollbar-width: thin;
+  }
+}
+
 // ── Week view ─────────────────────────────────────────────────────────────────
 
 .cal-week {
@@ -673,6 +752,10 @@
   border: 1px solid $color-border;
   border-radius: $border-radius-md;
   overflow: hidden;
+
+  @media (max-width: #{$bp-md - 1px}) {
+    min-width: 560px;
+  }
 
   &__day {
     background: $color-white;
@@ -744,6 +827,10 @@
   border: 1px solid $color-border;
   border-radius: $border-radius-md;
   overflow: hidden;
+
+  @media (max-width: #{$bp-md - 1px}) {
+    min-width: 560px;
+  }
 
   &__head {
     background: $color-bg-alt;
@@ -842,6 +929,9 @@
   font-family: $font-family-ui;
   background: $color-primary-tint-sm;
   transition: background-color $transition-fast, border-color $transition-fast;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
 
   &:hover {
     background: $color-primary-tint-md;
@@ -907,10 +997,18 @@
     text-align: left;
     margin-bottom: $space-2;
     transition: box-shadow $transition-fast, border-color $transition-fast;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
 
     &:hover {
       box-shadow: $shadow-md;
       border-color: $color-primary-light;
+    }
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      flex-wrap: wrap;
+      gap: $space-2;
     }
   }
 
@@ -955,6 +1053,11 @@
   align-items: center;
   justify-content: center;
   padding: $space-4;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    align-items: flex-end;
+    padding: 0;
+  }
 }
 
 .cal-detail {
@@ -965,6 +1068,12 @@
   max-width: 480px;
   padding: $space-6;
   position: relative;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    border-radius: $border-radius-lg $border-radius-lg 0 0;
+    max-width: 100%;
+    padding: $space-5 $space-4;
+  }
 
   &__header {
     display: flex;
@@ -1154,10 +1263,18 @@
   gap: $space-3;
   margin-bottom: $space-6;
 
+  @media (max-width: #{$bp-sm - 1px}) {
+    gap: $space-2;
+  }
+
   &__select {
     width: auto;
     min-width: 140px;
     flex-shrink: 0;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      flex: 1;
+    }
   }
 
   &__search {
@@ -1165,7 +1282,11 @@
     align-items: center;
     gap: $space-2;
     flex: 1;
-    min-width: 240px;
+    min-width: 200px;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      min-width: 100%;
+    }
 
     .owner-input { flex: 1; }
   }

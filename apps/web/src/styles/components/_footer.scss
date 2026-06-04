@@ -12,6 +12,13 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: $space-2;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: $space-3;
+    }
   }
 
   &__copy {
@@ -24,12 +31,22 @@
   &__nav {
     display: flex;
     gap: $space-6;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      display: none;
+    }
 
     a {
       font-family: $font-family-ui;
       font-size: $font-size-sm;
       color: $color-bg-alt;
       transition: color $transition-fast;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      touch-action: manipulation;
 
       &:hover { color: $color-white; }
     }

@@ -3,12 +3,21 @@
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
+.memberships-page {
+  margin: 0 calc(-1 * $space-3) calc(-1 * $space-6);
+}
+
 .memberships-hero {
   background: $color-primary-dark;
   padding: $space-16 $space-4;
   margin: calc(-1 * $space-8) calc(-1 * $space-4) 0;
   text-align: center;
   color: $color-white;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: $space-10 $space-4 $space-8;
+    margin: calc(-1 * $space-6) calc(-1 * $space-3) 0;
+  }
 
   &__inner {
     max-width: 680px;
@@ -26,11 +35,15 @@
 
   &__title {
     font-family: $font-family-logo;
-    font-size: $font-size-3xl;
+    font-size: $font-size-2xl;
     font-weight: 700;
     color: $color-white;
     margin-bottom: $space-4;
     line-height: 1.15;
+
+    @include respond-to(sm) {
+      font-size: $font-size-3xl;
+    }
 
     @include respond-to(md) {
       font-size: 2.75rem;
