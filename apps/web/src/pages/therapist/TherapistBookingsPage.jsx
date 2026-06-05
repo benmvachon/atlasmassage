@@ -224,6 +224,7 @@ export default function TherapistBookingsPage() {
                       <th>Client</th>
                       <th>Service</th>
                       <th>Duration</th>
+                      <th>Consent</th>
                       <th>Status</th>
                       <th></th>
                     </tr>
@@ -240,6 +241,12 @@ export default function TherapistBookingsPage() {
                         </td>
                         <td>{appt.service_name}</td>
                         <td>{appt.duration_minutes} min</td>
+                        <td>
+                          {appt.consent_signed_at
+                            ? <span className="owner-badge owner-badge--active">On file</span>
+                            : <span className="owner-badge owner-badge--inactive">—</span>
+                          }
+                        </td>
                         <td>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                             <span className={`cal-status cal-status--${appt.status}`}>

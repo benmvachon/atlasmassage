@@ -6,6 +6,8 @@ import { createAppointmentRules, rescheduleAppointmentRules, validate } from '..
 const router = Router();
 
 router.get('/', authenticate, appointmentController.listAppointments);
+// Consent status check for authenticated clients (must be before /:id to avoid route collision)
+router.get('/consent/status', authenticate, appointmentController.getConsentStatus);
 // Guest checkout: authentication is optional — unauthenticated callers provide guest fields in the body
 router.post('/', optionalAuthenticate, createAppointmentRules, validate, appointmentController.createAppointment);
 router.get('/:id', authenticate, appointmentController.getAppointment);

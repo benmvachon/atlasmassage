@@ -10,6 +10,7 @@ await jest.unstable_mockModule('../database/pool.js', () => ({
 
 const mockApptRepo = {};
 const mockAvailRepo = {};
+const mockConsentRepo = {};
 const mockTransferRepo = {};
 
 await jest.unstable_mockModule('../repositories/appointmentRepository.js', () => ({
@@ -18,6 +19,10 @@ await jest.unstable_mockModule('../repositories/appointmentRepository.js', () =>
 
 await jest.unstable_mockModule('../repositories/availabilityRepository.js', () => ({
   AvailabilityRepository: jest.fn(() => mockAvailRepo),
+}));
+
+await jest.unstable_mockModule('../repositories/consentRepository.js', () => ({
+  ConsentRepository: jest.fn(() => mockConsentRepo),
 }));
 
 await jest.unstable_mockModule('../repositories/transferRequestRepository.js', () => ({
@@ -96,6 +101,11 @@ beforeEach(() => {
 
   Object.assign(mockAvailRepo, {
     getForDateRange: jest.fn().mockResolvedValue([]),
+  });
+
+  Object.assign(mockConsentRepo, {
+    findByClientId: jest.fn().mockResolvedValue(null),
+    create: jest.fn().mockResolvedValue({ id: 'cs-uuid', signed_at: new Date().toISOString() }),
   });
 
   Object.assign(mockTransferRepo, {
@@ -195,7 +205,7 @@ describe('POST /api/v1/appointments', () => {
     const res = await request(app)
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
-      .send({ therapistId: THERAPIST_ID, serviceId: SERVICE_ID }); // missing scheduledAt + waiverSignature
+      .send({ therapistId: THERAPIST_ID, serviceId: SERVICE_ID }); // missing scheduledAt
 
     expect(res.status).toBe(422);
   });

@@ -77,6 +77,13 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
           <dd>${(appt.price_cents / 100).toFixed(2)}</dd>
           <dt>Status</dt>
           <dd><span className={`cal-status cal-status--${appt.status}`}>{STATUS_LABELS[appt.status]}</span></dd>
+          <dt>Consent</dt>
+          <dd>
+            {appt.consent_signed_at
+              ? `On file since ${new Date(appt.consent_signed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+              : '—'
+            }
+          </dd>
           {appt.notes && <><dt>Notes</dt><dd>{appt.notes}</dd></>}
         </dl>
         {nexts.length > 0 && (

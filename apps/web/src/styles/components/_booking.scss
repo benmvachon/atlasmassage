@@ -319,6 +319,18 @@
   text-align: center;
 }
 
+.booking-consent-note {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  background: rgba($color-primary, 0.04);
+  border: 1px solid rgba($color-primary, 0.15);
+  border-radius: $border-radius-sm;
+  padding: $space-2 $space-4;
+  margin-bottom: $space-4;
+  text-align: center;
+}
+
 .booking-payment-loading {
   font-family: $font-family-ui;
   font-size: $font-size-sm;

@@ -67,11 +67,13 @@ export class AppointmentRepository {
          th.last_name  AS therapist_last_name,
          COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) AS client_name,
          COALESCE(cl.email, a.guest_email) AS client_email,
-         cl.phone AS client_phone
+         cl.phone AS client_phone,
+         cs.signed_at AS consent_signed_at
        FROM appointments a
        JOIN services s    ON s.id = a.service_id
        JOIN users th      ON th.id = a.therapist_id
        LEFT JOIN users cl ON cl.id = a.client_id
+       LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
        WHERE a.scheduled_at::date >= $1::date
          AND a.scheduled_at::date <= $2::date
          ${therapistClause}
@@ -133,12 +135,14 @@ export class AppointmentRepository {
          COALESCE(cl.phone, a.guest_phone) AS client_phone,
          tr.id AS transfer_request_id,
          tr.status AS transfer_status,
-         tr.reason AS transfer_reason
+         tr.reason AS transfer_reason,
+         cs.signed_at AS consent_signed_at
        FROM appointments a
        JOIN services s ON s.id = a.service_id
        LEFT JOIN users cl ON cl.id = a.client_id
        LEFT JOIN appointment_transfer_requests tr
          ON tr.appointment_id = a.id AND tr.status = 'pending'
+       LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
        WHERE ${conditions.join(' AND ')}
        ORDER BY a.scheduled_at DESC`,
       params
@@ -278,18 +282,19 @@ export class AppointmentRepository {
 
   async create({
     clientId, therapistId, serviceId, scheduledAt, durationMinutes,
-    notes, guestName, guestEmail, guestPhone, waiverSignature,
+    notes, guestName, guestEmail, guestPhone, waiverSignature, consentSignatureId,
   }) {
     const { rows } = await this.pool.query(
       `INSERT INTO appointments
          (client_id, therapist_id, service_id, scheduled_at, duration_minutes,
           notes, guest_name, guest_email, guest_phone,
-          waiver_signature, waiver_signed_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+          waiver_signature, waiver_signed_at, consent_signature_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+               CASE WHEN $10 IS NOT NULL THEN NOW() ELSE NULL END, $11)
        RETURNING *`,
       [clientId ?? null, therapistId, serviceId, scheduledAt, durationMinutes,
        notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
-       waiverSignature]
+       waiverSignature ?? null, consentSignatureId ?? null]
     );
     return rows[0];
   }

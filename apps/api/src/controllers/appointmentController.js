@@ -1,6 +1,7 @@
 import { getPool } from '../database/pool.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { AvailabilityRepository } from '../repositories/availabilityRepository.js';
+import { ConsentRepository } from '../repositories/consentRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { PaymentService } from '../services/paymentService.js';
 import { MembershipService } from '../services/membershipService.js';
@@ -17,6 +18,7 @@ function repos() {
   return {
     appointment: new AppointmentRepository(pool),
     availability: new AvailabilityRepository(pool),
+    consent: new ConsentRepository(pool),
     transfer: new TransferRequestRepository(pool),
   };
 }
@@ -34,7 +36,7 @@ export async function createAppointment(req, res, next) {
       throw new AppError('Guest name and email are required', 400, 'BAD_REQUEST');
     }
 
-    const { appointment: apptRepo, availability: availRepo } = repos();
+    const { appointment: apptRepo, availability: availRepo, consent: consentRepo } = repos();
 
     const apptDate = new Date(scheduledAt);
     if (apptDate < new Date(Date.now() + 24 * 60 * 60 * 1000)) {
@@ -65,6 +67,28 @@ export async function createAppointment(req, res, next) {
       }
     }
 
+    // Resolve or create consent signature.
+    // Authenticated clients who have signed before skip the waiver; guests always sign.
+    let consentSignatureId = null;
+    if (clientId) {
+      const existing = await consentRepo.findByClientId(clientId);
+      if (existing) {
+        consentSignatureId = existing.id;
+      } else {
+        if (!waiverSignature) {
+          throw new AppError('A signed waiver is required to book an appointment', 400, 'WAIVER_REQUIRED');
+        }
+        const created = await consentRepo.create({ clientId, signature: waiverSignature });
+        consentSignatureId = created.id;
+      }
+    } else {
+      if (!waiverSignature) {
+        throw new AppError('A signed waiver is required to book an appointment', 400, 'WAIVER_REQUIRED');
+      }
+      const created = await consentRepo.create({ guestEmail, signature: waiverSignature });
+      consentSignatureId = created.id;
+    }
+
     let appointment = await apptRepo.create({
       clientId,
       therapistId: resolvedTherapistId,
@@ -75,7 +99,8 @@ export async function createAppointment(req, res, next) {
       guestName: clientId ? null : guestName,
       guestEmail: clientId ? null : guestEmail,
       guestPhone: clientId ? null : (guestPhone || null),
-      waiverSignature,
+      waiverSignature: waiverSignature ?? null,
+      consentSignatureId,
     });
 
     // Check if the booking is covered by a membership credit.
@@ -314,3 +339,16 @@ export async function requestTransfer(req, res, next) {
 
 export const updateAppointment = (_req, _res, next) =>
   next(new AppError('Not implemented', 501, 'NOT_IMPLEMENTED'));
+
+export async function getConsentStatus(req, res, next) {
+  try {
+    const consentRepo = new ConsentRepository(getPool());
+    const existing = await consentRepo.findByClientId(req.user.sub);
+    res.json({
+      success: true,
+      data: { hasSigned: !!existing, signedAt: existing?.signed_at ?? null },
+    });
+  } catch (err) {
+    next(err);
+  }
+}

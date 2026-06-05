@@ -18,7 +18,7 @@ export const createAppointmentRules = [
     .optional({ values: 'falsy' })
     .isString().isLength({ max: 1000 }).withMessage('notes must be 1000 characters or fewer'),
   body('waiverSignature')
-    .notEmpty().withMessage('A signed waiver is required to book an appointment')
+    .optional({ values: 'falsy' })
     .isString().isLength({ max: 150000 }).withMessage('waiverSignature is too large'),
 ];
 

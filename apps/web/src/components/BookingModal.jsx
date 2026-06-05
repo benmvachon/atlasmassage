@@ -224,6 +224,7 @@ function BookingForm({
   paymentMethods, loadingMethods,
   selectedMethodId, setSelectedMethodId,
   membershipStatus,
+  consentStatus, loadingConsent,
   onClose, onComplete,
 }) {
   const { user } = useAuth();
@@ -237,6 +238,8 @@ function BookingForm({
   const dialogRef = useRef(null);
   useFocusTrap(dialogRef, { onEscape: onClose });
 
+  const hasConsent = !!(user && consentStatus?.hasSigned);
+
   const selectedService = services.find(s => s.id === serviceId);
   const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
   const needsPayment = !!stripePublishableKey && !membershipCoversBooking;
@@ -248,6 +251,7 @@ function BookingForm({
       if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
     }
     if (loadingMethods) return false;
+    if (loadingConsent) return false;
     if (needsPayment && !selectedMethodId) return false;
     return true;
   })();
@@ -265,39 +269,13 @@ function BookingForm({
     return true;
   }
 
-  async function handleContinue(e) {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    // Tokenize the new card before transitioning — the CardElement unmounts on
-    // the waiver step, so elements.getElement(CardElement) returns null there.
-    if (needsPayment && isNewCard && stripe) {
-      setSubmitting(true);
-      const cardElement = elements.getElement(CardElement);
-      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-      });
-      setSubmitting(false);
-      if (pmError) {
-        setError(pmError.message);
-        return;
-      }
-      setStagedPaymentMethodId(paymentMethod.id);
-    }
-
-    setError('');
-    setStep('waiver');
-  }
-
-  async function handleSign(waiverSignature) {
-    if (!waiverSignature) { setError('Please sign the consent form.'); return; }
-
+  async function submitBooking(waiverSignature, overridePaymentMethodId) {
     setSubmitting(true);
     setError('');
 
     const scheduledAt = `${date}T${slot.startTime}:00.000Z`;
     const savedMethod = paymentMethods.find(m => m.id === selectedMethodId);
+    const newCardPmId = overridePaymentMethodId ?? stagedPaymentMethodId;
 
     try {
       const result = await bookingService.createAppointment({
@@ -306,7 +284,7 @@ function BookingForm({
         scheduledAt,
         notes: notes.trim() || undefined,
         paymentMethodId: savedMethod ? savedMethod.id : undefined,
-        waiverSignature,
+        ...(waiverSignature && { waiverSignature }),
         ...(!user && { guestName: name.trim(), guestEmail: email.trim(), guestPhone: phone.trim() || undefined }),
       });
 
@@ -316,7 +294,7 @@ function BookingForm({
         let confirmResult;
         if (isNewCard) {
           confirmResult = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: stagedPaymentMethodId,
+            payment_method: newCardPmId,
           });
         } else if (savedMethod) {
           confirmResult = await stripe.confirmCardPayment(clientSecret, {
@@ -332,6 +310,43 @@ function BookingForm({
       setError(err.message || 'Booking failed. Please try again.');
       setSubmitting(false);
     }
+  }
+
+  async function handleContinue(e) {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    // Tokenize the new card before transitioning — the CardElement unmounts on
+    // the waiver step, so elements.getElement(CardElement) returns null there.
+    let newCardPmId = null;
+    if (needsPayment && isNewCard && stripe) {
+      setSubmitting(true);
+      const cardElement = elements.getElement(CardElement);
+      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+      setSubmitting(false);
+      if (pmError) {
+        setError(pmError.message);
+        return;
+      }
+      newCardPmId = paymentMethod.id;
+      setStagedPaymentMethodId(newCardPmId);
+    }
+
+    setError('');
+
+    if (hasConsent) {
+      await submitBooking(null, newCardPmId);
+    } else {
+      setStep('waiver');
+    }
+  }
+
+  async function handleSign(waiverSignature) {
+    if (!waiverSignature) { setError('Please sign the consent form.'); return; }
+    await submitBooking(waiverSignature);
   }
 
   if (step === 'success') {
@@ -521,6 +536,12 @@ function BookingForm({
             </div>
           )}
 
+          {hasConsent && consentStatus?.signedAt && (
+            <p className="booking-consent-note">
+              Consent on file since {new Date(consentStatus.signedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
+          )}
+
           {error && <p className="avail-modal__error" role="alert">{error}</p>}
 
           <div className="avail-modal__actions">
@@ -529,7 +550,7 @@ function BookingForm({
               type="submit"
               disabled={submitting || !isFormReady}
             >
-              Continue to Consent Form →
+              {submitting ? 'Booking…' : hasConsent ? 'Book Appointment' : 'Continue to Consent Form →'}
             </button>
             <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
               Cancel
@@ -559,6 +580,8 @@ export default function BookingModal({
   const [loadingMethods, setLoadingMethods] = useState(false);
   const [selectedMethodId, setSelectedMethodId] = useState(user ? '' : 'new');
   const [membershipStatus, setMembershipStatus] = useState(null);
+  const [consentStatus, setConsentStatus] = useState(null);
+  const [loadingConsent, setLoadingConsent] = useState(false);
 
   const therapistOptions = useMemo(() => {
     if (lockedTherapist) return [lockedTherapist];
@@ -568,7 +591,14 @@ export default function BookingModal({
   useEffect(() => {
     if (!user) return;
 
-    const fetches = [membershipService.getMyStatus().then(({ data }) => setMembershipStatus(data))];
+    setLoadingConsent(true);
+    const fetches = [
+      membershipService.getMyStatus().then(({ data }) => setMembershipStatus(data)),
+      bookingService.getConsentStatus()
+        .then(({ data }) => setConsentStatus(data))
+        .catch(() => setConsentStatus({ hasSigned: false, signedAt: null }))
+        .finally(() => setLoadingConsent(false)),
+    ];
 
     if (stripePublishableKey) {
       setLoadingMethods(true);
@@ -596,6 +626,7 @@ export default function BookingModal({
     name, setName, email, setEmail, phone, setPhone, notes, setNotes,
     paymentMethods, loadingMethods, selectedMethodId, setSelectedMethodId,
     membershipStatus,
+    consentStatus, loadingConsent,
     onClose, onComplete,
   };
 
