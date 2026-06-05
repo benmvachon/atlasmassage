@@ -69,6 +69,22 @@
     }
   }
 
+  &__section-label {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    padding: $space-4 $space-3 $space-1;
+    margin-top: $space-2;
+    border-top: 1px solid $color-border;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      display: none;
+    }
+  }
+
   &__link {
     display: block;
     padding: $space-2 $space-3;

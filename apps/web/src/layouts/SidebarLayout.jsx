@@ -4,6 +4,9 @@ import Header from '../components/Header.jsx';
 /**
  * Shared sidebar layout used by TherapistLayout and OwnerLayout.
  * Renders Header + left sidebar nav + main content area.
+ *
+ * navItems entries are either link items { to, label, end? }
+ * or section dividers { divider: true, label }.
  */
 export default function SidebarLayout({ heading, navItems }) {
   return (
@@ -13,19 +16,25 @@ export default function SidebarLayout({ heading, navItems }) {
         <nav className="owner-sidebar" aria-label={`${heading} navigation`}>
           <p className="owner-sidebar__heading">{heading}</p>
           <ul className="owner-sidebar__list">
-            {navItems.map(({ to, label, end }) => (
-              <li key={to}>
-                <NavLink
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    `owner-sidebar__link${isActive ? ' owner-sidebar__link--active' : ''}`
-                  }
-                >
-                  {label}
-                </NavLink>
-              </li>
-            ))}
+            {navItems.map((item) =>
+              item.divider ? (
+                <li key={item.label} className="owner-sidebar__section-label">
+                  {item.label}
+                </li>
+              ) : (
+                <li key={item.to}>
+                  <NavLink
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `owner-sidebar__link${isActive ? ' owner-sidebar__link--active' : ''}`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                </li>
+              )
+            )}
           </ul>
         </nav>
         <main id="main-content" className="layout__content">
