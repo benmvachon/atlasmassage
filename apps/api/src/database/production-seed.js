@@ -216,6 +216,8 @@ async function seed() {
 
       logger.info('seed_insert', { email: u.email, roles: u.roles });
     }
+
+    await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
     logger.error('seed_failed', { message: err.message });
