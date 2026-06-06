@@ -60,9 +60,9 @@ export default function Header() {
         >
           <NavLink to="/" end onClick={close}>Home</NavLink>
           <NavLink to="/services" onClick={close}>Services</NavLink>
-          <NavLink to="/memberships" onClick={close}>Memberships</NavLink>
           <NavLink to="/team" onClick={close}>Team</NavLink>
           <NavLink to="/testimonials" onClick={close}>Testimonials</NavLink>
+          <NavLink to="/memberships" onClick={close}>Memberships</NavLink>
           <NavLink to="/booking" className="btn btn--primary" onClick={close}>Book Now</NavLink>
           {isTherapist && !isOwner && (
             <NavLink to="/therapist/schedule" className="header__schedule-link" onClick={close}>
@@ -70,14 +70,14 @@ export default function Header() {
             </NavLink>
           )}
           {isOwner && (
-            <NavLink to="/owner/dashboard" className="header__admin-link" onClick={close}>
+            <NavLink to="/owner/dashboard" className="btn btn--outline" onClick={close}>
               Admin
             </NavLink>
           )}
           {user && (
             <NavLink
               to={isTherapist && !isOwner ? '/therapist/settings' : '/settings'}
-              className="header__settings-link"
+              className="btn btn--outline"
               onClick={close}
             >
               Settings
