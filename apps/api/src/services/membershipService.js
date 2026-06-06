@@ -26,16 +26,93 @@ export class MembershipService {
   }
 
   async createPlan({ name, description, priceMonthlyCents, creditsPerMonth }) {
-    return this.memberships.createPlan({ name, description, priceMonthlyCents, creditsPerMonth });
+    let stripePriceId = null;
+    let stripeProductId = null;
+
+    const stripe = getStripe();
+    if (stripe) {
+      const product = await stripe.products.create({
+        name,
+        ...(description && { description }),
+        metadata: { type: 'membership_plan' },
+      });
+      stripeProductId = product.id;
+
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: priceMonthlyCents,
+        currency: 'usd',
+        recurring: { interval: 'month' },
+      });
+      stripePriceId = price.id;
+    }
+
+    return this.memberships.createPlan({ name, description, priceMonthlyCents, creditsPerMonth, stripePriceId, stripeProductId });
   }
 
   async updatePlan(id, data) {
     const plan = await this.memberships.findPlanById(id);
     if (!plan) throw new AppError('Plan not found', 404, 'NOT_FOUND');
+
+    const stripe = getStripe();
+    let stripePriceId;
+    let stripeProductId;
+
+    if (stripe) {
+      // Sync product name/description if changed
+      if (plan.stripe_product_id && (data.name !== undefined || data.description !== undefined)) {
+        await stripe.products.update(plan.stripe_product_id, {
+          ...(data.name !== undefined && { name: data.name }),
+          ...(data.description !== undefined && { description: data.description }),
+        });
+      }
+
+      // If price changed, create a new price and archive the old one
+      const priceChanged = data.priceMonthlyCents !== undefined &&
+        data.priceMonthlyCents !== plan.price_monthly_cents;
+
+      if (priceChanged) {
+        let productId = plan.stripe_product_id;
+
+        if (!productId && plan.stripe_price_id) {
+          const existing = await stripe.prices.retrieve(plan.stripe_price_id);
+          productId = typeof existing.product === 'string' ? existing.product : existing.product.id;
+        }
+
+        if (!productId) {
+          const product = await stripe.products.create({
+            name: data.name ?? plan.name,
+            metadata: { type: 'membership_plan' },
+          });
+          productId = product.id;
+        }
+
+        const newPrice = await stripe.prices.create({
+          product: productId,
+          unit_amount: data.priceMonthlyCents,
+          currency: 'usd',
+          recurring: { interval: 'month' },
+        });
+        stripePriceId = newPrice.id;
+
+        if (plan.stripe_price_id) {
+          await stripe.prices.update(plan.stripe_price_id, { active: false });
+        }
+
+        if (!plan.stripe_product_id && productId) {
+          stripeProductId = productId;
+        }
+      }
+    }
+
     return this.memberships.updatePlan(id, {
       name: data.name,
       description: data.description,
+      priceMonthlyCents: data.priceMonthlyCents,
+      creditsPerMonth: data.creditsPerMonth,
       isActive: data.isActive,
+      stripePriceId,
+      stripeProductId,
     });
   }
 

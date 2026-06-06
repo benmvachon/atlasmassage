@@ -62,22 +62,34 @@ export class BusinessRepository {
     return rows;
   }
 
-  async createService({ name, description, durationMinutes, priceCents }) {
+  async findServiceById(id) {
     const { rows } = await this.pool.query(
-      `INSERT INTO services (name, description, duration_minutes, price_cents)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [name, description ?? null, durationMinutes, priceCents]
+      'SELECT * FROM services WHERE id = $1',
+      [id]
+    );
+    return rows[0] ?? null;
+  }
+
+  async createService({ name, description, durationMinutes, priceCents, stripeProductId, stripePriceId }) {
+    const { rows } = await this.pool.query(
+      `INSERT INTO services (name, description, duration_minutes, price_cents, stripe_product_id, stripe_price_id)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [name, description ?? null, durationMinutes, priceCents, stripeProductId ?? null, stripePriceId ?? null]
     );
     return rows[0];
   }
 
-  async updateService(id, { name, description, durationMinutes, priceCents, isActive }) {
+  async updateService(id, { name, description, durationMinutes, priceCents, isActive, stripeProductId, stripePriceId }) {
+    const sets = ['name = $1', 'description = $2', 'duration_minutes = $3', 'price_cents = $4', 'is_active = $5', 'updated_at = NOW()'];
+    const vals = [name, description ?? null, durationMinutes, priceCents, isActive];
+    let i = 6;
+    if (stripeProductId !== undefined) { sets.push(`stripe_product_id = $${i++}`); vals.push(stripeProductId); }
+    if (stripePriceId !== undefined)   { sets.push(`stripe_price_id = $${i++}`);   vals.push(stripePriceId); }
+    vals.push(id);
+
     const { rows } = await this.pool.query(
-      `UPDATE services
-       SET name = $1, description = $2, duration_minutes = $3, price_cents = $4,
-           is_active = $5, updated_at = NOW()
-       WHERE id = $6 RETURNING *`,
-      [name, description ?? null, durationMinutes, priceCents, isActive, id]
+      `UPDATE services SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`,
+      vals
     );
     return rows[0] ?? null;
   }

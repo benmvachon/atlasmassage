@@ -14,7 +14,17 @@ await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 }));
 
 await jest.unstable_mockModule('stripe', () => ({
-  default: jest.fn(() => ({})),
+  default: jest.fn(() => ({
+    products: {
+      create: jest.fn().mockResolvedValue({ id: 'prod_test' }),
+      update: jest.fn().mockResolvedValue({}),
+    },
+    prices: {
+      create: jest.fn().mockResolvedValue({ id: 'price_test' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'price_old', product: 'prod_test' }),
+      update: jest.fn().mockResolvedValue({}),
+    },
+  })),
 }));
 
 const { default: request } = await import('supertest');

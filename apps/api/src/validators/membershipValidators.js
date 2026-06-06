@@ -19,6 +19,10 @@ export const updatePlanRules = [
     .isLength({ max: 255 }),
   body('description')
     .optional({ values: 'falsy' }).trim(),
+  body('priceMonthlyCents')
+    .optional().isInt({ min: 1 }).withMessage('Price must be a positive integer in cents'),
+  body('creditsPerMonth')
+    .optional().isInt({ min: 1 }).withMessage('Credits per month must be a positive integer'),
   body('isActive')
     .optional().isBoolean().withMessage('isActive must be a boolean'),
 ];

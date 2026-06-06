@@ -1,11 +1,19 @@
 import bcrypt from 'bcrypt';
+import Stripe from 'stripe';
 import { getPool } from '../database/pool.js';
+import { config } from '../config/index.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { BusinessRepository } from '../repositories/businessRepository.js';
 import { TherapistRepository } from '../repositories/therapistRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
+import { MembershipService } from '../services/membershipService.js';
 import { AppError } from '../middleware/errorHandler.js';
+
+function getStripe() {
+  if (!config.stripe.secretKey) return null;
+  return new Stripe(config.stripe.secretKey, { apiVersion: '2024-06-20' });
+}
 
 const BCRYPT_ROUNDS = 12;
 
@@ -103,7 +111,27 @@ export async function listServices(req, res, next) {
 export async function createService(req, res, next) {
   try {
     const { name, description, durationMinutes, priceCents } = req.body;
-    const service = await repos().business.createService({ name, description, durationMinutes, priceCents });
+    let stripeProductId = null;
+    let stripePriceId = null;
+
+    const stripe = getStripe();
+    if (stripe) {
+      const product = await stripe.products.create({
+        name,
+        ...(description && { description }),
+        metadata: { type: 'service' },
+      });
+      stripeProductId = product.id;
+
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: priceCents,
+        currency: 'usd',
+      });
+      stripePriceId = price.id;
+    }
+
+    const service = await repos().business.createService({ name, description, durationMinutes, priceCents, stripeProductId, stripePriceId });
     res.status(201).json({ success: true, data: service });
   } catch (err) {
     next(err);
@@ -113,10 +141,56 @@ export async function createService(req, res, next) {
 export async function updateService(req, res, next) {
   try {
     const { name, description, durationMinutes, priceCents, isActive } = req.body;
-    const service = await repos().business.updateService(req.params.id, {
-      name, description, durationMinutes, priceCents, isActive,
+    const { business } = repos();
+    const current = await business.findServiceById(req.params.id);
+    if (!current) throw new AppError('Service not found', 404, 'NOT_FOUND');
+
+    let stripeProductId;
+    let stripePriceId;
+
+    const stripe = getStripe();
+    if (stripe && priceCents !== undefined && priceCents !== current.price_cents) {
+      let productId = current.stripe_product_id;
+
+      if (!productId && current.stripe_price_id) {
+        const existing = await stripe.prices.retrieve(current.stripe_price_id);
+        productId = typeof existing.product === 'string' ? existing.product : existing.product.id;
+      }
+
+      if (!productId) {
+        const product = await stripe.products.create({
+          name: name ?? current.name,
+          metadata: { type: 'service' },
+        });
+        productId = product.id;
+      }
+
+      const newPrice = await stripe.prices.create({
+        product: productId,
+        unit_amount: priceCents,
+        currency: 'usd',
+      });
+      stripePriceId = newPrice.id;
+
+      if (current.stripe_price_id) {
+        await stripe.prices.update(current.stripe_price_id, { active: false });
+      }
+
+      if (!current.stripe_product_id && productId) {
+        stripeProductId = productId;
+      }
+    }
+
+    if (stripe && current.stripe_product_id && (name !== undefined || description !== undefined)) {
+      await stripe.products.update(current.stripe_product_id, {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+      });
+    }
+
+    const service = await business.updateService(req.params.id, {
+      name, description, durationMinutes, priceCents, isActive, stripeProductId, stripePriceId,
     });
-    if (!service) throw new AppError('Service not found', 404, 'NOT_FOUND');
     res.json({ success: true, data: service });
   } catch (err) {
     next(err);
@@ -297,6 +371,40 @@ export async function denyTransferRequest(req, res, next) {
     const result = await repos().transfer.deny(req.params.id, req.user.sub);
     if (!result) throw new AppError('Transfer request not found or already resolved', 404, 'NOT_FOUND');
     res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Membership plans ─────────────────────────────────────────────────────────
+
+function membershipService() {
+  return new MembershipService(getPool());
+}
+
+export async function listMembershipPlans(req, res, next) {
+  try {
+    const plans = await membershipService().memberships.findAllPlans();
+    res.json({ success: true, data: { plans } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function createMembershipPlan(req, res, next) {
+  try {
+    const { name, description, priceMonthlyCents, creditsPerMonth } = req.body;
+    const plan = await membershipService().createPlan({ name, description, priceMonthlyCents, creditsPerMonth });
+    res.status(201).json({ success: true, data: { plan } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateMembershipPlan(req, res, next) {
+  try {
+    const plan = await membershipService().updatePlan(req.params.id, req.body);
+    res.json({ success: true, data: { plan } });
   } catch (err) {
     next(err);
   }

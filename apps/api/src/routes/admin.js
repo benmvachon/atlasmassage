@@ -9,6 +9,8 @@ import {
   businessHoursRules,
   massageBedCreateRules,
   massageBedUpdateRules,
+  membershipPlanCreateRules,
+  membershipPlanUpdateRules,
   serviceCreateRules,
   serviceUpdateRules,
   therapistCreateRules,
@@ -75,6 +77,11 @@ router.get('/services', adminController.listServices);
 router.post('/services', serviceCreateRules, validate, adminController.createService);
 router.put('/services/:id', serviceUpdateRules, validate, adminController.updateService);
 router.delete('/services/:id', adminController.deactivateService);
+
+// ── Membership plans ──────────────────────────────────────────────────────────
+router.get('/membership-plans', adminController.listMembershipPlans);
+router.post('/membership-plans', membershipPlanCreateRules, validate, adminController.createMembershipPlan);
+router.put('/membership-plans/:id', membershipPlanUpdateRules, validate, adminController.updateMembershipPlan);
 
 // ── Therapist management ──────────────────────────────────────────────────────
 router.get('/therapists', adminController.listTherapists);

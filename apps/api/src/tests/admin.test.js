@@ -29,6 +29,20 @@ await jest.unstable_mockModule('bcrypt', () => ({
   default: { hash: jest.fn().mockResolvedValue('$2b$12$hashed') },
 }));
 
+await jest.unstable_mockModule('stripe', () => ({
+  default: jest.fn(() => ({
+    products: {
+      create: jest.fn().mockResolvedValue({ id: 'prod_test' }),
+      update: jest.fn().mockResolvedValue({}),
+    },
+    prices: {
+      create: jest.fn().mockResolvedValue({ id: 'price_test' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'price_old', product: 'prod_test' }),
+      update: jest.fn().mockResolvedValue({}),
+    },
+  })),
+}));
+
 const { default: request } = await import('supertest');
 const { default: app } = await import('../app.js');
 const { issueAccessToken } = await import('../services/tokenService.js');
@@ -86,6 +100,7 @@ beforeEach(() => {
     updateMassageBed: jest.fn(),
     deleteMassageBed: jest.fn(),
     createService: jest.fn(),
+    findServiceById: jest.fn().mockResolvedValue(SERVICES[0]),
     updateService: jest.fn(),
     deactivateService: jest.fn(),
   });
@@ -364,11 +379,11 @@ describe('PUT /api/v1/admin/services/:id', () => {
       .send(payload);
 
     expect(res.status).toBe(200);
-    expect(mockBusiness.updateService).toHaveBeenCalledWith('svc-1', payload);
+    expect(mockBusiness.updateService).toHaveBeenCalledWith('svc-1', expect.objectContaining(payload));
   });
 
   it('returns 404 when the service does not exist', async () => {
-    mockBusiness.updateService.mockResolvedValue(null);
+    mockBusiness.findServiceById.mockResolvedValue(null);
 
     const res = await request(app)
       .put('/api/v1/admin/services/nonexistent')

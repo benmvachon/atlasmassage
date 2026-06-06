@@ -25,23 +25,26 @@ export class MembershipRepository {
     return rows[0] ?? null;
   }
 
-  async createPlan({ name, description, priceMonthlyCents, creditsPerMonth, stripePriceId }) {
+  async createPlan({ name, description, priceMonthlyCents, creditsPerMonth, stripePriceId, stripeProductId }) {
     const { rows: [plan] } = await this.pool.query(
-      `INSERT INTO membership_plans (name, description, price_monthly_cents, credits_per_month, stripe_price_id)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [name, description ?? null, priceMonthlyCents, creditsPerMonth, stripePriceId ?? null]
+      `INSERT INTO membership_plans (name, description, price_monthly_cents, credits_per_month, stripe_price_id, stripe_product_id)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [name, description ?? null, priceMonthlyCents, creditsPerMonth, stripePriceId ?? null, stripeProductId ?? null]
     );
     return plan;
   }
 
-  async updatePlan(id, { name, description, isActive, stripePriceId }) {
+  async updatePlan(id, { name, description, isActive, stripePriceId, stripeProductId, priceMonthlyCents, creditsPerMonth }) {
     const sets = ['updated_at = NOW()'];
     const vals = [];
     let i = 1;
-    if (name !== undefined)          { sets.push(`name = $${i++}`);            vals.push(name); }
-    if (description !== undefined)   { sets.push(`description = $${i++}`);     vals.push(description); }
-    if (isActive !== undefined)      { sets.push(`is_active = $${i++}`);       vals.push(isActive); }
-    if (stripePriceId !== undefined) { sets.push(`stripe_price_id = $${i++}`); vals.push(stripePriceId); }
+    if (name !== undefined)              { sets.push(`name = $${i++}`);               vals.push(name); }
+    if (description !== undefined)       { sets.push(`description = $${i++}`);        vals.push(description); }
+    if (isActive !== undefined)          { sets.push(`is_active = $${i++}`);          vals.push(isActive); }
+    if (stripePriceId !== undefined)     { sets.push(`stripe_price_id = $${i++}`);    vals.push(stripePriceId); }
+    if (stripeProductId !== undefined)   { sets.push(`stripe_product_id = $${i++}`);  vals.push(stripeProductId); }
+    if (priceMonthlyCents !== undefined) { sets.push(`price_monthly_cents = $${i++}`);vals.push(priceMonthlyCents); }
+    if (creditsPerMonth !== undefined)   { sets.push(`credits_per_month = $${i++}`);  vals.push(creditsPerMonth); }
     vals.push(id);
 
     const { rows: [plan] } = await this.pool.query(

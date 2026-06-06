@@ -289,12 +289,11 @@ export class AppointmentRepository {
          (client_id, therapist_id, service_id, scheduled_at, duration_minutes,
           notes, guest_name, guest_email, guest_phone,
           waiver_signature, waiver_signed_at, consent_signature_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-               CASE WHEN $10 IS NOT NULL THEN NOW() ELSE NULL END, $11)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
       [clientId ?? null, therapistId, serviceId, scheduledAt, durationMinutes,
        notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
-       waiverSignature ?? null, consentSignatureId ?? null]
+       waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null]
     );
     return rows[0];
   }

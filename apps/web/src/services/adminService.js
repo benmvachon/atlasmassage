@@ -54,6 +54,11 @@ export const adminService = {
   updateTestimonial: (id, data) => api.put(`/admin/testimonials/${id}`, data),
   deleteTestimonial: (id) => api.delete(`/admin/testimonials/${id}`),
 
+  // Membership plans
+  listMembershipPlans: () => api.get('/admin/membership-plans'),
+  createMembershipPlan: (data) => api.post('/admin/membership-plans', data),
+  updateMembershipPlan: (id, data) => api.put(`/admin/membership-plans/${id}`, data),
+
   // Transfer requests
   listTransferRequests: () => api.get('/admin/transfer-requests'),
   approveTransferRequest: (id, toTherapistId) =>
