@@ -22,6 +22,11 @@ export const bookingService = {
     return res.data;
   },
 
+  async getHealthStatus() {
+    const res = await api.get('/appointments/health/status');
+    return res.data;
+  },
+
   async createAppointment(data) {
     const res = await api.post('/appointments', data);
     return res.data;

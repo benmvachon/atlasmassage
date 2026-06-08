@@ -77,13 +77,17 @@ function reminderHtml(name, appt) {
 }
 
 function feedbackRequestHtml(name, appt) {
+  const feedbackUrl = `${config.app.url}/feedback?id=${appt.id}&token=${appt.feedback_token}`;
   return baseLayout('How was your visit?', `
     <p style="margin-bottom:16px">Hi ${name},</p>
     <p style="margin-bottom:24px">We hope you enjoyed your ${appt.service_name} yesterday. Your feedback helps us continue to improve — we&rsquo;d love to hear how it went.</p>
     ${apptCard(appt)}
-    <p style="color:#6b7280;font-size:14px">
-      Feel free to reply to this email with any thoughts or suggestions. Thank you for choosing Atlas Bodywork!
-    </p>`);
+    <div style="text-align:center;margin-bottom:24px">
+      <a href="${feedbackUrl}" style="background:#2c6e49;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block">
+        Leave Feedback
+      </a>
+    </div>
+    <p style="color:#6b7280;font-size:14px;text-align:center">Thank you for choosing Atlas Bodywork!</p>`);
 }
 
 function weekFollowupHtml(name, bookingUrl) {

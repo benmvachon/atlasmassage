@@ -8,23 +8,36 @@ await jest.unstable_mockModule('../database/pool.js', () => ({
   closePool: jest.fn(),
 }));
 
-const mockApptRepo = {};
-const mockAvailRepo = {};
-const mockConsentRepo = {};
+const mockApptRepo     = {};
+const mockAvailRepo    = {};
+const mockConsentRepo  = {};
+const mockHealthRepo   = {};
+const mockSoapRepo     = {};
+const mockFeedbackRepo = {};
+const mockHistoryRepo  = {};
 const mockTransferRepo = {};
 
 await jest.unstable_mockModule('../repositories/appointmentRepository.js', () => ({
   AppointmentRepository: jest.fn(() => mockApptRepo),
 }));
-
 await jest.unstable_mockModule('../repositories/availabilityRepository.js', () => ({
   AvailabilityRepository: jest.fn(() => mockAvailRepo),
 }));
-
 await jest.unstable_mockModule('../repositories/consentRepository.js', () => ({
   ConsentRepository: jest.fn(() => mockConsentRepo),
 }));
-
+await jest.unstable_mockModule('../repositories/healthRecordRepository.js', () => ({
+  HealthRecordRepository: jest.fn(() => mockHealthRepo),
+}));
+await jest.unstable_mockModule('../repositories/soapNoteRepository.js', () => ({
+  SoapNoteRepository: jest.fn(() => mockSoapRepo),
+}));
+await jest.unstable_mockModule('../repositories/clientFeedbackRepository.js', () => ({
+  ClientFeedbackRepository: jest.fn(() => mockFeedbackRepo),
+}));
+await jest.unstable_mockModule('../repositories/clientHistoryRepository.js', () => ({
+  ClientHistoryRepository: jest.fn(() => mockHistoryRepo),
+}));
 await jest.unstable_mockModule('../repositories/transferRequestRepository.js', () => ({
   TransferRequestRepository: jest.fn(() => mockTransferRepo),
 }));
@@ -36,43 +49,43 @@ await jest.unstable_mockModule('../services/notificationService.js', () => ({
 }));
 
 const mockMembershipSvc = {
-  getMyStatus: jest.fn().mockResolvedValue({ active: false }),
-  consumeCredit: jest.fn().mockResolvedValue(0),
+  getMyStatus:    jest.fn().mockResolvedValue({ active: false }),
+  consumeCredit:  jest.fn().mockResolvedValue(0),
 };
 await jest.unstable_mockModule('../services/membershipService.js', () => ({
   MembershipService: jest.fn(() => mockMembershipSvc),
 }));
 
-// Mock slotService so we control which slots are valid
 const mockGenerateSlots = jest.fn();
 await jest.unstable_mockModule('../services/slotService.js', () => ({
-  generateSlots: mockGenerateSlots,
+  generateSlots:        mockGenerateSlots,
   availableDaysForMonth: jest.fn(() => []),
 }));
 
-const { default: request } = await import('supertest');
-const { default: app } = await import('../app.js');
-const { issueAccessToken } = await import('../services/tokenService.js');
+const { default: request }     = await import('supertest');
+const { default: app }         = await import('../app.js');
+const { issueAccessToken }     = await import('../services/tokenService.js');
 
 const CLIENT_ID    = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const THERAPIST_ID = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22';
 const OWNER_ID     = 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33';
 const APPT_ID      = 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44';
 const SERVICE_ID   = 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55';
+const FEEDBACK_TOKEN = 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66';
 
-// Far future date so the 24h guard passes
 const FUTURE_AT = '2030-06-15T10:00:00.000Z';
-const SOON_AT   = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1h from now
+const SOON_AT   = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
 const APPT = {
-  id: APPT_ID,
-  client_id: CLIENT_ID,
-  therapist_id: THERAPIST_ID,
-  service_id: SERVICE_ID,
-  scheduled_at: FUTURE_AT,
-  status: 'pending',
-  cancel_token: 'tok-cancel',
-  notes: null,
+  id:             APPT_ID,
+  client_id:      CLIENT_ID,
+  therapist_id:   THERAPIST_ID,
+  service_id:     SERVICE_ID,
+  scheduled_at:   FUTURE_AT,
+  status:         'pending',
+  cancel_token:   'tok-cancel',
+  feedback_token: FEEDBACK_TOKEN,
+  notes:          null,
 };
 
 const bearer = (id, roles = ['client']) =>
@@ -84,44 +97,59 @@ beforeEach(() => {
   mockGenerateSlots.mockReturnValue([
     { startTime: '10:00', endTime: '11:00', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
   ]);
-
   mockMembershipSvc.getMyStatus.mockResolvedValue({ active: false });
   mockMembershipSvc.consumeCredit.mockResolvedValue(0);
 
   Object.assign(mockApptRepo, {
-    create: jest.fn().mockResolvedValue(APPT),
-    findById: jest.fn().mockResolvedValue(APPT),
+    create:          jest.fn().mockResolvedValue(APPT),
+    findById:        jest.fn().mockResolvedValue(APPT),
     findServiceById: jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 0, duration_minutes: 60 }),
-    updateStatus: jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
-    setMembership: jest.fn().mockResolvedValue({ ...APPT }),
-    getByDateRange: jest.fn().mockResolvedValue([]),
-    listForTherapist: jest.fn().mockResolvedValue([]),
-    reschedule: jest.fn().mockResolvedValue(APPT),
+    updateStatus:    jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
+    setMembership:   jest.fn().mockResolvedValue({ ...APPT }),
+    getByDateRange:  jest.fn().mockResolvedValue([]),
+    listForTherapist:jest.fn().mockResolvedValue([]),
+    reschedule:      jest.fn().mockResolvedValue(APPT),
   });
-
   Object.assign(mockAvailRepo, {
     getForDateRange: jest.fn().mockResolvedValue([]),
   });
-
   Object.assign(mockConsentRepo, {
     findByClientId: jest.fn().mockResolvedValue(null),
-    create: jest.fn().mockResolvedValue({ id: 'cs-uuid', signed_at: new Date().toISOString() }),
+    create:         jest.fn().mockResolvedValue({ id: 'cs-uuid', signed_at: new Date().toISOString() }),
   });
-
+  Object.assign(mockHealthRepo, {
+    findLatestByClientId: jest.fn().mockResolvedValue(null),
+    create:               jest.fn().mockResolvedValue({ id: 'hr-uuid' }),
+  });
+  Object.assign(mockSoapRepo, {
+    findByAppointmentId: jest.fn().mockResolvedValue(null),
+    upsert:              jest.fn().mockResolvedValue({
+      id: 'sn-uuid', appointment_id: APPT_ID, therapist_id: THERAPIST_ID,
+      subjective: 'S', objective: 'O', assessment: 'A', plan: 'P',
+    }),
+  });
+  Object.assign(mockFeedbackRepo, {
+    findByAppointmentId: jest.fn().mockResolvedValue(null),
+    create:              jest.fn().mockResolvedValue({ id: 'fb-uuid', appointment_id: APPT_ID, rating: 5 }),
+  });
+  Object.assign(mockHistoryRepo, {
+    findByAppointment: jest.fn().mockResolvedValue({
+      clientName: 'Test Client', clientId: CLIENT_ID, guestEmail: null, sessions: [],
+    }),
+  });
   Object.assign(mockTransferRepo, {
     findPendingByAppointment: jest.fn().mockResolvedValue(null),
-    create: jest.fn().mockResolvedValue({ id: 'tr-uuid' }),
+    create:                   jest.fn().mockResolvedValue({ id: 'tr-uuid' }),
   });
 });
 
 // ── POST /appointments ────────────────────────────────────────────────────────
 
 describe('POST /api/v1/appointments', () => {
-  // waiverSignature is required by the validator
   const body = {
-    therapistId: THERAPIST_ID,
-    serviceId: SERVICE_ID,
-    scheduledAt: FUTURE_AT,
+    therapistId:    THERAPIST_ID,
+    serviceId:      SERVICE_ID,
+    scheduledAt:    FUTURE_AT,
     waiverSignature: 'data:image/png;base64,iVBORw0KGgo=',
   };
 
@@ -130,18 +158,47 @@ describe('POST /api/v1/appointments', () => {
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send(body);
-
     expect(res.status).toBe(201);
     expect(res.body.data.appointment.id).toBe(APPT_ID);
     expect(mockApptRepo.create).toHaveBeenCalled();
+  });
+
+  it('creates a health record for a new authenticated client', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+    expect(res.status).toBe(201);
+    expect(mockHealthRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ clientId: CLIENT_ID })
+    );
+  });
+
+  it('reuses the existing health record for a returning authenticated client', async () => {
+    mockHealthRepo.findLatestByClientId.mockResolvedValue({ id: 'existing-hr' });
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+    expect(res.status).toBe(201);
+    expect(mockHealthRepo.create).not.toHaveBeenCalled();
   });
 
   it('creates appointment for guest with name and email', async () => {
     const res = await request(app)
       .post('/api/v1/appointments')
       .send({ ...body, guestName: 'Guest', guestEmail: 'guest@example.com' });
-
     expect(res.status).toBe(201);
+  });
+
+  it('creates a health record for a guest booking', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .send({ ...body, guestName: 'Guest', guestEmail: 'guest@example.com' });
+    expect(res.status).toBe(201);
+    expect(mockHealthRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ guestEmail: 'guest@example.com' })
+    );
   });
 
   it('randomly assigns a therapist when therapistId is omitted', async () => {
@@ -150,7 +207,6 @@ describe('POST /api/v1/appointments', () => {
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send(noTherapistBody);
-
     expect(res.status).toBe(201);
     expect(mockApptRepo.create).toHaveBeenCalledWith(
       expect.objectContaining({ therapistId: THERAPIST_ID })
@@ -166,7 +222,6 @@ describe('POST /api/v1/appointments', () => {
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send(noTherapistBody);
-
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
   });
@@ -176,28 +231,24 @@ describe('POST /api/v1/appointments', () => {
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send({ ...body, scheduledAt: SOON_AT });
-
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('TOO_SOON');
   });
 
   it('returns 409 when the slot is not available', async () => {
-    mockGenerateSlots.mockReturnValue([]); // No slots available
+    mockGenerateSlots.mockReturnValue([]);
     const res = await request(app)
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send(body);
-
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
   });
 
   it('returns 400 when unauthenticated guest provides no guest details', async () => {
-    // No auth + no guestName + no guestEmail → controller returns 400 (after validation passes)
     const res = await request(app)
       .post('/api/v1/appointments')
-      .send(body); // waiverSignature present, but no guest fields
-
+      .send(body);
     expect(res.status).toBe(400);
   });
 
@@ -206,7 +257,6 @@ describe('POST /api/v1/appointments', () => {
       .post('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID))
       .send({ therapistId: THERAPIST_ID, serviceId: SERVICE_ID }); // missing scheduledAt
-
     expect(res.status).toBe(422);
   });
 });
@@ -219,7 +269,6 @@ describe('GET /api/v1/appointments', () => {
     const res = await request(app)
       .get('/api/v1/appointments')
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
-
     expect(res.status).toBe(200);
     expect(res.body.data).toEqual([APPT]);
   });
@@ -228,12 +277,37 @@ describe('GET /api/v1/appointments', () => {
     const res = await request(app)
       .get('/api/v1/appointments')
       .set('Authorization', bearer(CLIENT_ID, ['client']));
-
     expect(res.status).toBe(403);
   });
 
   it('returns 401 when unauthenticated', async () => {
     const res = await request(app).get('/api/v1/appointments');
+    expect(res.status).toBe(401);
+  });
+});
+
+// ── GET /appointments/health/status ──────────────────────────────────────────
+
+describe('GET /api/v1/appointments/health/status', () => {
+  it('returns hasRecord: false when no health record exists', async () => {
+    const res = await request(app)
+      .get('/api/v1/appointments/health/status')
+      .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(200);
+    expect(res.body.data.hasRecord).toBe(false);
+  });
+
+  it('returns hasRecord: true when a health record exists', async () => {
+    mockHealthRepo.findLatestByClientId.mockResolvedValue({ id: 'hr-uuid' });
+    const res = await request(app)
+      .get('/api/v1/appointments/health/status')
+      .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(200);
+    expect(res.body.data.hasRecord).toBe(true);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get('/api/v1/appointments/health/status');
     expect(res.status).toBe(401);
   });
 });
@@ -245,7 +319,6 @@ describe('GET /api/v1/appointments/:id', () => {
     const res = await request(app)
       .get(`/api/v1/appointments/${APPT_ID}`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(200);
     expect(res.body.data.id).toBe(APPT_ID);
   });
@@ -254,7 +327,6 @@ describe('GET /api/v1/appointments/:id', () => {
     const res = await request(app)
       .get(`/api/v1/appointments/${APPT_ID}`)
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
-
     expect(res.status).toBe(200);
   });
 
@@ -262,7 +334,6 @@ describe('GET /api/v1/appointments/:id', () => {
     const res = await request(app)
       .get(`/api/v1/appointments/${APPT_ID}`)
       .set('Authorization', bearer(OWNER_ID, ['owner']));
-
     expect(res.status).toBe(200);
   });
 
@@ -271,7 +342,6 @@ describe('GET /api/v1/appointments/:id', () => {
     const res = await request(app)
       .get(`/api/v1/appointments/${APPT_ID}`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(404);
   });
 
@@ -279,8 +349,230 @@ describe('GET /api/v1/appointments/:id', () => {
     const res = await request(app)
       .get(`/api/v1/appointments/${APPT_ID}`)
       .set('Authorization', bearer('other-uuid'));
-
     expect(res.status).toBe(403);
+  });
+});
+
+// ── GET /appointments/:id/soap-notes ─────────────────────────────────────────
+
+describe('GET /api/v1/appointments/:id/soap-notes', () => {
+  it('returns null when no SOAP notes exist', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(200);
+    expect(res.body.data).toBeNull();
+  });
+
+  it('returns existing SOAP notes', async () => {
+    mockSoapRepo.findByAppointmentId.mockResolvedValue({
+      id: 'sn-uuid', subjective: 'S note', objective: 'O note',
+      assessment: 'A note', plan: 'P note',
+    });
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(200);
+    expect(res.body.data.subjective).toBe('S note');
+  });
+
+  it('returns 403 for a plain client', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(CLIENT_ID, ['client']));
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get(`/api/v1/appointments/${APPT_ID}/soap-notes`);
+    expect(res.status).toBe(401);
+  });
+});
+
+// ── POST /appointments/:id/soap-notes ─────────────────────────────────────────
+
+describe('POST /api/v1/appointments/:id/soap-notes', () => {
+  const soapBody = {
+    subjective:  'Client reports shoulder tension.',
+    objective:   'Restricted ROM in left shoulder.',
+    assessment:  'Rotator cuff tension pattern.',
+    plan:        'Deep tissue on upper traps. Weekly sessions recommended.',
+  };
+
+  it('creates SOAP notes for the appointment therapist', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send(soapBody);
+    expect(res.status).toBe(200);
+    expect(mockSoapRepo.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: APPT_ID, therapistId: THERAPIST_ID })
+    );
+  });
+
+  it('allows an owner to write SOAP notes on any appointment', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(OWNER_ID, ['owner']))
+      .send(soapBody);
+    expect(res.status).toBe(200);
+  });
+
+  it('returns 403 when a different therapist tries to write notes', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer('other-therapist-id', ['therapist']))
+      .send(soapBody);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send(soapBody);
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 422 when a required SOAP field is missing', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ subjective: 'Only one field' }); // objective, assessment, plan missing
+    expect(res.status).toBe(422);
+  });
+});
+
+// ── GET /appointments/:id/client-history ─────────────────────────────────────
+
+describe('GET /api/v1/appointments/:id/client-history', () => {
+  it('returns client history for a therapist', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveProperty('sessions');
+    expect(mockHistoryRepo.findByAppointment).toHaveBeenCalledWith(APPT_ID);
+  });
+
+  it('returns client history for an owner', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(OWNER_ID, ['owner']));
+    expect(res.status).toBe(200);
+  });
+
+  it('returns 404 when no matching client found', async () => {
+    mockHistoryRepo.findByAppointment.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 403 for a plain client', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(CLIENT_ID, ['client']));
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get(`/api/v1/appointments/${APPT_ID}/client-history`);
+    expect(res.status).toBe(401);
+  });
+});
+
+// ── GET /appointments/:id/feedback-info ──────────────────────────────────────
+
+describe('GET /api/v1/appointments/:id/feedback-info', () => {
+  it('returns appointment info with a valid token', async () => {
+    mockApptRepo.findServiceById.mockResolvedValue({ id: SERVICE_ID, name: 'Swedish Massage', price_cents: 8000 });
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/feedback-info?token=${FEEDBACK_TOKEN}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.serviceName).toBe('Swedish Massage');
+    expect(res.body.data.alreadySubmitted).toBe(false);
+  });
+
+  it('reports alreadySubmitted: true when feedback already exists', async () => {
+    mockApptRepo.findServiceById.mockResolvedValue({ id: SERVICE_ID, name: 'Massage', price_cents: 0 });
+    mockFeedbackRepo.findByAppointmentId.mockResolvedValue({ id: 'fb-uuid', rating: 5 });
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/feedback-info?token=${FEEDBACK_TOKEN}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.alreadySubmitted).toBe(true);
+  });
+
+  it('returns 403 with wrong token', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/feedback-info?token=wrong-token`);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/feedback-info?token=${FEEDBACK_TOKEN}`);
+    expect(res.status).toBe(404);
+  });
+});
+
+// ── POST /appointments/:id/feedback ──────────────────────────────────────────
+
+describe('POST /api/v1/appointments/:id/feedback', () => {
+  it('submits feedback for a completed appointment', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'completed' });
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: FEEDBACK_TOKEN, rating: 5, comments: 'Great session!' });
+    expect(res.status).toBe(201);
+    expect(mockFeedbackRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: APPT_ID, rating: 5 })
+    );
+  });
+
+  it('returns 403 when the feedback token is wrong', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'completed' });
+    // Valid UUID format but wrong value
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: 'a0000000-0000-4000-8000-000000000001', rating: 4 });
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 400 when appointment is not completed', async () => {
+    // Default APPT has status 'pending'
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: FEEDBACK_TOKEN, rating: 4 });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('BAD_REQUEST');
+  });
+
+  it('returns 409 when feedback was already submitted', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'completed' });
+    mockFeedbackRepo.findByAppointmentId.mockResolvedValue({ id: 'existing-fb' });
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: FEEDBACK_TOKEN, rating: 4 });
+    expect(res.status).toBe(409);
+  });
+
+  it('returns 422 when rating is out of range', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'completed' });
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: FEEDBACK_TOKEN, rating: 6 });
+    expect(res.status).toBe(422);
+  });
+
+  it('returns 422 when feedbackToken is not a valid UUID', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/feedback`)
+      .send({ feedbackToken: 'not-a-uuid', rating: 4 });
+    expect(res.status).toBe(422);
   });
 });
 
@@ -292,7 +584,6 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(200);
     expect(mockApptRepo.updateStatus).toHaveBeenCalledWith(APPT_ID, 'cancelled');
   });
@@ -300,11 +591,9 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
   it('cancels appointment via cancel token for guests', async () => {
     const guestAppt = { ...APPT, client_id: null, cancel_token: 'tok-cancel' };
     mockApptRepo.findById.mockResolvedValue(guestAppt);
-
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .send({ cancelToken: 'tok-cancel' });
-
     expect(res.status).toBe(200);
   });
 
@@ -312,7 +601,6 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer('stranger-uuid'));
-
     expect(res.status).toBe(403);
   });
 
@@ -321,7 +609,6 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('MODIFICATION_WINDOW_CLOSED');
   });
@@ -331,7 +618,6 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(400);
   });
 
@@ -340,7 +626,6 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(404);
   });
 });
@@ -352,7 +637,6 @@ describe('POST /api/v1/appointments/:id/confirm', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/confirm`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(200);
     expect(mockApptRepo.updateStatus).toHaveBeenCalledWith(APPT_ID, 'confirmed');
   });
@@ -361,7 +645,6 @@ describe('POST /api/v1/appointments/:id/confirm', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/confirm`)
       .set('Authorization', bearer(OWNER_ID, ['owner']));
-
     expect(res.status).toBe(200);
   });
 
@@ -369,7 +652,6 @@ describe('POST /api/v1/appointments/:id/confirm', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/confirm`)
       .set('Authorization', bearer('stranger-uuid'));
-
     expect(res.status).toBe(403);
   });
 
@@ -378,7 +660,6 @@ describe('POST /api/v1/appointments/:id/confirm', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/confirm`)
       .set('Authorization', bearer(CLIENT_ID));
-
     expect(res.status).toBe(404);
   });
 });
@@ -391,7 +672,6 @@ describe('POST /api/v1/appointments/:id/complete', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/complete`)
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
-
     expect(res.status).toBe(200);
   });
 
@@ -399,7 +679,6 @@ describe('POST /api/v1/appointments/:id/complete', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/complete`)
       .set('Authorization', bearer(OWNER_ID, ['owner']));
-
     expect(res.status).toBe(200);
   });
 
@@ -407,7 +686,6 @@ describe('POST /api/v1/appointments/:id/complete', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/complete`)
       .set('Authorization', bearer('other-therapist', ['therapist']));
-
     expect(res.status).toBe(403);
   });
 });
@@ -420,7 +698,6 @@ describe('POST /api/v1/appointments/:id/transfer-request', () => {
       .post(`/api/v1/appointments/${APPT_ID}/transfer-request`)
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
       .send({ reason: 'Scheduling conflict' });
-
     expect(res.status).toBe(201);
     expect(mockTransferRepo.create).toHaveBeenCalled();
   });
@@ -430,7 +707,6 @@ describe('POST /api/v1/appointments/:id/transfer-request', () => {
       .post(`/api/v1/appointments/${APPT_ID}/transfer-request`)
       .set('Authorization', bearer('other-therapist', ['therapist']))
       .send({ reason: 'x' });
-
     expect(res.status).toBe(403);
   });
 
@@ -440,7 +716,6 @@ describe('POST /api/v1/appointments/:id/transfer-request', () => {
       .post(`/api/v1/appointments/${APPT_ID}/transfer-request`)
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
       .send({ reason: 'x' });
-
     expect(res.status).toBe(409);
   });
 });
@@ -455,7 +730,6 @@ describe('POST /api/v1/appointments/:id/reschedule', () => {
       .post(`/api/v1/appointments/${APPT_ID}/reschedule`)
       .set('Authorization', bearer(CLIENT_ID))
       .send({ scheduledAt: newAt, therapistId: THERAPIST_ID });
-
     expect(res.status).toBe(200);
     expect(mockApptRepo.reschedule).toHaveBeenCalled();
   });
@@ -466,7 +740,6 @@ describe('POST /api/v1/appointments/:id/reschedule', () => {
       .post(`/api/v1/appointments/${APPT_ID}/reschedule`)
       .set('Authorization', bearer(CLIENT_ID))
       .send({ scheduledAt: newAt, therapistId: THERAPIST_ID });
-
     expect(res.status).toBe(409);
   });
 
@@ -475,7 +748,6 @@ describe('POST /api/v1/appointments/:id/reschedule', () => {
       .post(`/api/v1/appointments/${APPT_ID}/reschedule`)
       .set('Authorization', bearer(CLIENT_ID))
       .send({ scheduledAt: SOON_AT, therapistId: THERAPIST_ID });
-
     expect(res.status).toBe(400);
   });
 });

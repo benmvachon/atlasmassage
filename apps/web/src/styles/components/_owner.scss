@@ -1333,6 +1333,327 @@
   white-space: nowrap;
 }
 
+.bookings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  align-items: flex-start;
+}
+
+// ── SOAP notes status badges ──────────────────────────────────────────────────
+
+.soap-badge {
+  display: inline-block;
+  font-family: $font-family-ui;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: $border-radius-full;
+  padding: 2px $space-2;
+  white-space: nowrap;
+
+  &--missing {
+    color: $color-badge-warning-text;
+    background: $color-badge-warning-bg;
+  }
+
+  &--done {
+    color: $color-badge-success-text;
+    background: $color-badge-success-bg;
+  }
+}
+
+// ── SOAP notes modal ──────────────────────────────────────────────────────────
+
+.soap-modal {
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+
+  &__meta {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-top: $space-1;
+  }
+
+  &__loading {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: $space-8 0;
+    text-align: center;
+  }
+
+  &__fields {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: $space-1;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding-top: $space-4;
+    border-top: 1px solid $color-bg-alt;
+    margin-top: $space-2;
+    flex-shrink: 0;
+  }
+
+  &__required-note {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-left: auto;
+  }
+}
+
+.soap-field {
+  margin-bottom: $space-5;
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $color-text;
+    display: block;
+    margin-bottom: $space-1;
+  }
+
+  &__hint {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-bottom: $space-2;
+    line-height: 1.5;
+  }
+
+  &__textarea {
+    width: 100%;
+    padding: $space-2 $space-3;
+    @include input-base;
+    resize: vertical;
+    min-height: 96px;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    line-height: 1.55;
+  }
+}
+
+// ── Client history modal ──────────────────────────────────────────────────────
+
+.history-modal {
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+
+  &__client {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+    margin-top: $space-1;
+  }
+
+  &__email {
+    font-weight: 400;
+    color: $color-text-muted;
+  }
+
+  &__loading,
+  &__empty {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: $space-8 0;
+    text-align: center;
+  }
+}
+
+.history-timeline {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding-right: $space-1;
+}
+
+.history-session {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+    padding: $space-3 $space-4;
+    background: $color-bg-alt;
+    width: 100%;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    transition: background-color $transition-fast;
+
+    &:hover:not(:disabled) { background: rgba($color-primary, 0.04); }
+    &:disabled { cursor: default; }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__date {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+  }
+
+  &__service {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-1;
+    flex-shrink: 0;
+  }
+
+  &__chevron {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__records {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid $color-border;
+  }
+}
+
+// Record type chips (shown on session header)
+.history-chip {
+  font-family: $font-family-ui;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: $border-radius-full;
+  padding: 2px $space-2;
+  white-space: nowrap;
+
+  &--empty {
+    color: $color-text-muted;
+    background: $color-bg-alt;
+    border: 1px solid $color-border;
+  }
+
+  &.history-record--intake  { background: $color-badge-info-bg;     color: $color-badge-info-text; }
+  &.history-record--consent { background: $color-badge-transfer-bg;  color: $color-badge-transfer-text; }
+  &.history-record--soap    { background: $color-badge-success-bg;   color: $color-badge-success-text; }
+  &.history-record--feedback{ background: $color-badge-warning-bg;   color: $color-badge-warning-text; }
+}
+
+// Individual record blocks (shown when session is expanded)
+.history-record {
+  padding: $space-4;
+  border-top: 1px solid $color-border;
+  font-family: $font-family-ui;
+
+  &:first-child { border-top: none; }
+
+  &--intake  { background: rgba($color-badge-info-bg, 0.4); }
+  &--consent { background: rgba($color-badge-transfer-bg, 0.4); }
+  &--soap    { background: rgba($color-badge-success-bg, 0.4); }
+  &--feedback{ background: rgba($color-badge-warning-bg, 0.4); }
+  &--notes   { background: $color-bg-alt; }
+
+  &__type {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: $color-text-muted;
+    margin-bottom: $space-3;
+  }
+
+  &__author {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: $font-size-xs;
+    color: $color-text;
+  }
+
+  &__dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: $space-2 $space-4;
+    font-size: $font-size-sm;
+    margin: 0 0 $space-3;
+
+    dt {
+      font-weight: 600;
+      color: $color-text;
+      white-space: nowrap;
+    }
+
+    dd {
+      color: $color-text;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  }
+
+  &__empty {
+    grid-column: 1 / -1;
+    color: $color-text-muted;
+    font-style: italic;
+  }
+
+  &__body {
+    font-size: $font-size-sm;
+    color: $color-text;
+    line-height: 1.6;
+    margin: 0 0 $space-3;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &__date {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin: 0;
+  }
+}
+
+.history-stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 1.25rem;
+  margin-bottom: $space-2;
+}
+
+.history-star--on  { color: $color-secondary; }
+.history-star--off { color: $color-border; }
+
 // ── btn--ghost variant ────────────────────────────────────────────────────────
 
 // .btn--ghost {

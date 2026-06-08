@@ -220,22 +220,29 @@ test('booking modal: guest booking with a new test card completes successfully',
   await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
-  // Guest info
+  // Step 1: Contact — fill required fields including address
   await page.fill('#bm-name', 'E2E Guest');
   await page.fill('#bm-email', 'e2e-guest@example.com');
+  await page.fill('#bm-addr1', '123 Test St');
+  await page.fill('#bm-city', 'Test City');
+  await page.fill('#bm-state', 'CA');
+  await page.fill('#bm-zip', '90210');
+  await expect(page.locator('.booking-modal form button[type="submit"]')).toBeEnabled();
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
 
-  // New card is pre-selected for guests — fill the Stripe CardElement
-  await page.waitForSelector('[title="Secure card payment input frame"]');
-  await fillStripeCard(page);
+  // Step 2: Health — all optional, just continue
+  await page.waitForSelector('#bm-medications');
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
 
-  // Wait for Continue button to be enabled (Stripe validates the card)
-  await expect(page.locator('[aria-labelledby="booking-modal-title"] button[type="submit"]')).toBeEnabled({ timeout: 10000 });
-  await page.locator('[aria-labelledby="booking-modal-title"] form').evaluate(f => f.requestSubmit());
-
-  // Waiver step
-  await page.waitForSelector('[aria-labelledby="waiver-modal-title"]');
+  // Step 3: Consent
+  await page.waitForSelector('.waiver-sig__canvas');
   await drawSignature(page);
   await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
+  await page.locator('.avail-modal__actions .btn--primary').click();
+
+  // Step 4: Payment — new card is pre-selected for guests
+  await page.waitForSelector('[title="Secure card payment input frame"]');
+  await fillStripeCard(page);
 
   // Intercept the appointment creation to capture the ID for afterAll cleanup
   const [apptResponse] = await Promise.all([
@@ -244,7 +251,7 @@ test('booking modal: guest booking with a new test card completes successfully',
       res.request().method() === 'POST' &&
       !res.url().includes('/confirm')
     ),
-    page.locator('button:has-text("Sign & Book")').click(),
+    page.locator('button:has-text("Book Appointment")').click(),
   ]);
   const apptBody = await apptResponse.json().catch(() => null);
   if (apptBody?.data?.appointment?.id) createdApptIds.push(apptBody.data.appointment.id);
@@ -269,15 +276,9 @@ test('booking modal: authenticated booking with a saved card completes successfu
   await slots.last().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
-  // Saved card should be pre-selected once the async payment methods fetch completes
+  // client1 has health + consent on file (seeded) → wizard shows payment step directly.
+  // Wait for the saved card to load and be pre-selected.
   await expect(page.locator('.booking-pm-option--selected')).not.toHaveCount(0, { timeout: 15000 });
-
-  await page.locator('[aria-labelledby="booking-modal-title"] form').evaluate(f => f.requestSubmit());
-
-  // Waiver step
-  await page.waitForSelector('[aria-labelledby="waiver-modal-title"]');
-  await drawSignature(page);
-  await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
 
   const [authApptRes] = await Promise.all([
     page.waitForResponse(res =>
@@ -285,7 +286,7 @@ test('booking modal: authenticated booking with a saved card completes successfu
       res.request().method() === 'POST' &&
       !res.url().includes('/confirm')
     ),
-    page.locator('button:has-text("Sign & Book")').click(),
+    page.locator('[aria-labelledby="booking-modal-title"] form').evaluate(f => f.requestSubmit()),
   ]);
   const authApptBody = await authApptRes.json().catch(() => null);
   if (authApptBody?.data?.appointment?.id) createdApptIds.push(authApptBody.data.appointment.id);

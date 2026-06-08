@@ -169,6 +169,22 @@
 .booking-modal {
   max-width: 520px;
 
+  &__loading {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    padding: $space-12 0;
+  }
+
+  &--wizard {
+    max-width: 540px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
   &__slot-summary {
     font-family: $font-family-ui;
     font-size: $font-size-sm;
@@ -236,11 +252,25 @@
   }
 }
 
+.booking-field-row {
+  display: flex;
+  gap: $space-3;
+  align-items: flex-start;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    flex-wrap: wrap;
+  }
+}
+
 .booking-field {
   display: flex;
   flex-direction: column;
   gap: $space-2;
   margin-bottom: $space-4;
+
+  &--grow { flex: 1 1 0; min-width: 0; }
+  &--state { flex: 0 0 72px; }
+  &--zip { flex: 0 0 120px; }
 
   &__label {
     font-family: $font-family-ui;
@@ -402,14 +432,176 @@
   }
 }
 
-// ── Waiver step ───────────────────────────────────────────────────────────────
+// ── Wizard progress indicator ─────────────────────────────────────────────────
 
-.booking-modal--waiver {
-  max-width: 560px;
+.booking-wizard-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: $space-6;
+  counter-reset: none;
+}
+
+.booking-wizard-step {
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  align-items: center;
+  flex: 1;
+  gap: $space-2;
+  position: relative;
+
+  // connector line between steps
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: calc(50% + 14px);
+    right: calc(-50% + 14px);
+    height: 1px;
+    background: $color-border;
+  }
+
+  &--done:not(:last-child)::after {
+    background: $color-primary;
+  }
+
+  &__dot {
+    width: 28px;
+    height: 28px;
+    border-radius: $border-radius-full;
+    border: 2px solid $color-border;
+    background: $color-white;
+    color: $color-text-muted;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+    position: relative;
+    z-index: 1;
+  }
+
+  &--active &__dot {
+    border-color: $color-primary;
+    background: $color-primary;
+    color: $color-white;
+  }
+
+  &--done &__dot {
+    border-color: $color-primary;
+    background: $color-primary;
+    color: $color-white;
+  }
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-align: center;
+    line-height: 1.3;
+
+    @media (max-width: #{$bp-sm - 1px}) {
+      display: none;
+    }
+  }
+
+  &--active &__label {
+    color: $color-primary;
+    font-weight: 600;
+  }
+
+  &--done &__label {
+    color: $color-text;
+  }
 }
+
+// ── Step description ──────────────────────────────────────────────────────────
+
+.booking-step-desc {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-bottom: $space-5;
+  line-height: 1.55;
+}
+
+// ── Pregnancy radio group ─────────────────────────────────────────────────────
+
+.booking-pregnancy-options {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.booking-radio-option {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text;
+  cursor: pointer;
+  padding: $space-2 $space-3;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  transition: border-color $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    border-color: $color-primary-light;
+    background: $color-primary-tint-xs;
+  }
+
+  input[type='radio'] {
+    accent-color: $color-primary;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  // selected state via :has() where supported, with JS class fallback
+  &:has(input:checked) {
+    border-color: $color-primary;
+    background: $color-primary-tint-xs;
+  }
+}
+
+// ── Returning client banner ───────────────────────────────────────────────────
+
+.booking-return-client {
+  background: rgba($color-primary, 0.05);
+  border: 1px solid rgba($color-primary, 0.2);
+  border-radius: $border-radius-sm;
+  padding: $space-3 $space-4;
+  margin-bottom: $space-5;
+
+  &__greeting {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+    margin-bottom: $space-2;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__badge {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-primary;
+    background: $color-primary-tint-active;
+    border-radius: $border-radius-full;
+    padding: 2px $space-3;
+    font-weight: 500;
+  }
+}
+
+// ── Waiver step ───────────────────────────────────────────────────────────────
 
 .waiver-scroll {
   flex: 1;
@@ -516,5 +708,164 @@
     font-size: $font-size-sm;
     line-height: 1.5;
     color: $color-text;
+  }
+}
+
+// ── Feedback page ─────────────────────────────────────────────────────────────
+
+.feedback-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-8 $space-4;
+  background: $color-bg;
+}
+
+.feedback-card {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  padding: $space-10 $space-8;
+  width: 100%;
+  max-width: 480px;
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    padding: $space-6 $space-4;
+  }
+
+  &__logo {
+    font-family: $font-family-logo;
+    font-size: $font-size-lg;
+    color: $color-primary;
+    margin-bottom: $space-6;
+  }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: $space-2;
+  }
+
+  &__session {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-6;
+  }
+
+  &__loading {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    padding: $space-8 0;
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    background: $color-error-bg;
+    border: 1px solid $color-error-border-alpha;
+    border-radius: $border-radius-sm;
+    padding: $space-3 $space-4;
+  }
+
+  &__error-inline {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    margin-bottom: $space-4;
+  }
+
+  &__thanks {
+    text-align: center;
+    padding: $space-4 0;
+
+    h2 {
+      font-family: $font-family-ui;
+      font-size: $font-size-xl;
+      font-weight: 700;
+      color: $color-text;
+      margin-bottom: $space-3;
+    }
+
+    p {
+      font-family: $font-family-ui;
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      line-height: 1.6;
+    }
+  }
+
+  &__check {
+    width: 56px;
+    height: 56px;
+    border-radius: $border-radius-full;
+    background: $color-success;
+    color: $color-white;
+    font-size: $font-size-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $space-4;
+  }
+
+  &__submit {
+    width: 100%;
+  }
+}
+
+.feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-bottom: $space-5;
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &__optional {
+    font-weight: 400;
+    color: $color-text-muted;
+  }
+
+  &__input {
+    padding: $space-2 $space-3;
+    @include input-base;
+    width: 100%;
+    resize: vertical;
+  }
+}
+
+.feedback-stars {
+  display: flex;
+  gap: $space-2;
+}
+
+.feedback-star {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: $color-border;
+  transition: color $transition-fast, transform $transition-fast;
+  line-height: 1;
+
+  &:hover,
+  &--on {
+    color: $color-secondary;
+  }
+
+  &:hover {
+    transform: scale(1.15);
   }
 }

@@ -49,6 +49,29 @@ const WAIVER_ITEMS = [
 
 const WAIVER_CLOSING = 'I further understand that massage therapy is not a substitute for a medical examination or treatment, and that I should see a physician or other qualified health specialist for any mental or physical ailment of which I am aware. I understand that massage therapists do not diagnose illness or disease, and nothing said during the massage should be construed as such. My consent is informed and voluntary and I understand that I may withdraw my consent at any time except for actions already taken.';
 
+const STEP_LABELS = {
+  contact: 'Contact',
+  health: 'Medical History',
+  consent: 'Consent',
+  payment: 'Payment',
+};
+
+const PREGNANCY_OPTIONS = [
+  { value: 'not_pregnant', label: 'Not pregnant' },
+  { value: 'pregnant', label: 'Currently pregnant' },
+  { value: 'recently_pregnant', label: 'Recently pregnant (within 3 months)' },
+  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+];
+
+function computeSteps(user, hasHealthRecord, hasConsent) {
+  const steps = [];
+  if (!user) steps.push('contact');
+  if (!user || !hasHealthRecord) steps.push('health');
+  if (!user || !hasConsent) steps.push('consent');
+  steps.push('payment');
+  return steps;
+}
+
 // ── Signature canvas ───────────────────────────────────────────────────────────
 
 function SignatureCanvas({ onChange }) {
@@ -140,133 +163,129 @@ function SignatureCanvas({ onChange }) {
   );
 }
 
-// ── Waiver step ────────────────────────────────────────────────────────────────
+// ── Wizard (must be inside <Elements> for Stripe card access) ─────────────────
 
-function WaiverStep({ slot, date, onBack, onSign, submitting, error }) {
-  const [signature, setSignature] = useState('');
-  const [agreed, setAgreed] = useState(false);
-  const dialogRef = useRef(null);
-  useFocusTrap(dialogRef, { onEscape: onBack });
-
-  return (
-    <div className="avail-modal-overlay" role="presentation">
-      <div
-        ref={dialogRef}
-        className="avail-modal booking-modal booking-modal--waiver"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="waiver-modal-title"
-      >
-        <h3 id="waiver-modal-title" className="avail-modal__title">Massage Therapy Consent</h3>
-        <p className="booking-modal__slot-summary">
-          {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-        </p>
-
-        <div className="waiver-scroll" role="region" aria-label="Waiver text">
-          <ol className="waiver-list">
-            {WAIVER_ITEMS.map((item, i) => (
-              <li key={i} className="waiver-list__item">{item}</li>
-            ))}
-          </ol>
-          <p className="waiver-closing">{WAIVER_CLOSING}</p>
-        </div>
-
-        <SignatureCanvas onChange={setSignature} />
-
-        <label className="waiver-agree">
-          <input
-            type="checkbox"
-            className="waiver-agree__checkbox"
-            checked={agreed}
-            onChange={e => setAgreed(e.target.checked)}
-            disabled={submitting}
-          />
-          <span className="waiver-agree__text">
-            I have read and agree to the above consent form
-          </span>
-        </label>
-
-        {error && <p className="avail-modal__error" role="alert">{error}</p>}
-
-        <div className="avail-modal__actions">
-          <button
-            className="btn btn--primary"
-            type="button"
-            onClick={() => onSign(signature)}
-            disabled={!signature || !agreed || submitting}
-          >
-            {submitting ? 'Booking…' : 'Sign & Book'}
-          </button>
-          <button
-            className="btn btn--ghost"
-            type="button"
-            onClick={onBack}
-            disabled={submitting}
-          >
-            Back
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Inner form (must be inside <Elements> when new-card path is active) ────────
-
-function BookingForm({
+function BookingWizard({
   slot, date, services, therapistOptions, lockedTherapist,
-  therapistId, setTherapistId,
-  serviceId,
-  name, setName,
-  email, setEmail,
-  phone, setPhone,
-  notes, setNotes,
-  paymentMethods, loadingMethods,
-  selectedMethodId, setSelectedMethodId,
+  paymentMethods, loadingMethods, selectedMethodId, setSelectedMethodId,
   membershipStatus,
   consentStatus, loadingConsent,
+  healthStatus, loadingHealth,
   onClose, onComplete,
 }) {
   const { user } = useAuth();
   const stripe = useStripe();
   const elements = useElements();
 
-  const [step, setStep] = useState('form'); // 'form' | 'waiver' | 'success'
+  const [currentStep, setCurrentStep] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Contact
+  const [name, setName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [phone, setPhone] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [addressState, setAddressState] = useState('');
+  const [zip, setZip] = useState('');
+
+  // Health
+  const [medications, setMedications] = useState('');
+  const [surgeries, setSurgeries] = useState('');
+  const [pregnancyStatus, setPregnancyStatus] = useState('not_pregnant');
+  const [injuries, setInjuries] = useState('');
+  const [notes, setNotes] = useState('');
+
+  // Consent
+  const [signature, setSignature] = useState('');
+  const [agreed, setAgreed] = useState(false);
+
+  // Payment
+  const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
+  const [serviceId] = useState(services[0]?.id ?? '');
   const [stagedPaymentMethodId, setStagedPaymentMethodId] = useState(null);
+
   const dialogRef = useRef(null);
   useFocusTrap(dialogRef, { onEscape: onClose });
 
   const hasConsent = !!(user && consentStatus?.hasSigned);
+  const hasHealthRecord = !!(user && healthStatus?.hasRecord);
+  const isReturnClient = hasHealthRecord && hasConsent;
 
+  const steps = useMemo(
+    () => computeSteps(user, hasHealthRecord, hasConsent),
+    [user, hasHealthRecord, hasConsent]
+  );
+
+  // Initialize first step once status data has loaded
+  useEffect(() => {
+    if (!loadingConsent && !loadingHealth && currentStep === null) {
+      setCurrentStep(steps[0]);
+    }
+  }, [loadingConsent, loadingHealth]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset signature state each time the consent step is shown
+  useEffect(() => {
+    if (currentStep === 'consent') {
+      setSignature('');
+      setAgreed(false);
+    }
+  }, [currentStep]);
+
+  const stepIndex = steps.indexOf(currentStep ?? steps[0]);
   const selectedService = services.find(s => s.id === serviceId);
   const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
   const needsPayment = !!stripePublishableKey && !membershipCoversBooking;
   const isNewCard = selectedMethodId === 'new';
 
-  const isFormReady = (() => {
-    if (!user) {
-      if (!name.trim()) return false;
-      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
-    }
-    if (loadingMethods) return false;
-    if (loadingConsent) return false;
-    if (needsPayment && !selectedMethodId) return false;
-    return true;
-  })();
+  function goNext() {
+    setError('');
+    setCurrentStep(steps[stepIndex + 1]);
+  }
 
-  function validateForm() {
-    if (!user) {
-      if (!name.trim()) { setError('Name is required.'); return false; }
-      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setError('A valid email is required.'); return false;
-      }
+  function goBack() {
+    setError('');
+    setCurrentStep(steps[stepIndex - 1]);
+  }
+
+  // ── Step handlers ────────────────────────────────────────────────────────────
+
+  const isContactReady = !!(
+    name.trim() &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
+    addressLine1.trim() &&
+    city.trim() &&
+    addressState.trim() &&
+    zip.trim()
+  );
+
+  function handleContactNext(e) {
+    e.preventDefault();
+    if (!name.trim()) { setError('Full name is required.'); return; }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('A valid email address is required.'); return;
     }
-    if (needsPayment && !selectedMethodId) {
-      setError('Please select a payment method.'); return false;
-    }
-    return true;
+    if (!addressLine1.trim()) { setError('Street address is required.'); return; }
+    if (!city.trim()) { setError('City is required.'); return; }
+    if (!addressState.trim()) { setError('State is required.'); return; }
+    if (!zip.trim()) { setError('ZIP code is required.'); return; }
+    setError('');
+    goNext();
+  }
+
+  function handleHealthNext(e) {
+    e.preventDefault();
+    setError('');
+    goNext();
+  }
+
+  function handleConsentNext() {
+    if (!signature) { setError('Please draw your signature.'); return; }
+    if (!agreed) { setError('Please check the agreement box.'); return; }
+    setError('');
+    goNext();
   }
 
   async function submitBooking(waiverSignature, overridePaymentMethodId) {
@@ -285,7 +304,23 @@ function BookingForm({
         notes: notes.trim() || undefined,
         paymentMethodId: savedMethod ? savedMethod.id : undefined,
         ...(waiverSignature && { waiverSignature }),
-        ...(!user && { guestName: name.trim(), guestEmail: email.trim(), guestPhone: phone.trim() || undefined }),
+        ...(!user && {
+          guestName: name.trim(),
+          guestEmail: email.trim(),
+          guestPhone: phone.trim() || undefined,
+          guestAddressLine1: addressLine1.trim(),
+          guestAddressLine2: addressLine2.trim() || undefined,
+          guestCity: city.trim(),
+          guestState: addressState.trim(),
+          guestZip: zip.trim(),
+        }),
+        // Health fields only when no existing record is on file
+        ...(!hasHealthRecord && {
+          healthCurrentMedications: medications.trim() || undefined,
+          healthRecentSurgeries: surgeries.trim() || undefined,
+          healthPregnancyStatus: pregnancyStatus || undefined,
+          healthInjuries: injuries.trim() || undefined,
+        }),
       });
 
       const { appointment, clientSecret } = result;
@@ -305,19 +340,21 @@ function BookingForm({
         if (user) await bookingService.confirmAppointment(appointment.id);
       }
 
-      setStep('success');
+      setCurrentStep('success');
     } catch (err) {
       setError(err.message || 'Booking failed. Please try again.');
       setSubmitting(false);
     }
   }
 
-  async function handleContinue(e) {
+  async function handlePaymentSubmit(e) {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (needsPayment && !selectedMethodId) {
+      setError('Please select a payment method.');
+      return;
+    }
 
-    // Tokenize the new card before transitioning — the CardElement unmounts on
-    // the waiver step, so elements.getElement(CardElement) returns null there.
+    // Tokenize new card while CardElement is still mounted
     let newCardPmId = null;
     if (needsPayment && isNewCard && stripe) {
       setSubmitting(true);
@@ -327,29 +364,30 @@ function BookingForm({
         card: cardElement,
       });
       setSubmitting(false);
-      if (pmError) {
-        setError(pmError.message);
-        return;
-      }
+      if (pmError) { setError(pmError.message); return; }
       newCardPmId = paymentMethod.id;
       setStagedPaymentMethodId(newCardPmId);
     }
 
-    setError('');
-
-    if (hasConsent) {
-      await submitBooking(null, newCardPmId);
-    } else {
-      setStep('waiver');
-    }
+    const waiverSig = hasConsent ? null : signature;
+    await submitBooking(waiverSig, newCardPmId);
   }
 
-  async function handleSign(waiverSignature) {
-    if (!waiverSignature) { setError('Please sign the consent form.'); return; }
-    await submitBooking(waiverSignature);
+  // ── Loading state ────────────────────────────────────────────────────────────
+
+  if (loadingConsent || loadingHealth || currentStep === null) {
+    return (
+      <div className="avail-modal-overlay" role="presentation">
+        <div className="avail-modal booking-modal" role="dialog" aria-modal="true" aria-label="Loading booking form">
+          <p className="booking-modal__loading">Loading…</p>
+        </div>
+      </div>
+    );
   }
 
-  if (step === 'success') {
+  // ── Success state ────────────────────────────────────────────────────────────
+
+  if (currentStep === 'success') {
     return (
       <div className="avail-modal-overlay" onClick={onClose} role="presentation">
         <div className="avail-modal booking-modal--success" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="booking-success-title">
@@ -365,24 +403,15 @@ function BookingForm({
     );
   }
 
-  if (step === 'waiver') {
-    return (
-      <WaiverStep
-        slot={slot}
-        date={date}
-        onBack={() => { setError(''); setStep('form'); }}
-        onSign={handleSign}
-        submitting={submitting}
-        error={error}
-      />
-    );
-  }
+  // ── Wizard ────────────────────────────────────────────────────────────────────
+
+  const showProgress = steps.length > 1;
 
   return (
     <div className="avail-modal-overlay" onClick={onClose} role="presentation">
       <div
         ref={dialogRef}
-        className="avail-modal booking-modal"
+        className={`avail-modal booking-modal${showProgress ? ' booking-modal--wizard' : ''}`}
         onClick={e => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -394,194 +423,482 @@ function BookingForm({
           {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
         </p>
 
-        <form onSubmit={handleContinue} noValidate>
-          {/* Therapist */}
-          <div className="booking-field">
-            <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>
-            {lockedTherapist ? (
-              <p className="booking-field__locked">
-                {lockedTherapist.firstName} {lockedTherapist.lastName}
-              </p>
-            ) : (
-              <select
-                id="bm-therapist"
-                className="booking-field__input"
-                value={therapistId}
-                onChange={e => setTherapistId(e.target.value)}
-                disabled={submitting}
+        {showProgress && (
+          <nav className="booking-wizard-progress" aria-label="Booking progress">
+            {steps.map((s, i) => (
+              <div
+                key={s}
+                className={`booking-wizard-step${i === stepIndex ? ' booking-wizard-step--active' : i < stepIndex ? ' booking-wizard-step--done' : ''}`}
               >
-                <option value="">Any therapist</option>
-                {therapistOptions.map(t => (
-                  <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          {/* Contact info — only for guests */}
-          {!user && (
-            <>
-              <div className="booking-divider">Contact Information</div>
-              <div className="booking-field">
-                <label className="booking-field__label" htmlFor="bm-name">Full name</label>
-                <input id="bm-name" className="booking-field__input" type="text"
-                  value={name} onChange={e => setName(e.target.value)}
-                  disabled={submitting} autoComplete="name" required />
+                <div className="booking-wizard-step__dot" aria-hidden="true">
+                  {i < stepIndex ? '✓' : i + 1}
+                </div>
+                <span className="booking-wizard-step__label">{STEP_LABELS[s]}</span>
               </div>
-              <div className="booking-field">
-                <label className="booking-field__label" htmlFor="bm-email">Email</label>
-                <input id="bm-email" className="booking-field__input" type="email"
-                  value={email} onChange={e => setEmail(e.target.value)}
-                  disabled={submitting} autoComplete="email" required />
-              </div>
-              <div className="booking-field">
-                <label className="booking-field__label" htmlFor="bm-phone">
-                  Phone <span className="booking-field__optional">(optional)</span>
-                </label>
-                <input id="bm-phone" className="booking-field__input" type="tel"
-                  value={phone} onChange={e => setPhone(e.target.value)}
-                  disabled={submitting} autoComplete="tel" />
-              </div>
-            </>
-          )}
+            ))}
+          </nav>
+        )}
 
-          {/* Notes */}
-          <div className="booking-field">
-            <label className="booking-field__label" htmlFor="bm-notes">
-              Notes <span className="booking-field__optional">(optional)</span>
-            </label>
-            <textarea
-              id="bm-notes"
-              className="booking-field__input booking-field__input--textarea"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              disabled={submitting}
-              rows={2}
-              placeholder="Areas to focus on, health considerations, etc."
-            />
-          </div>
+        {/* ── Step: Contact ──────────────────────────────────────────────────── */}
+        {currentStep === 'contact' && (
+          <form onSubmit={handleContactNext} noValidate>
+            <p className="booking-step-desc">
+              We&apos;ll send your booking confirmation to this email.
+            </p>
 
-          {/* Payment */}
-          {membershipCoversBooking ? (
-            <div className="booking-membership-banner">
-              <span className="booking-membership-banner__icon">★</span>
-              <div>
-                <strong>Covered by {membershipStatus.planName}</strong>
-                <p className="booking-membership-banner__credits">
-                  {membershipStatus.creditsRemaining} of {membershipStatus.creditsPerMonth} monthly session{membershipStatus.creditsPerMonth !== 1 ? 's' : ''} remaining — no payment required
-                </p>
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-name">Full name</label>
+              <input
+                id="bm-name"
+                className="booking-field__input"
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={submitting}
+                autoComplete="name"
+                required
+              />
+            </div>
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-email">Email</label>
+              <input
+                id="bm-email"
+                className="booking-field__input"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={submitting}
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-phone">
+                Phone <span className="booking-field__optional">(optional)</span>
+              </label>
+              <input
+                id="bm-phone"
+                className="booking-field__input"
+                type="tel"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                disabled={submitting}
+                autoComplete="tel"
+              />
+            </div>
+
+            <div className="booking-divider">Mailing Address</div>
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-addr1">Street address</label>
+              <input
+                id="bm-addr1"
+                className="booking-field__input"
+                type="text"
+                value={addressLine1}
+                onChange={e => setAddressLine1(e.target.value)}
+                disabled={submitting}
+                autoComplete="address-line1"
+                required
+              />
+            </div>
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-addr2">
+                Apt, suite, etc. <span className="booking-field__optional">(optional)</span>
+              </label>
+              <input
+                id="bm-addr2"
+                className="booking-field__input"
+                type="text"
+                value={addressLine2}
+                onChange={e => setAddressLine2(e.target.value)}
+                disabled={submitting}
+                autoComplete="address-line2"
+              />
+            </div>
+            <div className="booking-field-row">
+              <div className="booking-field booking-field--grow">
+                <label className="booking-field__label" htmlFor="bm-city">City</label>
+                <input
+                  id="bm-city"
+                  className="booking-field__input"
+                  type="text"
+                  value={city}
+                  onChange={e => setCity(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="address-level2"
+                  required
+                />
+              </div>
+              <div className="booking-field booking-field--state">
+                <label className="booking-field__label" htmlFor="bm-state">State</label>
+                <input
+                  id="bm-state"
+                  className="booking-field__input"
+                  type="text"
+                  value={addressState}
+                  onChange={e => setAddressState(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="address-level1"
+                  maxLength={2}
+                  placeholder="CA"
+                  required
+                />
+              </div>
+              <div className="booking-field booking-field--zip">
+                <label className="booking-field__label" htmlFor="bm-zip">ZIP code</label>
+                <input
+                  id="bm-zip"
+                  className="booking-field__input"
+                  type="text"
+                  value={zip}
+                  onChange={e => setZip(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="postal-code"
+                  inputMode="numeric"
+                  maxLength={10}
+                  required
+                />
               </div>
             </div>
-          ) : needsPayment ? (
-            <>
-              <div className="booking-divider">
-                Payment
-                {selectedService && (
-                  <span className="booking-divider__amount">
-                    ${(selectedService.priceCents / 100).toFixed(0)}
-                  </span>
-                )}
-              </div>
 
-              {loadingMethods ? (
-                <p className="booking-payment-loading">Loading saved cards…</p>
+            {error && <p className="avail-modal__error" role="alert">{error}</p>}
+
+            <div className="avail-modal__actions">
+              <button
+                className="btn btn--primary"
+                type="submit"
+                disabled={submitting || !isContactReady}
+              >
+                Continue →
+              </button>
+              <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* ── Step: Health ───────────────────────────────────────────────────── */}
+        {currentStep === 'health' && (
+          <form onSubmit={handleHealthNext} noValidate>
+            <p className="booking-step-desc">
+              This information helps your therapist provide the safest and most effective session.
+              All fields are optional.
+            </p>
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-medications">
+                Current medications <span className="booking-field__optional">(optional)</span>
+              </label>
+              <textarea
+                id="bm-medications"
+                className="booking-field__input booking-field__input--textarea"
+                value={medications}
+                onChange={e => setMedications(e.target.value)}
+                disabled={submitting}
+                rows={2}
+                placeholder="List any medications you are currently taking"
+              />
+            </div>
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-surgeries">
+                Recent surgeries <span className="booking-field__optional">(optional)</span>
+              </label>
+              <textarea
+                id="bm-surgeries"
+                className="booking-field__input booking-field__input--textarea"
+                value={surgeries}
+                onChange={e => setSurgeries(e.target.value)}
+                disabled={submitting}
+                rows={2}
+                placeholder="Any surgeries in the past 12 months"
+              />
+            </div>
+
+            <div className="booking-field">
+              <span className="booking-field__label">Pregnancy status</span>
+              <div className="booking-pregnancy-options">
+                {PREGNANCY_OPTIONS.map(opt => (
+                  <label key={opt.value} className="booking-radio-option">
+                    <input
+                      type="radio"
+                      name="pregnancyStatus"
+                      value={opt.value}
+                      checked={pregnancyStatus === opt.value}
+                      onChange={() => setPregnancyStatus(opt.value)}
+                      disabled={submitting}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-injuries">
+                Injuries or physical limitations <span className="booking-field__optional">(optional)</span>
+              </label>
+              <textarea
+                id="bm-injuries"
+                className="booking-field__input booking-field__input--textarea"
+                value={injuries}
+                onChange={e => setInjuries(e.target.value)}
+                disabled={submitting}
+                rows={2}
+                placeholder="Any injuries, chronic pain, or physical limitations"
+              />
+            </div>
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-notes">
+                Reason for your visit <span className="booking-field__optional">(optional)</span>
+              </label>
+              <textarea
+                id="bm-notes"
+                className="booking-field__input booking-field__input--textarea"
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                disabled={submitting}
+                rows={3}
+                placeholder="What brings you in today? Areas of focus, specific concerns, or goals for this session."
+              />
+            </div>
+
+            {error && <p className="avail-modal__error" role="alert">{error}</p>}
+
+            <div className="avail-modal__actions">
+              <button className="btn btn--primary" type="submit" disabled={submitting}>
+                Continue →
+              </button>
+              <button className="btn btn--ghost" type="button" onClick={stepIndex > 0 ? goBack : onClose} disabled={submitting}>
+                {stepIndex > 0 ? 'Back' : 'Cancel'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* ── Step: Consent ──────────────────────────────────────────────────── */}
+        {currentStep === 'consent' && (
+          <div>
+            <div className="waiver-scroll" role="region" aria-label="Consent form text">
+              <ol className="waiver-list">
+                {WAIVER_ITEMS.map((item, i) => (
+                  <li key={i} className="waiver-list__item">{item}</li>
+                ))}
+              </ol>
+              <p className="waiver-closing">{WAIVER_CLOSING}</p>
+            </div>
+
+            <SignatureCanvas onChange={setSignature} />
+
+            <label className="waiver-agree">
+              <input
+                type="checkbox"
+                className="waiver-agree__checkbox"
+                checked={agreed}
+                onChange={e => setAgreed(e.target.checked)}
+                disabled={submitting}
+              />
+              <span className="waiver-agree__text">
+                I have read and agree to the above consent form
+              </span>
+            </label>
+
+            {error && <p className="avail-modal__error" role="alert">{error}</p>}
+
+            <div className="avail-modal__actions">
+              <button
+                className="btn btn--primary"
+                type="button"
+                onClick={handleConsentNext}
+                disabled={!signature || !agreed || submitting}
+              >
+                Continue →
+              </button>
+              <button className="btn btn--ghost" type="button" onClick={goBack} disabled={submitting}>
+                Back
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step: Payment ──────────────────────────────────────────────────── */}
+        {currentStep === 'payment' && (
+          <form onSubmit={handlePaymentSubmit} noValidate>
+
+            {isReturnClient && (
+              <div className="booking-return-client">
+                <p className="booking-return-client__greeting">
+                  Welcome back, {user.first_name}!
+                </p>
+                <div className="booking-return-client__badges">
+                  {consentStatus?.signedAt && (
+                    <span className="booking-return-client__badge">
+                      Consent on file since {new Date(consentStatus.signedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    </span>
+                  )}
+                  <span className="booking-return-client__badge">Medical history on file</span>
+                </div>
+              </div>
+            )}
+
+            <div className="booking-field">
+              <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>
+              {lockedTherapist ? (
+                <p className="booking-field__locked">
+                  {lockedTherapist.firstName} {lockedTherapist.lastName}
+                </p>
               ) : (
-                <div className="booking-payment-options">
-                  {paymentMethods.map(pm => (
-                    <label key={pm.id} className={`booking-pm-option${selectedMethodId === pm.id ? ' booking-pm-option--selected' : ''}`}>
+                <select
+                  id="bm-therapist"
+                  className="booking-field__input"
+                  value={therapistId}
+                  onChange={e => setTherapistId(e.target.value)}
+                  disabled={submitting}
+                >
+                  <option value="">Any therapist</option>
+                  {therapistOptions.map(t => (
+                    <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {isReturnClient && (
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-notes">
+                  Notes <span className="booking-field__optional">(optional)</span>
+                </label>
+                <textarea
+                  id="bm-notes"
+                  className="booking-field__input booking-field__input--textarea"
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  disabled={submitting}
+                  rows={3}
+                  placeholder="Any updates to your health condition, new concerns, or focus areas for this visit."
+                />
+              </div>
+            )}
+
+            {membershipCoversBooking ? (
+              <div className="booking-membership-banner">
+                <span className="booking-membership-banner__icon">★</span>
+                <div>
+                  <strong>Covered by {membershipStatus.planName}</strong>
+                  <p className="booking-membership-banner__credits">
+                    {membershipStatus.creditsRemaining} of {membershipStatus.creditsPerMonth} monthly session{membershipStatus.creditsPerMonth !== 1 ? 's' : ''} remaining — no payment required
+                  </p>
+                </div>
+              </div>
+            ) : needsPayment ? (
+              <>
+                <div className="booking-divider">
+                  Payment
+                  {selectedService && (
+                    <span className="booking-divider__amount">
+                      ${(selectedService.priceCents / 100).toFixed(0)}
+                    </span>
+                  )}
+                </div>
+
+                {loadingMethods ? (
+                  <p className="booking-payment-loading">Loading saved cards…</p>
+                ) : (
+                  <div className="booking-payment-options">
+                    {paymentMethods.map(pm => (
+                      <label key={pm.id} className={`booking-pm-option${selectedMethodId === pm.id ? ' booking-pm-option--selected' : ''}`}>
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={pm.id}
+                          checked={selectedMethodId === pm.id}
+                          onChange={() => setSelectedMethodId(pm.id)}
+                          disabled={submitting}
+                        />
+                        <span className="booking-pm-option__brand">{brandLabel(pm.brand)}</span>
+                        <span className="booking-pm-option__number">•••• {pm.last4}</span>
+                        <span className="booking-pm-option__expiry">
+                          {String(pm.expiry_month).padStart(2, '0')}/{pm.expiry_year}
+                        </span>
+                        {pm.is_default && (
+                          <span className="booking-pm-option__badge">Default</span>
+                        )}
+                      </label>
+                    ))}
+
+                    <label className={`booking-pm-option${isNewCard ? ' booking-pm-option--selected' : ''}`}>
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value={pm.id}
-                        checked={selectedMethodId === pm.id}
-                        onChange={() => setSelectedMethodId(pm.id)}
+                        value="new"
+                        checked={isNewCard}
+                        onChange={() => setSelectedMethodId('new')}
                         disabled={submitting}
                       />
-                      <span className="booking-pm-option__brand">{brandLabel(pm.brand)}</span>
-                      <span className="booking-pm-option__number">•••• {pm.last4}</span>
-                      <span className="booking-pm-option__expiry">
-                        {String(pm.expiry_month).padStart(2, '0')}/{pm.expiry_year}
-                      </span>
-                      {pm.is_default && (
-                        <span className="booking-pm-option__badge">Default</span>
-                      )}
+                      <span className="booking-pm-option__brand">Enter a new card</span>
                     </label>
-                  ))}
 
-                  <label className={`booking-pm-option${isNewCard ? ' booking-pm-option--selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="new"
-                      checked={isNewCard}
-                      onChange={() => setSelectedMethodId('new')}
-                      disabled={submitting}
-                    />
-                    <span className="booking-pm-option__brand">Enter a new card</span>
-                  </label>
+                    {isNewCard && (
+                      <div className="booking-card-element">
+                        <CardElement options={CARD_STYLE} />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="booking-payment-note">
+                {user
+                  ? 'Payment processing is not configured — payment will be collected at time of service.'
+                  : 'Payment will be collected at time of service.'}
+              </div>
+            )}
 
-                  {isNewCard && (
-                    <div className="booking-card-element">
-                      <CardElement options={CARD_STYLE} />
-                    </div>
-                  )}
-                </div>
+            {error && <p className="avail-modal__error" role="alert">{error}</p>}
+
+            <div className="avail-modal__actions">
+              <button
+                className="btn btn--primary"
+                type="submit"
+                disabled={submitting || (loadingMethods && needsPayment)}
+              >
+                {submitting ? 'Booking…' : 'Book Appointment'}
+              </button>
+              {stepIndex > 0 ? (
+                <button className="btn btn--ghost" type="button" onClick={goBack} disabled={submitting}>
+                  Back
+                </button>
+              ) : (
+                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
+                  Cancel
+                </button>
               )}
-            </>
-          ) : (
-            <div className="booking-payment-note">
-              {user
-                ? 'Payment processing is not configured — payment will be collected at time of service.'
-                : 'Payment will be collected at time of service.'}
             </div>
-          )}
-
-          {hasConsent && consentStatus?.signedAt && (
-            <p className="booking-consent-note">
-              Consent on file since {new Date(consentStatus.signedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
-          )}
-
-          {error && <p className="avail-modal__error" role="alert">{error}</p>}
-
-          <div className="avail-modal__actions">
-            <button
-              className="btn btn--primary"
-              type="submit"
-              disabled={submitting || !isFormReady}
-            >
-              {submitting ? 'Booking…' : hasConsent ? 'Book Appointment' : 'Continue to Consent Form →'}
-            </button>
-            <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
-              Cancel
-            </button>
-          </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Shell — fetches payment methods + membership status, wraps in <Elements> ───
+// ── Shell — fetches status data and wraps in <Elements> ───────────────────────
 
 export default function BookingModal({
   slot, date, services, _allTherapists, lockedTherapist, onComplete, onClose,
 }) {
   const { user } = useAuth();
 
-  const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
-  const [serviceId, setServiceId] = useState(services[0]?.id ?? '');
-  const [name, setName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
-  const [email, setEmail] = useState(user?.email ?? '');
-  const [phone, setPhone] = useState('');
-  const [notes, setNotes] = useState('');
-
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [loadingMethods, setLoadingMethods] = useState(false);
+  const [loadingMethods, setLoadingMethods] = useState(!!(user && stripePublishableKey));
   const [selectedMethodId, setSelectedMethodId] = useState(user ? '' : 'new');
   const [membershipStatus, setMembershipStatus] = useState(null);
   const [consentStatus, setConsentStatus] = useState(null);
-  const [loadingConsent, setLoadingConsent] = useState(false);
+  const [loadingConsent, setLoadingConsent] = useState(!!user);
+  const [healthStatus, setHealthStatus] = useState(null);
+  const [loadingHealth, setLoadingHealth] = useState(!!user);
 
   const therapistOptions = useMemo(() => {
     if (lockedTherapist) return [lockedTherapist];
@@ -591,17 +908,19 @@ export default function BookingModal({
   useEffect(() => {
     if (!user) return;
 
-    setLoadingConsent(true);
     const fetches = [
       membershipService.getMyStatus().then(({ data }) => setMembershipStatus(data)),
       bookingService.getConsentStatus()
         .then(({ data }) => setConsentStatus(data))
         .catch(() => setConsentStatus({ hasSigned: false, signedAt: null }))
         .finally(() => setLoadingConsent(false)),
+      bookingService.getHealthStatus()
+        .then(({ data }) => setHealthStatus(data))
+        .catch(() => setHealthStatus({ hasRecord: false }))
+        .finally(() => setLoadingHealth(false)),
     ];
 
     if (stripePublishableKey) {
-      setLoadingMethods(true);
       fetches.push(
         paymentService.listPaymentMethods()
           .then(({ data }) => {
@@ -620,19 +939,27 @@ export default function BookingModal({
   }, [user]);
 
   const stripePromise = getStripePromise();
-  const sharedProps = {
-    slot, date, services, therapistOptions, lockedTherapist,
-    therapistId, setTherapistId, serviceId, setServiceId,
-    name, setName, email, setEmail, phone, setPhone, notes, setNotes,
-    paymentMethods, loadingMethods, selectedMethodId, setSelectedMethodId,
-    membershipStatus,
-    consentStatus, loadingConsent,
-    onClose, onComplete,
-  };
 
   return (
     <Elements stripe={stripePromise}>
-      <BookingForm {...sharedProps} />
+      <BookingWizard
+        slot={slot}
+        date={date}
+        services={services}
+        therapistOptions={therapistOptions}
+        lockedTherapist={lockedTherapist}
+        paymentMethods={paymentMethods}
+        loadingMethods={loadingMethods}
+        selectedMethodId={selectedMethodId}
+        setSelectedMethodId={setSelectedMethodId}
+        membershipStatus={membershipStatus}
+        consentStatus={consentStatus}
+        loadingConsent={loadingConsent}
+        healthStatus={healthStatus}
+        loadingHealth={loadingHealth}
+        onClose={onClose}
+        onComplete={onComplete}
+      />
     </Elements>
   );
 }

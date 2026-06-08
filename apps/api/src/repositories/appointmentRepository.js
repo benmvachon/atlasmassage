@@ -136,7 +136,8 @@ export class AppointmentRepository {
          tr.id AS transfer_request_id,
          tr.status AS transfer_status,
          tr.reason AS transfer_reason,
-         cs.signed_at AS consent_signed_at
+         cs.signed_at AS consent_signed_at,
+         EXISTS (SELECT 1 FROM soap_notes sn WHERE sn.appointment_id = a.id) AS has_soap_notes
        FROM appointments a
        JOIN services s ON s.id = a.service_id
        LEFT JOIN users cl ON cl.id = a.client_id
@@ -282,18 +283,22 @@ export class AppointmentRepository {
 
   async create({
     clientId, therapistId, serviceId, scheduledAt, durationMinutes,
-    notes, guestName, guestEmail, guestPhone, waiverSignature, consentSignatureId,
+    notes, guestName, guestEmail, guestPhone,
+    guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
+    waiverSignature, consentSignatureId, healthRecordId,
   }) {
     const { rows } = await this.pool.query(
       `INSERT INTO appointments
          (client_id, therapist_id, service_id, scheduled_at, duration_minutes,
           notes, guest_name, guest_email, guest_phone,
-          waiver_signature, waiver_signed_at, consent_signature_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          guest_address_line1, guest_address_line2, guest_city, guest_state, guest_zip,
+          waiver_signature, waiver_signed_at, consent_signature_id, health_record_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        RETURNING *`,
       [clientId ?? null, therapistId, serviceId, scheduledAt, durationMinutes,
        notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
-       waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null]
+       guestAddressLine1 ?? null, guestAddressLine2 ?? null, guestCity ?? null, guestState ?? null, guestZip ?? null,
+       waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null, healthRecordId ?? null]
     );
     return rows[0];
   }

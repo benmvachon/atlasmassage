@@ -9,17 +9,23 @@ import {
   cancelAppointment, mockStripeDisabled, drawSignature,
 } from './helpers.js';
 
-// All tests share TEST_DATE availability set in beforeAll/afterAll.
-// Serial mode ensures one worker runs beforeAll and afterAll exactly once.
 test.describe.configure({ mode: 'serial' });
 
 const GUEST_NAME  = 'Jordan E2E';
 const GUEST_EMAIL = 'jordan-e2e@test.invalid';
 
-// All workflow tests share the same availability setup: Sarah available on DATES.mon2
+// Minimal address required by the contact step
+const GUEST_ADDR = {
+  line1: '123 Test St',
+  city:  'Test City',
+  state: 'CA',
+  zip:   '90210',
+};
+
 const { owner, sarah } = getAuthState();
-const ownerToken = owner.token, ownerUserId = owner.userId;
-const sarahToken = sarah.token, sarahUserId = sarah.userId;
+const ownerToken = owner.token;
+const sarahToken = sarah.token;
+const sarahUserId = sarah.userId;
 const TEST_DATE = DATES.mon2; // 2030-09-09
 
 test.beforeAll(async ({ request }) => {
@@ -32,40 +38,65 @@ test.afterAll(async ({ request }) => {
   await deleteAvailability(request, sarahUserId, sarahToken, [TEST_DATE]);
 });
 
-// ── Happy-path booking ────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-test('complete guest booking flow: select date → slot → form → consent → success', async ({ page }) => {
-  await mockStripeDisabled(page);
-
+/** Open the booking modal and land on the first wizard step (contact). */
+async function openModal(page) {
   await page.goto(`/booking?year=2030&month=9`);
   await page.waitForSelector('.avail-calendar');
-
-  // Step 1: Click the available Monday
   await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.waitForSelector('.slot-panel__grid');
-
-  // Step 2: Pick the first available slot (9:00 AM)
-  const firstSlot = page.locator('button.slot-btn').first();
-  const slotLabel = await firstSlot.getAttribute('aria-label');
-  await firstSlot.click();
+  await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
+}
 
-  // Step 3: Fill guest contact info
+/** Fill every required contact field (name, email, address). */
+async function fillContactStep(page) {
   await page.fill('#bm-name', GUEST_NAME);
   await page.fill('#bm-email', GUEST_EMAIL);
+  await page.fill('#bm-addr1', GUEST_ADDR.line1);
+  await page.fill('#bm-city', GUEST_ADDR.city);
+  await page.fill('#bm-state', GUEST_ADDR.state);
+  await page.fill('#bm-zip', GUEST_ADDR.zip);
+}
 
-  // Step 4: Proceed to consent form
-  await expect(page.locator('.booking-modal form button[type="submit"]')).toBeEnabled();
+/** Advance past the contact step (requires all fields pre-filled). */
+async function advancePastContact(page) {
   await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
-  await page.waitForSelector('[aria-labelledby="waiver-modal-title"]');
+  await page.waitForSelector('#bm-medications'); // health step
+}
 
-  // Step 5: Sign + agree
+/** Advance past the health step (all fields optional — just continue). */
+async function advancePastHealth(page) {
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+  await page.waitForSelector('.waiver-sig__canvas'); // consent step
+}
+
+/** Complete the consent step (sign + check). */
+async function completeConsentStep(page) {
   await drawSignature(page);
   await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
+  // The "Continue →" button on the consent step
+  await page.locator('.avail-modal__actions .btn--primary').click();
+  await page.waitForSelector('.booking-divider'); // payment step
+}
 
-  // Step 6: Submit — mock POST so we don't actually charge anyone
-  // (The real appointment is blocked anyway since GUEST_EMAIL is not a real email)
-  // We intercept just the POST here so the booking modal can show success.
+// ── Happy-path booking ────────────────────────────────────────────────────────
+
+test('complete guest booking flow: contact → health → consent → payment → success', async ({ page }) => {
+  await mockStripeDisabled(page);
+  await openModal(page);
+
+  // Step 1: Contact
+  await fillContactStep(page);
+  await advancePastContact(page);
+
+  // Step 2: Health — all optional, just continue
+  await advancePastHealth(page);
+
+  // Step 3: Consent — sign and advance
+  await completeConsentStep(page);
+
+  // Step 4: Payment — mock POST so no real booking is created
   await page.route('**/api/v1/appointments', route => {
     if (route.request().method() !== 'POST') { route.continue(); return; }
     route.fulfill({
@@ -80,48 +111,32 @@ test('complete guest booking flow: select date → slot → form → consent →
       }),
     });
   });
-  await page.locator('button:has-text("Sign & Book")').evaluate(btn => btn.click());
+  await page.locator('button:has-text("Book Appointment")').click();
 
-  // Step 7: Success
+  // Success
   await expect(page.locator('.booking-modal__success-title')).toContainText('Booking Confirmed');
   await expect(page.locator('.booking-modal__success-body')).toContainText(GUEST_EMAIL);
 });
 
 // ── Empty and edge states ─────────────────────────────────────────────────────
 
-test('shows "no available times" when the date has no open slots (all blocked by buffer)', async ({ page, request }) => {
-  const serviceId = await getServiceId(request);
-  // Fill all slots on TEST_DATE with a single 09:00 appointment.
-  // Availability is 09:00–17:00, which means lastSlotStart = 16:00.
-  // One appointment at 09:00 blocks 09:00–10:15 range.
-  // The date still shows in calendar but fewer slots available.
-  // Instead, verify via a date with NO availability at all.
-  const emptyDate = DATES.sat1; // 2030-09-07 (Saturday — Sarah has no Saturday availability seeded)
-  // Ensure no availability on that date
+test('shows "no available times" when the date has no open slots', async ({ page, request }) => {
+  const emptyDate = DATES.sat1; // Saturday — Sarah has no Saturday availability seeded
   await deleteAvailability(request, sarahUserId, sarahToken, [emptyDate]);
 
   await page.goto(`/booking?year=2030&month=9&therapistId=${sarahUserId}`);
   await page.waitForSelector('.avail-calendar');
 
-  // Saturday should not be marked available for Sarah
   const satBtn = page.locator(`button[aria-label*="${emptyDate}"]`);
   const count = await satBtn.count();
   if (count > 0) {
     const label = await satBtn.getAttribute('aria-label');
-    // Either disabled or not available
-    const isAvailable = (label ?? '').includes(', available');
-    expect(isAvailable).toBe(false);
+    expect((label ?? '').includes(', available')).toBe(false);
   }
 });
 
 test('shows booking form pre-populated with correct date and time', async ({ page }) => {
-  await page.goto(`/booking?year=2030&month=9`);
-  await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.waitForSelector('.slot-panel__grid');
-
-  await page.locator('button.slot-btn').first().click();
-  await page.waitForSelector('[role="dialog"]');
-
+  await openModal(page);
   const summary = page.locator('.booking-modal__slot-summary');
   await expect(summary).toContainText('September');
   await expect(summary).toContainText('9'); // day 9 of September
@@ -129,77 +144,75 @@ test('shows booking form pre-populated with correct date and time', async ({ pag
 
 // ── Form validation ───────────────────────────────────────────────────────────
 
-test('Continue button is disabled until name and email are filled', async ({ page }) => {
-  await page.goto(`/booking?year=2030&month=9`);
-  await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.locator('button.slot-btn').first().click();
-  await page.waitForSelector('[role="dialog"]');
+test('Continue button is disabled until all required contact fields are filled', async ({ page }) => {
+  await openModal(page);
 
   const submitBtn = page.locator('.booking-modal form button[type="submit"]');
   await expect(submitBtn).toBeDisabled();
 
   await page.fill('#bm-name', GUEST_NAME);
-  await expect(submitBtn).toBeDisabled(); // email still missing
+  await expect(submitBtn).toBeDisabled(); // email + address still missing
 
   await page.fill('#bm-email', 'not-valid-email');
   await expect(submitBtn).toBeDisabled(); // invalid email
 
   await page.fill('#bm-email', GUEST_EMAIL);
-  await expect(submitBtn).toBeEnabled();
+  await expect(submitBtn).toBeDisabled(); // address still missing
+
+  await page.fill('#bm-addr1', GUEST_ADDR.line1);
+  await expect(submitBtn).toBeDisabled(); // city/state/zip still missing
+
+  await page.fill('#bm-city', GUEST_ADDR.city);
+  await page.fill('#bm-state', GUEST_ADDR.state);
+  await expect(submitBtn).toBeDisabled(); // zip still missing
+
+  await page.fill('#bm-zip', GUEST_ADDR.zip);
+  await expect(submitBtn).toBeEnabled(); // all required fields filled
 });
 
-test('Sign & Book button is disabled until canvas is signed and checkbox is checked', async ({ page }) => {
+test('consent Continue button is disabled until canvas is signed and checkbox is checked', async ({ page }) => {
   await mockStripeDisabled(page);
-  await page.goto(`/booking?year=2030&month=9`);
-  await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.locator('button.slot-btn').first().click();
-  await page.waitForSelector('[role="dialog"]');
+  await openModal(page);
 
-  await page.fill('#bm-name', GUEST_NAME);
-  await page.fill('#bm-email', GUEST_EMAIL);
-  await expect(page.locator('.booking-modal form button[type="submit"]')).toBeEnabled();
-  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
-  await page.waitForSelector('[aria-labelledby="waiver-modal-title"]');
+  // Navigate to consent step
+  await fillContactStep(page);
+  await advancePastContact(page);
+  await advancePastHealth(page);
 
-  const signBtn = page.locator('button:has-text("Sign & Book")');
-  await expect(signBtn).toBeDisabled();
+  // On consent step — primary button should be disabled initially
+  const consentBtn = page.locator('.avail-modal__actions .btn--primary');
+  await expect(consentBtn).toBeDisabled();
 
+  // Sign → still disabled (checkbox not checked)
   await drawSignature(page);
-  await expect(signBtn).toBeDisabled(); // checkbox still unchecked
+  await expect(consentBtn).toBeDisabled();
 
+  // Check the checkbox → now enabled
   await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
-  await expect(signBtn).toBeEnabled();
+  await expect(consentBtn).toBeEnabled();
 });
 
 // ── Modal navigation ──────────────────────────────────────────────────────────
 
 test('closing the booking modal returns to the slot list', async ({ page }) => {
-  await page.goto(`/booking?year=2030&month=9`);
-  await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.locator('button.slot-btn').first().click();
-  await page.waitForSelector('[role="dialog"]');
-
+  await openModal(page);
   await page.locator('.avail-modal__close').evaluate(btn => btn.click());
   await expect(page.locator('[role="dialog"]')).not.toBeVisible();
   await expect(page.locator('.slot-panel__grid')).toBeVisible();
 });
 
-test('Back button on the consent step returns to the booking form', async ({ page }) => {
-  await mockStripeDisabled(page);
-  await page.goto(`/booking?year=2030&month=9`);
-  await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
-  await page.locator('button.slot-btn').first().click();
-  await page.waitForSelector('[role="dialog"]');
+test('Back button on the health step returns to the contact step with values preserved', async ({ page }) => {
+  await openModal(page);
 
-  await page.fill('#bm-name', GUEST_NAME);
-  await page.fill('#bm-email', GUEST_EMAIL);
-  await expect(page.locator('.booking-modal form button[type="submit"]')).toBeEnabled();
-  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
-  await page.waitForSelector('[aria-labelledby="waiver-modal-title"]');
+  await fillContactStep(page);
+  await advancePastContact(page); // now on health step
 
-  await page.locator('button:has-text("Back")').evaluate(btn => btn.click());
-  await page.waitForSelector('[aria-labelledby="booking-modal-title"]');
+  // Back to contact step
+  await page.locator('button:has-text("Back")').click();
+  await page.waitForSelector('#bm-name');
+
   await expect(page.locator('#bm-name')).toHaveValue(GUEST_NAME);
+  await expect(page.locator('#bm-email')).toHaveValue(GUEST_EMAIL);
 });
 
 // ── Filters ───────────────────────────────────────────────────────────────────

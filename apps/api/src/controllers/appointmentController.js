@@ -2,6 +2,10 @@ import { getPool } from '../database/pool.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { AvailabilityRepository } from '../repositories/availabilityRepository.js';
 import { ConsentRepository } from '../repositories/consentRepository.js';
+import { HealthRecordRepository } from '../repositories/healthRecordRepository.js';
+import { SoapNoteRepository } from '../repositories/soapNoteRepository.js';
+import { ClientFeedbackRepository } from '../repositories/clientFeedbackRepository.js';
+import { ClientHistoryRepository } from '../repositories/clientHistoryRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { PaymentService } from '../services/paymentService.js';
 import { MembershipService } from '../services/membershipService.js';
@@ -19,6 +23,10 @@ function repos() {
     appointment: new AppointmentRepository(pool),
     availability: new AvailabilityRepository(pool),
     consent: new ConsentRepository(pool),
+    health: new HealthRecordRepository(pool),
+    soap: new SoapNoteRepository(pool),
+    feedback: new ClientFeedbackRepository(pool),
+    history: new ClientHistoryRepository(pool),
     transfer: new TransferRequestRepository(pool),
   };
 }
@@ -28,7 +36,9 @@ export async function createAppointment(req, res, next) {
     const {
       therapistId, serviceId, scheduledAt,
       guestName, guestEmail, guestPhone,
+      guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
       notes, paymentMethodId, waiverSignature,
+      healthCurrentMedications, healthRecentSurgeries, healthPregnancyStatus, healthInjuries,
     } = req.body;
 
     const clientId = req.user?.sub ?? null;
@@ -36,7 +46,7 @@ export async function createAppointment(req, res, next) {
       throw new AppError('Guest name and email are required', 400, 'BAD_REQUEST');
     }
 
-    const { appointment: apptRepo, availability: availRepo, consent: consentRepo } = repos();
+    const { appointment: apptRepo, availability: availRepo, consent: consentRepo, health: healthRepo } = repos();
 
     const apptDate = new Date(scheduledAt);
     if (apptDate < new Date(Date.now() + 24 * 60 * 60 * 1000)) {
@@ -65,6 +75,34 @@ export async function createAppointment(req, res, next) {
       if (!slotValid) {
         throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
       }
+    }
+
+    // Resolve or create health record.
+    // Authenticated clients reuse their most recent record; guests always create a new one.
+    let healthRecordId = null;
+    if (clientId) {
+      const existingHealth = await healthRepo.findLatestByClientId(clientId);
+      if (existingHealth) {
+        healthRecordId = existingHealth.id;
+      } else {
+        const created = await healthRepo.create({
+          clientId,
+          currentMedications: healthCurrentMedications,
+          recentSurgeries: healthRecentSurgeries,
+          pregnancyStatus: healthPregnancyStatus,
+          injuries: healthInjuries,
+        });
+        healthRecordId = created.id;
+      }
+    } else {
+      const created = await healthRepo.create({
+        guestEmail,
+        currentMedications: healthCurrentMedications,
+        recentSurgeries: healthRecentSurgeries,
+        pregnancyStatus: healthPregnancyStatus,
+        injuries: healthInjuries,
+      });
+      healthRecordId = created.id;
     }
 
     // Resolve or create consent signature.
@@ -99,8 +137,14 @@ export async function createAppointment(req, res, next) {
       guestName: clientId ? null : guestName,
       guestEmail: clientId ? null : guestEmail,
       guestPhone: clientId ? null : (guestPhone || null),
+      guestAddressLine1: clientId ? null : (guestAddressLine1 || null),
+      guestAddressLine2: clientId ? null : (guestAddressLine2 || null),
+      guestCity: clientId ? null : (guestCity || null),
+      guestState: clientId ? null : (guestState || null),
+      guestZip: clientId ? null : (guestZip || null),
       waiverSignature: waiverSignature ?? null,
       consentSignatureId,
+      healthRecordId,
     });
 
     // Check if the booking is covered by a membership credit.
@@ -348,6 +392,122 @@ export async function getConsentStatus(req, res, next) {
       success: true,
       data: { hasSigned: !!existing, signedAt: existing?.signed_at ?? null },
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getHealthStatus(req, res, next) {
+  try {
+    const healthRepo = new HealthRecordRepository(getPool());
+    const existing = await healthRepo.findLatestByClientId(req.user.sub);
+    res.json({
+      success: true,
+      data: { hasRecord: !!existing },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getSoapNotes(req, res, next) {
+  try {
+    const { soap: soapRepo } = repos();
+    const notes = await soapRepo.findByAppointmentId(req.params.id);
+    res.json({ success: true, data: notes });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function upsertSoapNotes(req, res, next) {
+  try {
+    const { appointment: apptRepo, soap: soapRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    if (!isOwner && appt.therapist_id !== req.user.sub) {
+      return next(new AppError('You can only add SOAP notes for your own appointments', 403, 'FORBIDDEN'));
+    }
+
+    const { subjective, objective, assessment, plan } = req.body;
+    const notes = await soapRepo.upsert({
+      appointmentId: appt.id,
+      therapistId: req.user.sub,
+      subjective,
+      objective,
+      assessment,
+      plan,
+    });
+    res.json({ success: true, data: notes });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getClientHistory(req, res, next) {
+  try {
+    const { history: historyRepo } = repos();
+    const result = await historyRepo.findByAppointment(req.params.id);
+    if (!result) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getFeedbackInfo(req, res, next) {
+  try {
+    const { appointment: apptRepo, feedback: feedbackRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Not found', 404, 'NOT_FOUND'));
+    if (appt.feedback_token !== req.query.token) {
+      return next(new AppError('Invalid token', 403, 'FORBIDDEN'));
+    }
+    const service = await apptRepo.findServiceById(appt.service_id);
+    const existing = await feedbackRepo.findByAppointmentId(appt.id);
+    res.json({
+      success: true,
+      data: {
+        serviceName: service?.name ?? 'Massage',
+        scheduledAt: appt.scheduled_at,
+        alreadySubmitted: !!existing,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function submitFeedback(req, res, next) {
+  try {
+    const { appointment: apptRepo, feedback: feedbackRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    if (appt.feedback_token !== req.body.feedbackToken) {
+      return next(new AppError('Invalid feedback token', 403, 'FORBIDDEN'));
+    }
+
+    if (appt.status !== 'completed') {
+      return next(new AppError('Feedback can only be submitted for completed appointments', 400, 'BAD_REQUEST'));
+    }
+
+    const existing = await feedbackRepo.findByAppointmentId(appt.id);
+    if (existing) {
+      return next(new AppError('Feedback has already been submitted for this appointment', 409, 'CONFLICT'));
+    }
+
+    const { rating, comments } = req.body;
+    const feedback = await feedbackRepo.create({
+      appointmentId: appt.id,
+      clientId: appt.client_id ?? null,
+      guestEmail: appt.guest_email ?? null,
+      rating,
+      comments,
+    });
+    res.status(201).json({ success: true, data: feedback });
   } catch (err) {
     next(err);
   }

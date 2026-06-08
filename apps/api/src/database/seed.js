@@ -350,6 +350,30 @@ async function seed() {
     );
     logger.info('seed_appointments', { count: 2 });
 
+    // Seed consent signature and health record for client1 so the booking wizard
+    // shows the simplified returning-client flow (payment step only).
+    const { rows: [consentSig] } = await client.query(
+      `INSERT INTO consent_signatures (client_id, signature, signed_at)
+       VALUES ($1, $2, NOW())
+       RETURNING id`,
+      [clientUserId, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==']
+    );
+    const { rows: [healthRec] } = await client.query(
+      `INSERT INTO health_records (client_id, pregnancy_status)
+       VALUES ($1, 'not_pregnant')
+       RETURNING id`,
+      [clientUserId]
+    );
+    // Link health + consent records to the seeded appointments
+    await client.query(
+      `UPDATE appointments
+       SET health_record_id = $1,
+           consent_signature_id = $2
+       WHERE client_id = $3`,
+      [healthRec.id, consentSig.id, clientUserId]
+    );
+    logger.info('seed_client_records', { consentId: consentSig.id, healthId: healthRec.id });
+
     await client.query('COMMIT');
     logger.info('seed_complete', { users: USERS.length });
   } catch (err) {
