@@ -1367,6 +1367,7 @@
 .soap-modal {
   max-width: 680px;
   max-height: 90vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 

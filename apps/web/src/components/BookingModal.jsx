@@ -219,9 +219,10 @@ function BookingWizard({
     [user, hasHealthRecord, hasConsent]
   );
 
-  // Initialize first step once status data has loaded
+  // Initialize first step once status data has loaded; also re-initialize if
+  // the current step was set before auth completed and is no longer in steps.
   useEffect(() => {
-    if (!loadingConsent && !loadingHealth && currentStep === null) {
+    if (!loadingConsent && !loadingHealth && (currentStep === null || !steps.includes(currentStep))) {
       setCurrentStep(steps[0]);
     }
   }, [loadingConsent, loadingHealth]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -907,15 +908,19 @@ export default function BookingModal({
 
   useEffect(() => {
     if (!user) return;
+    // If loading states were already false (user was null at mount), re-arm them so
+    // the BookingWizard init effect fires correctly once status data arrives.
+    setLoadingHealth(true);
+    setLoadingConsent(true);
 
     const fetches = [
       membershipService.getMyStatus().then(({ data }) => setMembershipStatus(data)),
       bookingService.getConsentStatus()
-        .then(({ data }) => setConsentStatus(data))
+        .then(status => setConsentStatus(status))
         .catch(() => setConsentStatus({ hasSigned: false, signedAt: null }))
         .finally(() => setLoadingConsent(false)),
       bookingService.getHealthStatus()
-        .then(({ data }) => setHealthStatus(data))
+        .then(status => setHealthStatus(status))
         .catch(() => setHealthStatus({ hasRecord: false }))
         .finally(() => setLoadingHealth(false)),
     ];

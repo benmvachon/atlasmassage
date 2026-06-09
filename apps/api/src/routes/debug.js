@@ -134,23 +134,23 @@ router.post('/stripe-event', async (req, res, next) => {
 
 /**
  * DELETE /api/v1/debug/appointments/:therapistId/:date
- * Cancels all non-cancelled appointments for a therapist on a given date.
- * Used by test beforeAll to ensure a clean daily slate.
+ * Hard-deletes all appointments for a therapist on a given date.
+ * Used by test beforeAll/afterAll to ensure a clean daily slate.
+ * FK dependents (soap_notes, client_feedback, transfer_requests) cascade;
+ * payments and membership_credits nullify their appointment_id reference.
  */
 router.delete('/appointments/:therapistId/:date', async (req, res, next) => {
   try {
     const { therapistId, date } = req.params;
     const pool = getPool();
     const { rows } = await pool.query(
-      `UPDATE appointments
-          SET status = 'cancelled', updated_at = NOW()
+      `DELETE FROM appointments
         WHERE therapist_id = $1
           AND scheduled_at::date = $2::date
-          AND status NOT IN ('cancelled','completed')
         RETURNING id`,
       [therapistId, date]
     );
-    res.json({ success: true, data: { cancelled: rows.length } });
+    res.json({ success: true, data: { deleted: rows.length } });
   } catch (err) {
     next(err);
   }

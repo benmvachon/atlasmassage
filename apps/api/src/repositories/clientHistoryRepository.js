@@ -62,7 +62,7 @@ export class ClientHistoryRepository {
        LEFT JOIN users sn_t         ON sn_t.id = sn.therapist_id
        LEFT JOIN client_feedback cf ON cf.appointment_id = a.id
        WHERE ($1::uuid IS NOT NULL AND a.client_id = $1::uuid)
-          OR ($2 IS NOT NULL AND a.guest_email = $2)
+          OR ($2::text IS NOT NULL AND a.guest_email = $2::text)
        ORDER BY a.scheduled_at DESC`,
       [pivot.client_id ?? null, pivot.guest_email ?? null]
     );

@@ -107,7 +107,7 @@ function SoapNotesModal({ appt, onClose, onSaved }) {
 
   useEffect(() => {
     api.get(`/appointments/${appt.id}/soap-notes`)
-      .then(r => { if (r.data.data) setFields(r.data.data); })
+      .then(r => { if (r.data) setFields(r.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [appt.id]);
@@ -350,7 +350,7 @@ function ClientHistoryModal({ appt, onClose }) {
 
   useEffect(() => {
     api.get(`/appointments/${appt.id}/client-history`)
-      .then(r => setHistory(r.data.data))
+      .then(r => setHistory(r.data))
       .catch(() => setError('Failed to load client history.'))
       .finally(() => setLoading(false));
   }, [appt.id]);

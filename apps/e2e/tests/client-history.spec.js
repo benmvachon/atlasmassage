@@ -159,7 +159,8 @@ test('expanding a history session reveals the SOAP notes record', async ({ page 
   await page.waitForSelector('.history-session__records');
 
   // SOAP notes record should be visible (saved in the SOAP notes tests above)
-  await expect(page.locator('.history-record--soap')).toBeVisible();
-  await expect(page.locator('.history-record--soap')).toContainText('Subjective');
-  await expect(page.locator('.history-record--soap')).toContainText('neck stiffness');
+  // Use div selector to avoid matching the .history-chip spans that share the --soap modifier class
+  await expect(page.locator('div.history-record--soap')).toBeVisible();
+  await expect(page.locator('div.history-record--soap')).toContainText('Subjective');
+  await expect(page.locator('div.history-record--soap')).toContainText('neck stiffness');
 });
