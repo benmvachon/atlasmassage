@@ -113,6 +113,30 @@ describe('generateSlots', () => {
       return dt >= notBefore;
     })).toBe(true);
   });
+
+  it('blocks a slot when all active beds are occupied (bed_id present)', () => {
+    const bedAppt = { therapist_id: 't2', bed_id: 'bed-1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 };
+    // T1 is available at 09:00, but the single bed is occupied by T2's appointment.
+    // Availability must extend past 10:15 so that slot is reachable (lastStart = availEnd - 60).
+    const slots = generateSlots([avail(T1, '09:00', '12:00')], [bedAppt], { activeBedCount: 1 });
+    const times = slots.map(s => s.startTime);
+    // 09:00–10:00 slots conflict with the bed-occupying appointment + 15-min buffer
+    expect(times).not.toContain('09:00');
+    expect(times).toContain('10:15'); // first slot after the bed is free
+  });
+
+  it('does not block a slot when the conflicting appointment has no bed_id', () => {
+    // Appointment without bed_id does not count against bed capacity
+    const unassignedAppt = { therapist_id: 't2', bed_id: null, scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 };
+    const slots = generateSlots([avail(T1, '09:00', '10:00')], [unassignedAppt], { activeBedCount: 1 });
+    expect(slots.map(s => s.startTime)).toContain('09:00');
+  });
+
+  it('allows a slot when activeBedCount is 0 (no bed constraint)', () => {
+    const bedAppt = { therapist_id: 't2', bed_id: 'bed-1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 };
+    const slots = generateSlots([avail(T1, '09:00', '10:00')], [bedAppt], { activeBedCount: 0 });
+    expect(slots.map(s => s.startTime)).toContain('09:00');
+  });
 });
 
 // ── availableDaysForMonth ─────────────────────────────────────────────────────

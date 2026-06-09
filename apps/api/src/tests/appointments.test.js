@@ -10,6 +10,7 @@ await jest.unstable_mockModule('../database/pool.js', () => ({
 
 const mockApptRepo     = {};
 const mockAvailRepo    = {};
+const mockBusinessRepo = {};
 const mockConsentRepo  = {};
 const mockHealthRepo   = {};
 const mockSoapRepo     = {};
@@ -17,11 +18,16 @@ const mockFeedbackRepo = {};
 const mockHistoryRepo  = {};
 const mockTransferRepo = {};
 
+const BED_ID = 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380b11';
+
 await jest.unstable_mockModule('../repositories/appointmentRepository.js', () => ({
   AppointmentRepository: jest.fn(() => mockApptRepo),
 }));
 await jest.unstable_mockModule('../repositories/availabilityRepository.js', () => ({
   AvailabilityRepository: jest.fn(() => mockAvailRepo),
+}));
+await jest.unstable_mockModule('../repositories/businessRepository.js', () => ({
+  BusinessRepository: jest.fn(() => mockBusinessRepo),
 }));
 await jest.unstable_mockModule('../repositories/consentRepository.js', () => ({
   ConsentRepository: jest.fn(() => mockConsentRepo),
@@ -112,6 +118,9 @@ beforeEach(() => {
   });
   Object.assign(mockAvailRepo, {
     getForDateRange: jest.fn().mockResolvedValue([]),
+  });
+  Object.assign(mockBusinessRepo, {
+    getMassageBeds: jest.fn().mockResolvedValue([{ id: BED_ID, name: 'Table 1', is_active: true }]),
   });
   Object.assign(mockConsentRepo, {
     findByClientId: jest.fn().mockResolvedValue(null),

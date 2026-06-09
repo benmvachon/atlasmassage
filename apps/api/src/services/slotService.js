@@ -25,12 +25,22 @@ function scheduledAtToMinutes(scheduledAt) {
 /**
  * Build available slots for a given set of availability rows and existing appointments.
  *
- * availability: [{ therapist_id, first_name, last_name, start_time, end_time }]
- * appointments: [{ therapist_id, scheduled_at, duration_minutes }]
+ * availability:    [{ therapist_id, first_name, last_name, start_time, end_time }]
+ * appointments:    [{ therapist_id, scheduled_at, duration_minutes }]
+ * activeBedCount:  number of active massage beds (0 = no bed constraint)
  * Returns sorted [{ startTime, endTime, availableTherapists: [{id, firstName, lastName}] }]
  */
-export function generateSlots(availability, appointments, { timeOfDay, notBefore } = {}) {
+export function generateSlots(availability, appointments, { timeOfDay, notBefore, activeBedCount = 0 } = {}) {
   const todBounds = timeOfDay ? TOD_BOUNDS[timeOfDay] : null;
+
+  // Pre-compute appointment ranges for bed-level conflict checking.
+  // Only appointments with a bed_id actually occupy a bed slot.
+  const allApptRanges = appointments
+    .filter(a => a.bed_id)
+    .map(a => {
+      const startMin = scheduledAtToMinutes(a.scheduled_at);
+      return { startMin, endMin: startMin + a.duration_minutes };
+    });
 
   const apptsByTherapist = {};
   for (const a of appointments) {
@@ -60,18 +70,25 @@ export function generateSlots(availability, appointments, { timeOfDay, notBefore
       // Slot is blocked if [t, slotEnd] and any existing [a.startMin, a.endMin]
       // overlap when each is padded by BUFFER.
       const blocked = existing.some(a => t < a.endMin + BUFFER && slotEnd > a.startMin - BUFFER);
+      if (blocked) continue;
 
-      if (!blocked) {
-        const key = minutesToTime(t);
-        if (!slotMap[key]) {
-          slotMap[key] = { startTime: key, endTime: minutesToTime(slotEnd), availableTherapists: [] };
-        }
-        slotMap[key].availableTherapists.push({
-          id: tid,
-          firstName: avail.first_name,
-          lastName: avail.last_name,
-        });
+      // Bed-level constraint: skip if all active beds are already occupied at this time.
+      if (activeBedCount > 0) {
+        const bedsOccupied = allApptRanges.filter(
+          a => t < a.endMin + BUFFER && slotEnd > a.startMin - BUFFER
+        ).length;
+        if (bedsOccupied >= activeBedCount) continue;
       }
+
+      const key = minutesToTime(t);
+      if (!slotMap[key]) {
+        slotMap[key] = { startTime: key, endTime: minutesToTime(slotEnd), availableTherapists: [] };
+      }
+      slotMap[key].availableTherapists.push({
+        id: tid,
+        firstName: avail.first_name,
+        lastName: avail.last_name,
+      });
     }
   }
 

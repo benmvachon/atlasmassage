@@ -541,6 +541,7 @@ export default function TherapistBookingsPage() {
                       <th>Client</th>
                       <th>Service</th>
                       <th>Duration</th>
+                      <th>Table</th>
                       <th>Consent</th>
                       <th>Status</th>
                       <th></th>
@@ -558,6 +559,7 @@ export default function TherapistBookingsPage() {
                         </td>
                         <td>{appt.service_name}</td>
                         <td>{appt.duration_minutes} min</td>
+                        <td>{appt.bed_name || '—'}</td>
                         <td>
                           {appt.consent_signed_at
                             ? <span className="owner-badge owner-badge--active">On file</span>

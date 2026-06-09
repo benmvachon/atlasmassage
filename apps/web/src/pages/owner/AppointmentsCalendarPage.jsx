@@ -71,6 +71,8 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
           {appt.guest_phone && !appt.client_phone && <><dt>Phone</dt><dd>{appt.guest_phone}</dd></>}
           <dt>Therapist</dt>
           <dd>{appt.therapist_first_name} {appt.therapist_last_name}</dd>
+          <dt>Table</dt>
+          <dd>{appt.bed_name || '—'}</dd>
           <dt>Time</dt>
           <dd>{formatTime(appt.scheduled_at)} &mdash; {appt.duration_minutes} min</dd>
           <dt>Price</dt>

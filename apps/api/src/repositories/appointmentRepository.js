@@ -68,12 +68,14 @@ export class AppointmentRepository {
          COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) AS client_name,
          COALESCE(cl.email, a.guest_email) AS client_email,
          cl.phone AS client_phone,
-         cs.signed_at AS consent_signed_at
+         cs.signed_at AS consent_signed_at,
+         mb.name AS bed_name
        FROM appointments a
        JOIN services s    ON s.id = a.service_id
        JOIN users th      ON th.id = a.therapist_id
        LEFT JOIN users cl ON cl.id = a.client_id
        LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
+       LEFT JOIN massage_beds mb ON mb.id = a.bed_id
        WHERE a.scheduled_at::date >= $1::date
          AND a.scheduled_at::date <= $2::date
          ${therapistClause}
@@ -137,13 +139,15 @@ export class AppointmentRepository {
          tr.status AS transfer_status,
          tr.reason AS transfer_reason,
          cs.signed_at AS consent_signed_at,
-         EXISTS (SELECT 1 FROM soap_notes sn WHERE sn.appointment_id = a.id) AS has_soap_notes
+         EXISTS (SELECT 1 FROM soap_notes sn WHERE sn.appointment_id = a.id) AS has_soap_notes,
+         mb.name AS bed_name
        FROM appointments a
        JOIN services s ON s.id = a.service_id
        LEFT JOIN users cl ON cl.id = a.client_id
        LEFT JOIN appointment_transfer_requests tr
          ON tr.appointment_id = a.id AND tr.status = 'pending'
        LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
+       LEFT JOIN massage_beds mb ON mb.id = a.bed_id
        WHERE ${conditions.join(' AND ')}
        ORDER BY a.scheduled_at DESC`,
       params
@@ -269,11 +273,11 @@ export class AppointmentRepository {
     };
   }
 
-  async reschedule(id, { scheduledAt, therapistId }) {
-    const params = [id, scheduledAt, therapistId];
+  async reschedule(id, { scheduledAt, therapistId, bedId }) {
+    const params = [id, scheduledAt, therapistId, bedId ?? null];
     const { rows } = await this.pool.query(
       `UPDATE appointments
-       SET scheduled_at = $2, therapist_id = $3, reminded_at = NULL, updated_at = NOW()
+       SET scheduled_at = $2, therapist_id = $3, bed_id = $4, reminded_at = NULL, updated_at = NOW()
        WHERE id = $1
        RETURNING *`,
       params
@@ -282,20 +286,20 @@ export class AppointmentRepository {
   }
 
   async create({
-    clientId, therapistId, serviceId, scheduledAt, durationMinutes,
+    clientId, therapistId, serviceId, bedId, scheduledAt, durationMinutes,
     notes, guestName, guestEmail, guestPhone,
     guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
     waiverSignature, consentSignatureId, healthRecordId,
   }) {
     const { rows } = await this.pool.query(
       `INSERT INTO appointments
-         (client_id, therapist_id, service_id, scheduled_at, duration_minutes,
+         (client_id, therapist_id, service_id, bed_id, scheduled_at, duration_minutes,
           notes, guest_name, guest_email, guest_phone,
           guest_address_line1, guest_address_line2, guest_city, guest_state, guest_zip,
           waiver_signature, waiver_signed_at, consent_signature_id, health_record_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING *`,
-      [clientId ?? null, therapistId, serviceId, scheduledAt, durationMinutes,
+      [clientId ?? null, therapistId, serviceId, bedId ?? null, scheduledAt, durationMinutes,
        notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
        guestAddressLine1 ?? null, guestAddressLine2 ?? null, guestCity ?? null, guestState ?? null, guestZip ?? null,
        waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null, healthRecordId ?? null]

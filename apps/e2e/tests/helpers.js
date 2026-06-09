@@ -66,6 +66,8 @@ export const DATES = {
   tue2: '2030-09-10',
   // therapist-schedule.spec.js uses Oct 2030 (different month entirely)
   schedMon: '2030-10-07', // Monday in Oct 2030
+  // bed-assignment.spec.js uses Sep 2030 week 4
+  bedMon: '2030-09-23',   // Monday — therapist/owner table visibility + bed capacity
 };
 
 // ── Authentication ────────────────────────────────────────────────────────────
