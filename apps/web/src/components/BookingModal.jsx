@@ -418,359 +418,249 @@ function BookingWizard({
         aria-modal="true"
         aria-labelledby="booking-modal-title"
       >
-        <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
-        <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
-        <p className="booking-modal__slot-summary">
-          {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-        </p>
+        <div className="booking-modal__header">
+          <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
+          <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
+          <p className="booking-modal__slot-summary">
+            {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+          </p>
 
-        {showProgress && (
-          <nav className="booking-wizard-progress" aria-label="Booking progress">
-            {steps.map((s, i) => (
-              <div
-                key={s}
-                className={`booking-wizard-step${i === stepIndex ? ' booking-wizard-step--active' : i < stepIndex ? ' booking-wizard-step--done' : ''}`}
-              >
-                <div className="booking-wizard-step__dot" aria-hidden="true">
-                  {i < stepIndex ? '✓' : i + 1}
+          {showProgress && (
+            <nav className="booking-wizard-progress" aria-label="Booking progress">
+              {steps.map((s, i) => (
+                <div
+                  key={s}
+                  className={`booking-wizard-step${i === stepIndex ? ' booking-wizard-step--active' : i < stepIndex ? ' booking-wizard-step--done' : ''}`}
+                >
+                  <div className="booking-wizard-step__dot" aria-hidden="true">
+                    {i < stepIndex ? '✓' : i + 1}
+                  </div>
+                  <span className="booking-wizard-step__label">{STEP_LABELS[s]}</span>
                 </div>
-                <span className="booking-wizard-step__label">{STEP_LABELS[s]}</span>
-              </div>
-            ))}
-          </nav>
-        )}
+              ))}
+            </nav>
+          )}
+        </div>
 
         {/* ── Step: Contact ──────────────────────────────────────────────────── */}
         {currentStep === 'contact' && (
-          <form onSubmit={handleContactNext} noValidate>
-            <p className="booking-step-desc">
-              We&apos;ll send your booking confirmation to this email.
-            </p>
+          <form className="booking-modal__step" onSubmit={handleContactNext} noValidate>
+            <div className="booking-modal__body">
+              <p className="booking-step-desc">
+                We&apos;ll send your booking confirmation to this email.
+              </p>
 
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-name">Full name</label>
-              <input
-                id="bm-name"
-                className="booking-field__input"
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                disabled={submitting}
-                autoComplete="name"
-                required
-              />
-            </div>
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-email">Email</label>
-              <input
-                id="bm-email"
-                className="booking-field__input"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                disabled={submitting}
-                autoComplete="email"
-                required
-              />
-            </div>
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-phone">
-                Phone <span className="booking-field__optional">(optional)</span>
-              </label>
-              <input
-                id="bm-phone"
-                className="booking-field__input"
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                disabled={submitting}
-                autoComplete="tel"
-              />
-            </div>
-
-            <div className="booking-divider">Mailing Address</div>
-
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-addr1">Street address</label>
-              <input
-                id="bm-addr1"
-                className="booking-field__input"
-                type="text"
-                value={addressLine1}
-                onChange={e => setAddressLine1(e.target.value)}
-                disabled={submitting}
-                autoComplete="address-line1"
-                required
-              />
-            </div>
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-addr2">
-                Apt, suite, etc. <span className="booking-field__optional">(optional)</span>
-              </label>
-              <input
-                id="bm-addr2"
-                className="booking-field__input"
-                type="text"
-                value={addressLine2}
-                onChange={e => setAddressLine2(e.target.value)}
-                disabled={submitting}
-                autoComplete="address-line2"
-              />
-            </div>
-            <div className="booking-field-row">
-              <div className="booking-field booking-field--grow">
-                <label className="booking-field__label" htmlFor="bm-city">City</label>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-name">Full name</label>
                 <input
-                  id="bm-city"
+                  id="bm-name"
                   className="booking-field__input"
                   type="text"
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
                   disabled={submitting}
-                  autoComplete="address-level2"
+                  autoComplete="name"
                   required
                 />
               </div>
-              <div className="booking-field booking-field--state">
-                <label className="booking-field__label" htmlFor="bm-state">State</label>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-email">Email</label>
                 <input
-                  id="bm-state"
+                  id="bm-email"
                   className="booking-field__input"
-                  type="text"
-                  value={addressState}
-                  onChange={e => setAddressState(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   disabled={submitting}
-                  autoComplete="address-level1"
-                  maxLength={2}
-                  placeholder="CA"
+                  autoComplete="email"
                   required
                 />
               </div>
-              <div className="booking-field booking-field--zip">
-                <label className="booking-field__label" htmlFor="bm-zip">ZIP code</label>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-phone">
+                  Phone <span className="booking-field__optional">(optional)</span>
+                </label>
                 <input
-                  id="bm-zip"
+                  id="bm-phone"
+                  className="booking-field__input"
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="tel"
+                />
+              </div>
+
+              <div className="booking-divider">Mailing Address</div>
+
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-addr1">Street address</label>
+                <input
+                  id="bm-addr1"
                   className="booking-field__input"
                   type="text"
-                  value={zip}
-                  onChange={e => setZip(e.target.value)}
+                  value={addressLine1}
+                  onChange={e => setAddressLine1(e.target.value)}
                   disabled={submitting}
-                  autoComplete="postal-code"
-                  inputMode="numeric"
-                  maxLength={10}
+                  autoComplete="address-line1"
                   required
                 />
+              </div>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-addr2">
+                  Apt, suite, etc. <span className="booking-field__optional">(optional)</span>
+                </label>
+                <input
+                  id="bm-addr2"
+                  className="booking-field__input"
+                  type="text"
+                  value={addressLine2}
+                  onChange={e => setAddressLine2(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="address-line2"
+                />
+              </div>
+              <div className="booking-field-row">
+                <div className="booking-field booking-field--grow">
+                  <label className="booking-field__label" htmlFor="bm-city">City</label>
+                  <input
+                    id="bm-city"
+                    className="booking-field__input"
+                    type="text"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="address-level2"
+                    required
+                  />
+                </div>
+                <div className="booking-field booking-field--state">
+                  <label className="booking-field__label" htmlFor="bm-state">State</label>
+                  <input
+                    id="bm-state"
+                    className="booking-field__input"
+                    type="text"
+                    value={addressState}
+                    onChange={e => setAddressState(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="address-level1"
+                    maxLength={2}
+                    placeholder="CA"
+                    required
+                  />
+                </div>
+                <div className="booking-field booking-field--zip">
+                  <label className="booking-field__label" htmlFor="bm-zip">ZIP code</label>
+                  <input
+                    id="bm-zip"
+                    className="booking-field__input"
+                    type="text"
+                    value={zip}
+                    onChange={e => setZip(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="postal-code"
+                    inputMode="numeric"
+                    maxLength={10}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            {error && <p className="avail-modal__error" role="alert">{error}</p>}
-
-            <div className="avail-modal__actions">
-              <button
-                className="btn btn--primary"
-                type="submit"
-                disabled={submitting || !isContactReady}
-              >
-                Continue →
-              </button>
-              <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
-                Cancel
-              </button>
+            <div className="booking-modal__footer">
+              {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <div className="avail-modal__actions">
+                <button
+                  className="btn btn--primary"
+                  type="submit"
+                  disabled={submitting || !isContactReady}
+                >
+                  Continue →
+                </button>
+                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </form>
         )}
 
         {/* ── Step: Health ───────────────────────────────────────────────────── */}
         {currentStep === 'health' && (
-          <form onSubmit={handleHealthNext} noValidate>
-            <p className="booking-step-desc">
-              This information helps your therapist provide the safest and most effective session.
-              All fields are optional.
-            </p>
+          <form className="booking-modal__step" onSubmit={handleHealthNext} noValidate>
+            <div className="booking-modal__body">
+              <p className="booking-step-desc">
+                This information helps your therapist provide the safest and most effective session.
+                All fields are optional.
+              </p>
 
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-medications">
-                Current medications <span className="booking-field__optional">(optional)</span>
-              </label>
-              <textarea
-                id="bm-medications"
-                className="booking-field__input booking-field__input--textarea"
-                value={medications}
-                onChange={e => setMedications(e.target.value)}
-                disabled={submitting}
-                rows={2}
-                placeholder="List any medications you are currently taking"
-              />
-            </div>
-
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-surgeries">
-                Recent surgeries <span className="booking-field__optional">(optional)</span>
-              </label>
-              <textarea
-                id="bm-surgeries"
-                className="booking-field__input booking-field__input--textarea"
-                value={surgeries}
-                onChange={e => setSurgeries(e.target.value)}
-                disabled={submitting}
-                rows={2}
-                placeholder="Any surgeries in the past 12 months"
-              />
-            </div>
-
-            <div className="booking-field">
-              <span className="booking-field__label">Pregnancy status</span>
-              <div className="booking-pregnancy-options">
-                {PREGNANCY_OPTIONS.map(opt => (
-                  <label key={opt.value} className="booking-radio-option">
-                    <input
-                      type="radio"
-                      name="pregnancyStatus"
-                      value={opt.value}
-                      checked={pregnancyStatus === opt.value}
-                      onChange={() => setPregnancyStatus(opt.value)}
-                      disabled={submitting}
-                    />
-                    <span>{opt.label}</span>
-                  </label>
-                ))}
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-medications">
+                  Current medications <span className="booking-field__optional">(optional)</span>
+                </label>
+                <textarea
+                  id="bm-medications"
+                  className="booking-field__input booking-field__input--textarea"
+                  value={medications}
+                  onChange={e => setMedications(e.target.value)}
+                  disabled={submitting}
+                  rows={2}
+                  placeholder="List any medications you are currently taking"
+                />
               </div>
-            </div>
 
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-injuries">
-                Injuries or physical limitations <span className="booking-field__optional">(optional)</span>
-              </label>
-              <textarea
-                id="bm-injuries"
-                className="booking-field__input booking-field__input--textarea"
-                value={injuries}
-                onChange={e => setInjuries(e.target.value)}
-                disabled={submitting}
-                rows={2}
-                placeholder="Any injuries, chronic pain, or physical limitations"
-              />
-            </div>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-surgeries">
+                  Recent surgeries <span className="booking-field__optional">(optional)</span>
+                </label>
+                <textarea
+                  id="bm-surgeries"
+                  className="booking-field__input booking-field__input--textarea"
+                  value={surgeries}
+                  onChange={e => setSurgeries(e.target.value)}
+                  disabled={submitting}
+                  rows={2}
+                  placeholder="Any surgeries in the past 12 months"
+                />
+              </div>
 
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-notes">
-                Reason for your visit <span className="booking-field__optional">(optional)</span>
-              </label>
-              <textarea
-                id="bm-notes"
-                className="booking-field__input booking-field__input--textarea"
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                disabled={submitting}
-                rows={3}
-                placeholder="What brings you in today? Areas of focus, specific concerns, or goals for this session."
-              />
-            </div>
-
-            {error && <p className="avail-modal__error" role="alert">{error}</p>}
-
-            <div className="avail-modal__actions">
-              <button className="btn btn--primary" type="submit" disabled={submitting}>
-                Continue →
-              </button>
-              <button className="btn btn--ghost" type="button" onClick={stepIndex > 0 ? goBack : onClose} disabled={submitting}>
-                {stepIndex > 0 ? 'Back' : 'Cancel'}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* ── Step: Consent ──────────────────────────────────────────────────── */}
-        {currentStep === 'consent' && (
-          <div>
-            <div className="waiver-scroll" role="region" aria-label="Consent form text">
-              <ol className="waiver-list">
-                {WAIVER_ITEMS.map((item, i) => (
-                  <li key={i} className="waiver-list__item">{item}</li>
-                ))}
-              </ol>
-              <p className="waiver-closing">{WAIVER_CLOSING}</p>
-            </div>
-
-            <SignatureCanvas onChange={setSignature} />
-
-            <label className="waiver-agree">
-              <input
-                type="checkbox"
-                className="waiver-agree__checkbox"
-                checked={agreed}
-                onChange={e => setAgreed(e.target.checked)}
-                disabled={submitting}
-              />
-              <span className="waiver-agree__text">
-                I have read and agree to the above consent form
-              </span>
-            </label>
-
-            {error && <p className="avail-modal__error" role="alert">{error}</p>}
-
-            <div className="avail-modal__actions">
-              <button
-                className="btn btn--primary"
-                type="button"
-                onClick={handleConsentNext}
-                disabled={!signature || !agreed || submitting}
-              >
-                Continue →
-              </button>
-              <button className="btn btn--ghost" type="button" onClick={goBack} disabled={submitting}>
-                Back
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── Step: Payment ──────────────────────────────────────────────────── */}
-        {currentStep === 'payment' && (
-          <form onSubmit={handlePaymentSubmit} noValidate>
-
-            {isReturnClient && (
-              <div className="booking-return-client">
-                <p className="booking-return-client__greeting">
-                  Welcome back, {user.first_name}!
-                </p>
-                <div className="booking-return-client__badges">
-                  {consentStatus?.signedAt && (
-                    <span className="booking-return-client__badge">
-                      Consent on file since {new Date(consentStatus.signedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                    </span>
-                  )}
-                  <span className="booking-return-client__badge">Medical history on file</span>
+              <div className="booking-field">
+                <span className="booking-field__label">Pregnancy status</span>
+                <div className="booking-pregnancy-options">
+                  {PREGNANCY_OPTIONS.map(opt => (
+                    <label key={opt.value} className="booking-radio-option">
+                      <input
+                        type="radio"
+                        name="pregnancyStatus"
+                        value={opt.value}
+                        checked={pregnancyStatus === opt.value}
+                        onChange={() => setPregnancyStatus(opt.value)}
+                        disabled={submitting}
+                      />
+                      <span>{opt.label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
-            )}
 
-            <div className="booking-field">
-              <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>
-              {lockedTherapist ? (
-                <p className="booking-field__locked">
-                  {lockedTherapist.firstName} {lockedTherapist.lastName}
-                </p>
-              ) : (
-                <select
-                  id="bm-therapist"
-                  className="booking-field__input"
-                  value={therapistId}
-                  onChange={e => setTherapistId(e.target.value)}
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-injuries">
+                  Injuries or physical limitations <span className="booking-field__optional">(optional)</span>
+                </label>
+                <textarea
+                  id="bm-injuries"
+                  className="booking-field__input booking-field__input--textarea"
+                  value={injuries}
+                  onChange={e => setInjuries(e.target.value)}
                   disabled={submitting}
-                >
-                  <option value="">Any therapist</option>
-                  {therapistOptions.map(t => (
-                    <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>
-                  ))}
-                </select>
-              )}
-            </div>
+                  rows={2}
+                  placeholder="Any injuries, chronic pain, or physical limitations"
+                />
+              </div>
 
-            {isReturnClient && (
               <div className="booking-field">
                 <label className="booking-field__label" htmlFor="bm-notes">
-                  Notes <span className="booking-field__optional">(optional)</span>
+                  Reason for your visit <span className="booking-field__optional">(optional)</span>
                 </label>
                 <textarea
                   id="bm-notes"
@@ -779,104 +669,227 @@ function BookingWizard({
                   onChange={e => setNotes(e.target.value)}
                   disabled={submitting}
                   rows={3}
-                  placeholder="Any updates to your health condition, new concerns, or focus areas for this visit."
+                  placeholder="What brings you in today? Areas of focus, specific concerns, or goals for this session."
                 />
               </div>
-            )}
+            </div>
 
-            {membershipCoversBooking ? (
-              <div className="booking-membership-banner">
-                <span className="booking-membership-banner__icon">★</span>
-                <div>
-                  <strong>Covered by {membershipStatus.planName}</strong>
-                  <p className="booking-membership-banner__credits">
-                    {membershipStatus.creditsRemaining} of {membershipStatus.creditsPerMonth} monthly session{membershipStatus.creditsPerMonth !== 1 ? 's' : ''} remaining — no payment required
-                  </p>
-                </div>
+            <div className="booking-modal__footer">
+              {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <div className="avail-modal__actions">
+                <button className="btn btn--primary" type="submit" disabled={submitting}>
+                  Continue →
+                </button>
+                <button className="btn btn--ghost" type="button" onClick={stepIndex > 0 ? goBack : onClose} disabled={submitting}>
+                  {stepIndex > 0 ? 'Back' : 'Cancel'}
+                </button>
               </div>
-            ) : needsPayment ? (
-              <>
-                <div className="booking-divider">
-                  Payment
-                  {selectedService && (
-                    <span className="booking-divider__amount">
-                      ${(selectedService.priceCents / 100).toFixed(0)}
-                    </span>
-                  )}
-                </div>
+            </div>
+          </form>
+        )}
 
-                {loadingMethods ? (
-                  <p className="booking-payment-loading">Loading saved cards…</p>
-                ) : (
-                  <div className="booking-payment-options">
-                    {paymentMethods.map(pm => (
-                      <label key={pm.id} className={`booking-pm-option${selectedMethodId === pm.id ? ' booking-pm-option--selected' : ''}`}>
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value={pm.id}
-                          checked={selectedMethodId === pm.id}
-                          onChange={() => setSelectedMethodId(pm.id)}
-                          disabled={submitting}
-                        />
-                        <span className="booking-pm-option__brand">{brandLabel(pm.brand)}</span>
-                        <span className="booking-pm-option__number">•••• {pm.last4}</span>
-                        <span className="booking-pm-option__expiry">
-                          {String(pm.expiry_month).padStart(2, '0')}/{pm.expiry_year}
-                        </span>
-                        {pm.is_default && (
-                          <span className="booking-pm-option__badge">Default</span>
-                        )}
-                      </label>
-                    ))}
-
-                    <label className={`booking-pm-option${isNewCard ? ' booking-pm-option--selected' : ''}`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="new"
-                        checked={isNewCard}
-                        onChange={() => setSelectedMethodId('new')}
-                        disabled={submitting}
-                      />
-                      <span className="booking-pm-option__brand">Enter a new card</span>
-                    </label>
-
-                    {isNewCard && (
-                      <div className="booking-card-element">
-                        <CardElement options={CARD_STYLE} />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="booking-payment-note">
-                {user
-                  ? 'Payment processing is not configured — payment will be collected at time of service.'
-                  : 'Payment will be collected at time of service.'}
+        {/* ── Step: Consent ──────────────────────────────────────────────────── */}
+        {currentStep === 'consent' && (
+          <div className="booking-modal__step">
+            <div className="booking-modal__body">
+              <div className="waiver-scroll" role="region" aria-label="Consent form text">
+                <ol className="waiver-list">
+                  {WAIVER_ITEMS.map((item, i) => (
+                    <li key={i} className="waiver-list__item">{item}</li>
+                  ))}
+                </ol>
+                <p className="waiver-closing">{WAIVER_CLOSING}</p>
               </div>
-            )}
 
-            {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <SignatureCanvas onChange={setSignature} />
 
-            <div className="avail-modal__actions">
-              <button
-                className="btn btn--primary"
-                type="submit"
-                disabled={submitting || (loadingMethods && needsPayment)}
-              >
-                {submitting ? 'Booking…' : 'Book Appointment'}
-              </button>
-              {stepIndex > 0 ? (
+              <label className="waiver-agree">
+                <input
+                  type="checkbox"
+                  className="waiver-agree__checkbox"
+                  checked={agreed}
+                  onChange={e => setAgreed(e.target.checked)}
+                  disabled={submitting}
+                />
+                <span className="waiver-agree__text">
+                  I have read and agree to the above consent form
+                </span>
+              </label>
+            </div>
+
+            <div className="booking-modal__footer">
+              {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <div className="avail-modal__actions">
+                <button
+                  className="btn btn--primary"
+                  type="button"
+                  onClick={handleConsentNext}
+                  disabled={!signature || !agreed || submitting}
+                >
+                  Continue →
+                </button>
                 <button className="btn btn--ghost" type="button" onClick={goBack} disabled={submitting}>
                   Back
                 </button>
-              ) : (
-                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
-                  Cancel
-                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step: Payment ──────────────────────────────────────────────────── */}
+        {currentStep === 'payment' && (
+          <form className="booking-modal__step" onSubmit={handlePaymentSubmit} noValidate>
+            <div className="booking-modal__body">
+              {isReturnClient && (
+                <div className="booking-return-client">
+                  <p className="booking-return-client__greeting">
+                    Welcome back, {user.first_name}!
+                  </p>
+                  <div className="booking-return-client__badges">
+                    {consentStatus?.signedAt && (
+                      <span className="booking-return-client__badge">
+                        Consent on file since {new Date(consentStatus.signedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    )}
+                    <span className="booking-return-client__badge">Medical history on file</span>
+                  </div>
+                </div>
               )}
+
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>
+                {lockedTherapist ? (
+                  <p className="booking-field__locked">
+                    {lockedTherapist.firstName} {lockedTherapist.lastName}
+                  </p>
+                ) : (
+                  <select
+                    id="bm-therapist"
+                    className="booking-field__input"
+                    value={therapistId}
+                    onChange={e => setTherapistId(e.target.value)}
+                    disabled={submitting}
+                  >
+                    <option value="">Any therapist</option>
+                    {therapistOptions.map(t => (
+                      <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {isReturnClient && (
+                <div className="booking-field">
+                  <label className="booking-field__label" htmlFor="bm-notes">
+                    Notes <span className="booking-field__optional">(optional)</span>
+                  </label>
+                  <textarea
+                    id="bm-notes"
+                    className="booking-field__input booking-field__input--textarea"
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    disabled={submitting}
+                    rows={3}
+                    placeholder="Any updates to your health condition, new concerns, or focus areas for this visit."
+                  />
+                </div>
+              )}
+
+              {membershipCoversBooking ? (
+                <div className="booking-membership-banner">
+                  <span className="booking-membership-banner__icon">★</span>
+                  <div>
+                    <strong>Covered by {membershipStatus.planName}</strong>
+                    <p className="booking-membership-banner__credits">
+                      {membershipStatus.creditsRemaining} of {membershipStatus.creditsPerMonth} monthly session{membershipStatus.creditsPerMonth !== 1 ? 's' : ''} remaining — no payment required
+                    </p>
+                  </div>
+                </div>
+              ) : needsPayment ? (
+                <>
+                  <div className="booking-divider">
+                    Payment
+                    {selectedService && (
+                      <span className="booking-divider__amount">
+                        ${(selectedService.priceCents / 100).toFixed(0)}
+                      </span>
+                    )}
+                  </div>
+
+                  {loadingMethods ? (
+                    <p className="booking-payment-loading">Loading saved cards…</p>
+                  ) : (
+                    <div className="booking-payment-options">
+                      {paymentMethods.map(pm => (
+                        <label key={pm.id} className={`booking-pm-option${selectedMethodId === pm.id ? ' booking-pm-option--selected' : ''}`}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={pm.id}
+                            checked={selectedMethodId === pm.id}
+                            onChange={() => setSelectedMethodId(pm.id)}
+                            disabled={submitting}
+                          />
+                          <span className="booking-pm-option__brand">{brandLabel(pm.brand)}</span>
+                          <span className="booking-pm-option__number">•••• {pm.last4}</span>
+                          <span className="booking-pm-option__expiry">
+                            {String(pm.expiry_month).padStart(2, '0')}/{pm.expiry_year}
+                          </span>
+                          {pm.is_default && (
+                            <span className="booking-pm-option__badge">Default</span>
+                          )}
+                        </label>
+                      ))}
+
+                      <label className={`booking-pm-option${isNewCard ? ' booking-pm-option--selected' : ''}`}>
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="new"
+                          checked={isNewCard}
+                          onChange={() => setSelectedMethodId('new')}
+                          disabled={submitting}
+                        />
+                        <span className="booking-pm-option__brand">Enter a new card</span>
+                      </label>
+
+                      {isNewCard && (
+                        <div className="booking-card-element">
+                          <CardElement options={CARD_STYLE} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="booking-payment-note">
+                  {user
+                    ? 'Payment processing is not configured — payment will be collected at time of service.'
+                    : 'Payment will be collected at time of service.'}
+                </div>
+              )}
+            </div>
+
+            <div className="booking-modal__footer">
+              {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <div className="avail-modal__actions">
+                <button
+                  className="btn btn--primary"
+                  type="submit"
+                  disabled={submitting || (loadingMethods && needsPayment)}
+                >
+                  {submitting ? 'Booking…' : 'Book Appointment'}
+                </button>
+                {stepIndex > 0 ? (
+                  <button className="btn btn--ghost" type="button" onClick={goBack} disabled={submitting}>
+                    Back
+                  </button>
+                ) : (
+                  <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
+                    Cancel
+                  </button>
+                )}
+              </div>
             </div>
           </form>
         )}

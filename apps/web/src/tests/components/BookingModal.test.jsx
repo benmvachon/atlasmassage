@@ -145,6 +145,65 @@ async function advanceToPayment() {
   });
 }
 
+// ── Sticky layout structure ───────────────────────────────────────────────────
+
+describe('BookingModal — sticky layout structure', () => {
+  it('renders the title inside booking-modal__header on the contact step', () => {
+    renderModal();
+    const header = document.querySelector('.booking-modal__header');
+    expect(header).not.toBeNull();
+    expect(header).toHaveTextContent(/book appointment/i);
+  });
+
+  it('renders the slot summary inside booking-modal__header', () => {
+    renderModal();
+    const header = document.querySelector('.booking-modal__header');
+    expect(header).toHaveTextContent(/10:00/);
+  });
+
+  it('renders a scrollable body section on the contact step', () => {
+    renderModal();
+    expect(document.querySelector('.booking-modal__body')).not.toBeNull();
+  });
+
+  it('renders the action buttons inside booking-modal__footer', () => {
+    renderModal();
+    const footer = document.querySelector('.booking-modal__footer');
+    expect(footer).not.toBeNull();
+    expect(footer.querySelector('button')).not.toBeNull();
+  });
+
+  it('keeps the header visible when navigating to the health step', async () => {
+    renderModal();
+    await advanceToHealth();
+    const header = document.querySelector('.booking-modal__header');
+    expect(header).not.toBeNull();
+    expect(header).toHaveTextContent(/book appointment/i);
+  });
+
+  it('keeps the footer visible on the consent step', async () => {
+    renderModal();
+    await advanceToConsent();
+    const footer = document.querySelector('.booking-modal__footer');
+    expect(footer).not.toBeNull();
+    expect(footer.querySelector('button')).not.toBeNull();
+  });
+
+  it('keeps the footer visible on the payment step', async () => {
+    renderModal();
+    await advanceToPayment();
+    const footer = document.querySelector('.booking-modal__footer');
+    expect(footer).not.toBeNull();
+    expect(footer).toHaveTextContent(/book appointment/i);
+  });
+
+  it('renders the wizard progress nav inside booking-modal__header', () => {
+    renderModal();
+    const header = document.querySelector('.booking-modal__header');
+    expect(header.querySelector('.booking-wizard-progress')).not.toBeNull();
+  });
+});
+
 // ── Contact step — disabled state ─────────────────────────────────────────────
 
 describe('BookingModal — contact step disabled state', () => {

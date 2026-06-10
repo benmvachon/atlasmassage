@@ -167,22 +167,49 @@
 // ── Booking modal ─────────────────────────────────────────────────────────────
 
 .booking-modal {
+  // Override .avail-modal's uniform padding — sections carry their own padding
+  padding: 0;
   max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+
+  &--wizard { max-width: 540px; }
+
+  &__header {
+    flex-shrink: 0;
+    padding: $space-8 $space-8 $space-4;
+    position: relative;
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 $space-8;
+  }
+
+  &__footer {
+    flex-shrink: 0;
+    padding: $space-4 $space-8 $space-6;
+    border-top: 1px solid $color-bg-alt;
+  }
 
   &__loading {
     font-family: $font-family-ui;
     font-size: $font-size-sm;
     color: $color-text-muted;
     text-align: center;
-    padding: $space-12 0;
-  }
-
-  &--wizard {
-    max-width: 540px;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-    overflow-y: auto;
+    padding: $space-12 $space-8;
   }
 
   &__slot-summary {
@@ -225,6 +252,25 @@
     color: $color-text-muted;
     margin-bottom: $space-8;
     line-height: 1.6;
+  }
+
+  @media (max-width: #{$bp-sm - 1px}) {
+    height: 75dvh;
+    max-height: 75dvh;
+    // Override avail-modal mobile padding — sections carry their own
+    padding: 0;
+
+    .booking-modal__header {
+      padding: $space-5 $space-4 $space-3;
+    }
+
+    .booking-modal__body {
+      padding: 0 $space-4;
+    }
+
+    .booking-modal__footer {
+      padding: $space-3 $space-4 $space-5;
+    }
   }
 }
 
