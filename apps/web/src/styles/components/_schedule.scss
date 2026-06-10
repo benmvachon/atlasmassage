@@ -305,7 +305,7 @@
 
   @media (max-width: #{$bp-sm - 1px}) {
     padding: $space-5 $space-4 $space-8;
-    border-radius: $border-radius-lg $border-radius-lg 0 0;
+    border-radius: 0;
     max-width: 100%;
     max-height: 92dvh;
     overflow-y: auto;
