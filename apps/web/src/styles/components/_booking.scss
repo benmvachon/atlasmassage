@@ -255,8 +255,7 @@
   }
 
   @media (max-width: #{$bp-sm - 1px}) {
-    height: 75dvh;
-    max-height: 75dvh;
+    height: 100dvh;
     // Override avail-modal mobile padding — sections carry their own
     padding: 0;
 
