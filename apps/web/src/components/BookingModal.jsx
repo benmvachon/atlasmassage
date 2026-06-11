@@ -337,8 +337,11 @@ function BookingWizard({
             payment_method: savedMethod.stripe_payment_method_id,
           });
         }
-        if (confirmResult?.error) throw new Error(confirmResult.error.message);
-        if (user) await bookingService.confirmAppointment(appointment.id);
+        if (confirmResult?.error) {
+          bookingService.cancelAppointment(appointment.id, appointment.cancel_token).catch(() => {});
+          throw new Error(confirmResult.error.message);
+        }
+        await bookingService.confirmAppointment(appointment.id, appointment.cancel_token);
       }
 
       setCurrentStep('success');

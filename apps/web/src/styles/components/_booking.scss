@@ -914,3 +914,57 @@
     transform: scale(1.15);
   }
 }
+
+.guest-manage-card {
+  background: $color-bg-alt;
+  border-radius: $border-radius-md;
+  border-left: 3px solid $color-primary;
+  padding: $space-5 $space-6;
+  margin-bottom: $space-6;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: $space-4;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+
+    & + & {
+      margin-top: $space-3;
+    }
+  }
+
+  &__label {
+    font-weight: 600;
+    color: $color-text-muted;
+    flex-shrink: 0;
+  }
+
+  &__window-notice {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  &__confirm {
+    p {
+      font-family: $font-family-ui;
+      font-size: $font-size-sm;
+      color: $color-text;
+      margin-bottom: $space-4;
+      text-align: center;
+    }
+  }
+
+  &__confirm-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}

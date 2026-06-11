@@ -27,6 +27,20 @@ export class AppointmentRepository {
     return rows[0] ?? null;
   }
 
+  async findGuestAppointment(id, cancelToken) {
+    const { rows } = await this.pool.query(
+      `SELECT a.id, a.status, a.scheduled_at, a.guest_name, a.cancel_token,
+              s.name AS service_name, s.duration_minutes,
+              t.first_name AS therapist_first_name, t.last_name AS therapist_last_name
+       FROM appointments a
+       JOIN services s ON s.id = a.service_id
+       JOIN users t    ON t.id = a.therapist_id
+       WHERE a.id = $1 AND a.cancel_token = $2 AND a.client_id IS NULL`,
+      [id, cancelToken]
+    );
+    return rows[0] ?? null;
+  }
+
   async findServiceById(id) {
     const { rows } = await this.pool.query(
       'SELECT id, name, price_cents, duration_minutes FROM services WHERE id = $1',

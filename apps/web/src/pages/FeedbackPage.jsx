@@ -5,6 +5,7 @@ import { api } from '../services/api.js';
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
@@ -55,8 +56,8 @@ export default function FeedbackPage() {
     }
     api.get(`/appointments/${id}/feedback-info?token=${encodeURIComponent(token)}`)
       .then(r => {
-        setInfo(r.data.data);
-        if (r.data.data.alreadySubmitted) setSubmitted(true);
+        setInfo(r.data);
+        if (r.data.alreadySubmitted) setSubmitted(true);
       })
       .catch(() => setLoadError('This feedback link is invalid or has expired.'))
       .finally(() => setLoading(false));

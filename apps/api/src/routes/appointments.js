@@ -16,8 +16,8 @@ router.put('/:id', authenticate, appointmentController.updateAppointment);
 // Cancel and reschedule: open to guests (cancelToken in body) and authenticated clients/owners
 router.post('/:id/cancel', optionalAuthenticate, appointmentController.cancelAppointment);
 router.post('/:id/reschedule', optionalAuthenticate, rescheduleAppointmentRules, validate, appointmentController.rescheduleAppointment);
-// Clients confirm their own booking after successful payment; staff can also confirm
-router.post('/:id/confirm', authenticate, appointmentController.confirmAppointment);
+// Clients confirm their own booking after successful payment; guests pass cancelToken; staff can also confirm
+router.post('/:id/confirm', optionalAuthenticate, appointmentController.confirmAppointment);
 router.post('/:id/complete', authenticate, authorize('therapist', 'owner'), appointmentController.completeAppointment);
 router.post('/:id/transfer-request', authenticate, authorize('therapist'), appointmentController.requestTransfer);
 
@@ -27,6 +27,9 @@ router.post('/:id/soap-notes', authenticate, authorize('therapist', 'owner'), so
 
 // Client history — full timeline of intake, consent, soap notes, and feedback
 router.get('/:id/client-history', authenticate, authorize('therapist', 'owner'), appointmentController.getClientHistory);
+
+// Guest manage — public endpoint, verified by cancel_token
+router.get('/:id/guest', appointmentController.getGuestAppointment);
 
 // Client feedback — public endpoints, verified by feedback_token
 router.get('/:id/feedback-info', appointmentController.getFeedbackInfo);

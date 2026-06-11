@@ -29,6 +29,7 @@ import RevenueDashboardPage from '../pages/owner/RevenueDashboardPage.jsx';
 import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
 import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
 import FeedbackPage from '../pages/FeedbackPage.jsx';
+import GuestManagePage from '../pages/GuestManagePage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
 
 export default function AppRoutes() {
@@ -42,6 +43,7 @@ export default function AppRoutes() {
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/memberships" element={<MembershipsPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/booking/manage" element={<GuestManagePage />} />
       </Route>
 
       <Route element={<AuthLayout />}>

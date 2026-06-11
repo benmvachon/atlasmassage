@@ -4,9 +4,9 @@ import { adminService } from '../../services/adminService.js';
 
 function formatDateTime(iso) {
   const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
     + ' at '
-    + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'UTC' });
 }
 
 function ApproveModal({ request, therapists, onClose, onApprove, saving, error }) {
@@ -167,7 +167,7 @@ export default function TransferRequestsPage() {
                           {r.reason || <em style={{ color: '#9ca3af' }}>No reason given</em>}
                         </td>
                         <td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: '#6b7280' }}>
-                          {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
                         </td>
                         <td className="owner-table__actions">
                           <button

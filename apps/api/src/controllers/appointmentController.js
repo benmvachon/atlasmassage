@@ -237,10 +237,8 @@ export async function confirmAppointment(req, res, next) {
     const appt = await apptRepo.findById(req.params.id);
     if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
 
-    const isOwner = req.user.roles?.includes('owner');
-    if (!isOwner && appt.client_id !== req.user.sub) {
-      return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
-    }
+    const { isOwner, allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
+    if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
 
     const updated = await apptRepo.updateStatus(req.params.id, 'confirmed');
     res.json({ success: true, data: { appointment: updated } });
@@ -308,7 +306,8 @@ export async function cancelAppointment(req, res, next) {
     const { isOwner, allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
     if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
 
-    if (!isOwner && new Date(appt.scheduled_at) <= new Date(Date.now() + 24 * 60 * 60 * 1000)) {
+    // Pending appointments were never paid — skip the 24-hour window restriction
+    if (!isOwner && appt.status !== 'pending' && new Date(appt.scheduled_at) <= new Date(Date.now() + 24 * 60 * 60 * 1000)) {
       return next(new AppError('Appointments cannot be cancelled within 24 hours of the scheduled time', 400, 'MODIFICATION_WINDOW_CLOSED'));
     }
 
@@ -492,6 +491,26 @@ export async function getClientHistory(req, res, next) {
     const result = await historyRepo.findByAppointment(req.params.id);
     if (!result) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
     res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getGuestAppointment(req, res, next) {
+  try {
+    const { appointment: apptRepo } = repos();
+    const appt = await apptRepo.findGuestAppointment(req.params.id, req.query.token);
+    if (!appt) return next(new AppError('Not found', 404, 'NOT_FOUND'));
+    res.json({ success: true, data: {
+      id: appt.id,
+      status: appt.status,
+      scheduledAt: appt.scheduled_at,
+      guestName: appt.guest_name,
+      serviceName: appt.service_name,
+      durationMinutes: appt.duration_minutes,
+      therapistFirstName: appt.therapist_first_name,
+      therapistLastName: appt.therapist_last_name,
+    }});
   } catch (err) {
     next(err);
   }

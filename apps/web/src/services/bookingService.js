@@ -32,8 +32,13 @@ export const bookingService = {
     return res.data;
   },
 
-  async confirmAppointment(id) {
-    const res = await api.post(`/appointments/${id}/confirm`);
+  async confirmAppointment(id, cancelToken) {
+    const res = await api.post(`/appointments/${id}/confirm`, cancelToken ? { cancelToken } : {});
+    return res.data;
+  },
+
+  async cancelAppointment(id, cancelToken) {
+    const res = await api.post(`/appointments/${id}/cancel`, { cancelToken });
     return res.data;
   },
 };

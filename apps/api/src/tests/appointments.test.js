@@ -106,15 +106,23 @@ beforeEach(() => {
   mockMembershipSvc.getMyStatus.mockResolvedValue({ active: false });
   mockMembershipSvc.consumeCredit.mockResolvedValue(0);
 
+  const GUEST_APPT_DETAIL = {
+    id: APPT_ID, status: 'pending', scheduled_at: FUTURE_AT,
+    guest_name: 'Guest', cancel_token: 'tok-cancel',
+    service_name: 'Deep Tissue', duration_minutes: 60,
+    therapist_first_name: 'Alice', therapist_last_name: 'B',
+  };
+
   Object.assign(mockApptRepo, {
-    create:          jest.fn().mockResolvedValue(APPT),
-    findById:        jest.fn().mockResolvedValue(APPT),
-    findServiceById: jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 0, duration_minutes: 60 }),
-    updateStatus:    jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
-    setMembership:   jest.fn().mockResolvedValue({ ...APPT }),
-    getByDateRange:  jest.fn().mockResolvedValue([]),
-    listForTherapist:jest.fn().mockResolvedValue([]),
-    reschedule:      jest.fn().mockResolvedValue(APPT),
+    create:               jest.fn().mockResolvedValue(APPT),
+    findById:             jest.fn().mockResolvedValue(APPT),
+    findGuestAppointment: jest.fn().mockResolvedValue(GUEST_APPT_DETAIL),
+    findServiceById:      jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 0, duration_minutes: 60 }),
+    updateStatus:         jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
+    setMembership:        jest.fn().mockResolvedValue({ ...APPT }),
+    getByDateRange:       jest.fn().mockResolvedValue([]),
+    listForTherapist:     jest.fn().mockResolvedValue([]),
+    reschedule:           jest.fn().mockResolvedValue(APPT),
   });
   Object.assign(mockAvailRepo, {
     getForDateRange: jest.fn().mockResolvedValue([]),
@@ -613,13 +621,23 @@ describe('POST /api/v1/appointments/:id/cancel', () => {
     expect(res.status).toBe(403);
   });
 
-  it('returns 400 when appointment is within 24 hours', async () => {
-    mockApptRepo.findById.mockResolvedValue({ ...APPT, scheduled_at: SOON_AT });
+  it('returns 400 when confirmed appointment is within 24 hours', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'confirmed', scheduled_at: SOON_AT });
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/cancel`)
       .set('Authorization', bearer(CLIENT_ID));
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('MODIFICATION_WINDOW_CLOSED');
+  });
+
+  it('allows cancellation of pending appointments within 24 hours', async () => {
+    mockApptRepo.findById.mockResolvedValue({ ...APPT, status: 'pending', scheduled_at: SOON_AT });
+    mockApptRepo.updateStatus.mockResolvedValue({ ...APPT, status: 'cancelled' });
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/cancel`)
+      .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(200);
+    expect(mockApptRepo.updateStatus).toHaveBeenCalledWith(APPT_ID, 'cancelled');
   });
 
   it('returns 400 when appointment is already cancelled', async () => {
@@ -669,6 +687,62 @@ describe('POST /api/v1/appointments/:id/confirm', () => {
     const res = await request(app)
       .post(`/api/v1/appointments/${APPT_ID}/confirm`)
       .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(404);
+  });
+
+  it('guest confirms via cancel token', async () => {
+    const guestAppt = { ...APPT, client_id: null, cancel_token: 'tok-cancel' };
+    mockApptRepo.findById.mockResolvedValue(guestAppt);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/confirm`)
+      .send({ cancelToken: 'tok-cancel' });
+    expect(res.status).toBe(200);
+    expect(mockApptRepo.updateStatus).toHaveBeenCalledWith(APPT_ID, 'confirmed');
+  });
+
+  it('returns 403 when guest provides wrong cancel token', async () => {
+    const guestAppt = { ...APPT, client_id: null, cancel_token: 'tok-cancel' };
+    mockApptRepo.findById.mockResolvedValue(guestAppt);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/confirm`)
+      .send({ cancelToken: 'wrong-token' });
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 with no auth and no cancel token', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/confirm`);
+    expect(res.status).toBe(403);
+  });
+});
+
+// ── GET /appointments/:id/guest ───────────────────────────────────────────────
+
+describe('GET /api/v1/appointments/:id/guest', () => {
+  it('returns appointment details for valid id and token', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/guest?token=tok-cancel`);
+    expect(res.status).toBe(200);
+    expect(mockApptRepo.findGuestAppointment).toHaveBeenCalledWith(APPT_ID, 'tok-cancel');
+    expect(res.body.data).toMatchObject({
+      id: APPT_ID,
+      status: 'pending',
+      serviceName: 'Deep Tissue',
+      therapistFirstName: 'Alice',
+    });
+  });
+
+  it('returns 404 when token does not match', async () => {
+    mockApptRepo.findGuestAppointment.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/guest?token=wrong`);
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findGuestAppointment.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/guest`);
     expect(res.status).toBe(404);
   });
 });

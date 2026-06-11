@@ -38,7 +38,7 @@ function toISODate(date) {
 
 function formatTime(iso) {
   const d = new Date(iso);
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'UTC' });
 }
 
 function formatDate(date) {
@@ -82,7 +82,7 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
           <dt>Consent</dt>
           <dd>
             {appt.consent_signed_at
-              ? `On file since ${new Date(appt.consent_signed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+              ? `On file since ${new Date(appt.consent_signed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`
               : '—'
             }
           </dd>
