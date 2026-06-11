@@ -4,9 +4,14 @@ import { dirname, resolve } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Prevent e2e tests from sending real emails regardless of .env config.
-// dotenv does not override already-set env vars, so this wins over EMAIL_HOST in .env.
+// Run the e2e stack on isolated ports (3099/5174) so it never conflicts with
+// the dev server (3001/5173). Setting these before defineConfig means all
+// webServer child processes inherit them; dotenv in the API won't override
+// EMAIL_HOST because it is already present in the inherited environment.
 process.env.EMAIL_HOST = '';
+process.env.PORT = '3099';
+process.env.VITE_PORT = '5174';
+process.env.API_PORT = '3099';
 
 export default defineConfig({
   testDir: './tests',
@@ -17,7 +22,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
     viewport: { width: 1280, height: 900 },
   },
@@ -31,13 +36,13 @@ export default defineConfig({
     {
       command: 'npm run dev:api',
       cwd: resolve(__dirname, '../..'),
-      url: 'http://localhost:3001/health',
+      url: 'http://localhost:3099/health',
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'npm run dev:web',
       cwd: resolve(__dirname, '../..'),
-      url: 'http://localhost:5173',
+      url: 'http://localhost:5174',
       reuseExistingServer: !process.env.CI,
     },
   ],

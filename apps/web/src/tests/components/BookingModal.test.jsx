@@ -6,8 +6,7 @@ import { bookingService } from '../../services/bookingService.js';
 // ── Stripe mocks ──────────────────────────────────────────────────────────────
 
 const mockStripe = {
-  createPaymentMethod: jest.fn(),
-  confirmCardPayment:  jest.fn(),
+  confirmCardSetup: jest.fn(),
 };
 const mockCardElement = { _mock: 'card-element' };
 const mockElements    = { getElement: jest.fn(() => mockCardElement) };
@@ -28,6 +27,7 @@ jest.mock('../../services/bookingService.js', () => ({
   bookingService: {
     createAppointment:  jest.fn(),
     confirmAppointment: jest.fn().mockResolvedValue({}),
+    cancelAppointment:  jest.fn().mockResolvedValue({}),
     getConsentStatus:   jest.fn().mockResolvedValue({ data: { hasSigned: false, signedAt: null } }),
     getHealthStatus:    jest.fn().mockResolvedValue({ data: { hasRecord: false } }),
   },
@@ -95,11 +95,10 @@ beforeEach(() => {
     appointment: APPT,
     clientSecret: 'cs_test_secret',
   });
-  mockStripe.createPaymentMethod.mockResolvedValue({
-    paymentMethod: { id: 'pm_test_123' },
+  mockStripe.confirmCardSetup.mockResolvedValue({
+    setupIntent: { payment_method: 'pm_test_123' },
     error: null,
   });
-  mockStripe.confirmCardPayment.mockResolvedValue({ error: null });
 });
 
 // ── Navigation helpers ────────────────────────────────────────────────────────
@@ -294,7 +293,7 @@ describe('BookingModal — wizard navigation', () => {
 // ── New-card guest booking — integration ──────────────────────────────────────
 
 describe('BookingModal — new-card guest booking', () => {
-  it('tokenizes the card when Book Appointment is clicked', async () => {
+  it('calls confirmCardSetup with the card element when Book Appointment is clicked', async () => {
     renderModal();
     await advanceToPayment();
 
@@ -302,13 +301,13 @@ describe('BookingModal — new-card guest booking', () => {
       fireEvent.click(screen.getByRole('button', { name: /book appointment/i }));
     });
 
-    expect(mockStripe.createPaymentMethod).toHaveBeenCalledWith({
-      type: 'card',
-      card: mockCardElement,
-    });
+    expect(mockStripe.confirmCardSetup).toHaveBeenCalledWith(
+      'cs_test_secret',
+      { payment_method: { card: mockCardElement } }
+    );
   });
 
-  it('confirms payment with the tokenized PM id', async () => {
+  it('confirms the appointment with the PM id from the setup intent', async () => {
     renderModal();
     await advanceToPayment();
 
@@ -316,10 +315,13 @@ describe('BookingModal — new-card guest booking', () => {
       fireEvent.click(screen.getByRole('button', { name: /book appointment/i }));
     });
 
-    expect(mockStripe.confirmCardPayment).toHaveBeenCalledWith(
-      'cs_test_secret',
-      { payment_method: 'pm_test_123' }
-    );
+    await waitFor(() => {
+      expect(bookingService.confirmAppointment).toHaveBeenCalledWith(
+        'appt-1',
+        undefined,
+        'pm_test_123'
+      );
+    });
   });
 
   it('shows the success screen after a completed booking', async () => {
@@ -336,8 +338,8 @@ describe('BookingModal — new-card guest booking', () => {
   });
 
   it('shows a card error and stays on the payment step when tokenization fails', async () => {
-    mockStripe.createPaymentMethod.mockResolvedValue({
-      paymentMethod: null,
+    mockStripe.confirmCardSetup.mockResolvedValue({
+      setupIntent: null,
       error: { message: 'Your card number is incomplete.' },
     });
 
