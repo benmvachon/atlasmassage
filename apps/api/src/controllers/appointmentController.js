@@ -198,26 +198,41 @@ export async function createAppointment(req, res, next) {
       }
     }
 
-    // Create a payment intent when Stripe is configured.
-    // Service price is authoritative — never trust client-provided amounts.
+    // Collect card on file for potential no-show charges. Payment is not
+    // collected now — it is taken in-person after the appointment completes.
     if (config.stripe.secretKey) {
-      const service = await apptRepo.findServiceById(serviceId);
-      if (service?.price_cents > 0) {
-        const paymentSvc = new PaymentService(getPool());
-        const result = clientId
-          ? await paymentSvc.createPaymentIntent(clientId, {
-              amountCents: service.price_cents,
-              currency: 'usd',
-              paymentMethodId: paymentMethodId || undefined,
-              appointmentId: appointment.id,
-            })
-          : await paymentSvc.createGuestPaymentIntent({
-              amountCents: service.price_cents,
-              currency: 'usd',
-              appointmentId: appointment.id,
-            });
-        clientSecret = result.clientSecret;
+      const paymentSvc = new PaymentService(getPool());
+
+      if (clientId && paymentMethodId) {
+        // Returning client chose an existing saved card — no setup intent needed.
+        // Look up the Stripe PM ID and save it on the appointment so we can
+        // charge a no-show fee later without re-prompting for card details.
+        const pm = await paymentSvc.payments.findPaymentMethodById(paymentMethodId);
+        if (pm && pm.client_id === clientId) {
+          await apptRepo.updateStripePaymentMethodId(appointment.id, pm.stripe_payment_method_id);
+          await apptRepo.updateStatus(appointment.id, 'confirmed');
+          appointment = { ...appointment, status: 'confirmed' };
+
+          new NotificationService(getPool()).sendBookingConfirmation(appointment.id).catch(err => {
+            logger.error('notification_error', { appointmentId: appointment.id, message: err.message });
+          });
+
+          return res.status(201).json({ success: true, data: { appointment, clientSecret: null } });
+        }
       }
+
+      // New card or guest — create a SetupIntent to save the card without charging.
+      const result = await paymentSvc.createBookingSetupIntent({
+        appointmentId: appointment.id,
+        userId: clientId ?? undefined,
+        guestEmail: clientId ? undefined : guestEmail,
+        guestName: clientId ? undefined : guestName,
+      });
+      clientSecret = result.clientSecret;
+    } else {
+      // Stripe not configured — confirm the appointment immediately.
+      await apptRepo.updateStatus(appointment.id, 'confirmed');
+      appointment = { ...appointment, status: 'confirmed' };
     }
 
     // Fire booking confirmation — don't let notification failures break the booking response
@@ -240,7 +255,19 @@ export async function confirmAppointment(req, res, next) {
     const { allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
     if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
 
+    // The frontend sends the Stripe PM ID after confirming the SetupIntent so we
+    // can charge a no-show fee later without prompting for card details again.
+    const { stripePaymentMethodId } = req.body;
+    if (stripePaymentMethodId && !appt.stripe_payment_method_id) {
+      await apptRepo.updateStripePaymentMethodId(req.params.id, stripePaymentMethodId);
+    }
+
     const updated = await apptRepo.updateStatus(req.params.id, 'confirmed');
+
+    new NotificationService(getPool()).sendBookingConfirmation(req.params.id).catch(err => {
+      logger.error('notification_error', { appointmentId: req.params.id, message: err.message });
+    });
+
     res.json({ success: true, data: { appointment: updated } });
   } catch (err) {
     next(err);
@@ -415,6 +442,64 @@ export async function requestTransfer(req, res, next) {
 
     const request = await transfer.create(req.params.id, req.user.sub, req.body.reason);
     res.status(201).json({ success: true, data: request });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function recordPayment(req, res, next) {
+  try {
+    const { appointment: apptRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    const isTherapist = appt.therapist_id === req.user.sub;
+    if (!isOwner && !isTherapist) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+
+    const { amountCents, method } = req.body;
+    if (!amountCents || amountCents <= 0) {
+      return next(new AppError('A positive amountCents is required', 400, 'BAD_REQUEST'));
+    }
+    const VALID_METHODS = ['cash', 'card', 'check'];
+    if (method && !VALID_METHODS.includes(method)) {
+      return next(new AppError(`method must be one of: ${VALID_METHODS.join(', ')}`, 400, 'BAD_REQUEST'));
+    }
+
+    const svc = new PaymentService(getPool());
+    const payment = await svc.recordInPersonPayment({
+      appointmentId: appt.id,
+      amountCents,
+      method: method ?? 'cash',
+    });
+    res.status(201).json({ success: true, data: { payment } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function chargeNoShow(req, res, next) {
+  try {
+    const { appointment: apptRepo } = repos();
+    const appt = await apptRepo.findById(req.params.id);
+    if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    const isOwner = req.user.roles?.includes('owner');
+    const isTherapist = appt.therapist_id === req.user.sub;
+    if (!isOwner && !isTherapist) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
+
+    let amountCents = req.body.amountCents;
+    if (!amountCents) {
+      const service = await apptRepo.findServiceById(appt.service_id);
+      amountCents = service?.price_cents ?? 0;
+    }
+    if (!amountCents || amountCents <= 0) {
+      return next(new AppError('A positive amount is required to charge a no-show fee', 400, 'BAD_REQUEST'));
+    }
+
+    const svc = new PaymentService(getPool());
+    const { payment } = await svc.chargeNoShow(appt.id, amountCents);
+    res.json({ success: true, data: { payment } });
   } catch (err) {
     next(err);
   }

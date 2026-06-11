@@ -1,5 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
+
+const IN_PERSON_METHOD_LABELS = { cash: 'Cash', card: 'Card terminal', check: 'Check' };
+const PAYMENT_SOURCE_LABELS   = { stripe: 'Charged to card', in_person: 'Paid in-person', membership_credit: 'Membership credit' };
 
 const STATUS_LABELS = {
   pending:   'Pending',
@@ -394,6 +398,144 @@ function ClientHistoryModal({ appt, onClose }) {
 
 // ── Month options ──────────────────────────────────────────────────────────────
 
+// ── In-person payment modal ────────────────────────────────────────────────────
+
+function InPersonPaymentModal({ appt, onClose, onDone }) {
+  const [amount, setAmount] = useState(((appt.price_cents ?? 0) / 100).toFixed(2));
+  const [method, setMethod] = useState('cash');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const cents = Math.round(parseFloat(amount) * 100);
+    if (!cents || cents <= 0) { setError('Enter a valid amount.'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      await api.post(`/appointments/${appt.id}/record-payment`, { amountCents: cents, method });
+      onDone();
+    } catch (err) {
+      setError(err.message || 'Failed to record payment.');
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="cal-detail-overlay" onClick={onClose}>
+      <div className="cal-detail" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <div className="cal-detail__header">
+          <h3 className="cal-detail__title">Record In-Person Payment</h3>
+          <button className="cal-detail__close" onClick={onClose}>&#x2715;</button>
+        </div>
+        <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.875rem', marginBottom: '1.5rem', color: '#374151' }}>
+          <strong>{appt.client_name}</strong> &mdash; {appt.service_name}
+        </p>
+        <form onSubmit={handleSubmit} noValidate>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <label className="owner-label" style={{ flex: 1 }}>
+              Amount ($)
+              <input
+                className="owner-input"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                disabled={saving}
+              />
+            </label>
+            <label className="owner-label" style={{ flex: 1 }}>
+              Method
+              <select
+                className="owner-input"
+                value={method}
+                onChange={e => setMethod(e.target.value)}
+                disabled={saving}
+              >
+                <option value="cash">Cash</option>
+                <option value="card">Card terminal</option>
+                <option value="check">Check</option>
+              </select>
+            </label>
+          </div>
+          {error && <p className="owner-form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button className="btn btn--primary btn--sm" type="submit" disabled={saving}>
+              {saving ? 'Recording…' : 'Record Payment'}
+            </button>
+            <button className="btn btn--ghost btn--sm" type="button" onClick={onClose} disabled={saving}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── No-show charge modal ───────────────────────────────────────────────────────
+
+function NoShowChargeModal({ appt, onClose, onDone }) {
+  const defaultCents = appt.price_cents ?? 0;
+  const [amount, setAmount] = useState((defaultCents / 100).toFixed(2));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleCharge(e) {
+    e.preventDefault();
+    const cents = Math.round(parseFloat(amount) * 100);
+    if (!cents || cents <= 0) { setError('Enter a valid amount.'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      await api.post(`/appointments/${appt.id}/charge-no-show`, { amountCents: cents });
+      onDone();
+    } catch (err) {
+      setError(err.message || 'Failed to charge card.');
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="cal-detail-overlay" onClick={onClose}>
+      <div className="cal-detail" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <div className="cal-detail__header">
+          <h3 className="cal-detail__title">Charge No-Show Fee</h3>
+          <button className="cal-detail__close" onClick={onClose}>&#x2715;</button>
+        </div>
+        <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.875rem', marginBottom: '1.5rem', color: '#374151' }}>
+          <strong>{appt.client_name}</strong> did not appear for their <strong>{appt.service_name}</strong> appointment.
+          Their card on file will be charged.
+        </p>
+        <form onSubmit={handleCharge} noValidate>
+          <label className="owner-label" style={{ marginBottom: '1rem', display: 'block' }}>
+            Amount ($)
+            <input
+              className="owner-input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              disabled={saving}
+            />
+          </label>
+          {error && <p className="owner-form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button className="btn btn--primary btn--sm" type="submit" disabled={saving}>
+              {saving ? 'Charging…' : 'Charge Card'}
+            </button>
+            <button className="btn btn--ghost btn--sm" type="button" onClick={onClose} disabled={saving}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function generateMonthOptions() {
   const options = [{ value: '', label: 'All Time' }];
   const now = new Date();
@@ -417,6 +559,7 @@ const MONTH_OPTIONS = generateMonthOptions();
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function TherapistBookingsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -433,6 +576,14 @@ export default function TherapistBookingsPage() {
 
   const [soapAppt, setSoapAppt] = useState(null);
   const [historyAppt, setHistoryAppt] = useState(null);
+  const [paymentAppt, setPaymentAppt] = useState(null);
+  const [noShowAppt, setNoShowAppt] = useState(null);
+
+  // Rows whose payment was recorded this session (local optimistic update).
+  const [paidIds, setPaidIds] = useState(new Set());
+
+  // Ref for the row to scroll into view when ?appt= is set.
+  const highlightRef = useRef(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -448,6 +599,25 @@ export default function TherapistBookingsPage() {
   }, [month, clientSearch, statusFilter]);
 
   useEffect(() => { load(); }, [load]);
+
+  // When the page is opened via the payment-prompt email link (?appt=UUID),
+  // wait for appointments to load, then auto-open the appropriate payment modal.
+  const deepLinkApptId = searchParams.get('appt');
+  useEffect(() => {
+    if (!deepLinkApptId || loading || appointments.length === 0) return;
+    const appt = appointments.find(a => a.id === deepLinkApptId);
+    if (!appt) return;
+    // Scroll the row into view.
+    highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Open the right modal.
+    if (appt.status === 'no_show' && appt.stripe_payment_method_id && !paidIds.has(appt.id) && !appt.payment_id) {
+      setNoShowAppt(appt);
+    } else if (appt.status === 'completed' && !paidIds.has(appt.id) && !appt.payment_id) {
+      setPaymentAppt(appt);
+    }
+    // Remove the query param so a refresh doesn't re-open the modal.
+    setSearchParams({}, { replace: true });
+  }, [deepLinkApptId, loading, appointments]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleClientSearch(e) {
     e.preventDefault();
@@ -487,6 +657,14 @@ export default function TherapistBookingsPage() {
 
   const needsSoap = appt =>
     (appt.status === 'completed' || appt.status === 'no_show') && !appt.has_soap_notes;
+
+  const isPaid = appt => paidIds.has(appt.id) || !!appt.payment_id;
+
+  const canRecordPayment = appt =>
+    appt.status === 'completed' && !isPaid(appt);
+
+  const canChargeNoShow = appt =>
+    appt.status === 'no_show' && !!appt.stripe_payment_method_id && !isPaid(appt);
 
   return (
     <div className="page owner-page owner-page--wide">
@@ -544,12 +722,22 @@ export default function TherapistBookingsPage() {
                       <th>Table</th>
                       <th>Consent</th>
                       <th>Status</th>
+                      <th>Payment</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sorted.map(appt => (
-                      <tr key={appt.id} className={appt.status === 'cancelled' ? 'owner-row--inactive' : ''}>
+                    {sorted.map(appt => {
+                      const isHighlighted = appt.id === deepLinkApptId;
+                      return (
+                      <tr
+                        key={appt.id}
+                        ref={isHighlighted ? highlightRef : null}
+                        className={[
+                          appt.status === 'cancelled' ? 'owner-row--inactive' : '',
+                          isHighlighted ? 'owner-row--highlighted' : '',
+                        ].filter(Boolean).join(' ')}
+                      >
                         <td style={{ whiteSpace: 'nowrap' }}>{formatDateTime(appt.scheduled_at)}</td>
                         <td>
                           <span className="therapist-name">{appt.client_name}</span>
@@ -584,11 +772,39 @@ export default function TherapistBookingsPage() {
                             )}
                           </div>
                         </td>
+                        <td>
+                          {isPaid(appt) ? (
+                            <span className="owner-badge owner-badge--active">
+                              {appt.payment_source
+                                ? PAYMENT_SOURCE_LABELS[appt.payment_source] ?? appt.payment_source
+                                : 'Paid'}
+                              {appt.payment_in_person_method
+                                ? ` (${IN_PERSON_METHOD_LABELS[appt.payment_in_person_method] ?? appt.payment_in_person_method})`
+                                : ''}
+                            </span>
+                          ) : appt.stripe_payment_method_id && (appt.status === 'completed' || appt.status === 'no_show') ? (
+                            <span className="owner-badge owner-badge--inactive" title="Card on file — no payment recorded yet">
+                              Card on file
+                            </span>
+                          ) : (
+                            <span className="owner-badge owner-badge--inactive">—</span>
+                          )}
+                        </td>
                         <td className="owner-table__actions">
                           <div className="bookings-actions">
                             {canRequestTransfer(appt) && (
                               <button className="btn btn--outline btn--sm" onClick={() => setTransferAppt(appt)}>
                                 Request Transfer
+                              </button>
+                            )}
+                            {canRecordPayment(appt) && (
+                              <button className="btn btn--primary btn--sm" onClick={() => setPaymentAppt(appt)}>
+                                Record Payment
+                              </button>
+                            )}
+                            {canChargeNoShow(appt) && (
+                              <button className="btn btn--primary btn--sm" onClick={() => setNoShowAppt(appt)}>
+                                Charge No-Show
                               </button>
                             )}
                             {(appt.status === 'completed' || appt.status === 'no_show') && (
@@ -608,7 +824,8 @@ export default function TherapistBookingsPage() {
                           )}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -640,6 +857,28 @@ export default function TherapistBookingsPage() {
         <ClientHistoryModal
           appt={historyAppt}
           onClose={() => setHistoryAppt(null)}
+        />
+      )}
+
+      {paymentAppt && (
+        <InPersonPaymentModal
+          appt={paymentAppt}
+          onClose={() => setPaymentAppt(null)}
+          onDone={() => {
+            setPaidIds(prev => new Set([...prev, paymentAppt.id]));
+            setPaymentAppt(null);
+          }}
+        />
+      )}
+
+      {noShowAppt && (
+        <NoShowChargeModal
+          appt={noShowAppt}
+          onClose={() => setNoShowAppt(null)}
+          onDone={() => {
+            setPaidIds(prev => new Set([...prev, noShowAppt.id]));
+            setNoShowAppt(null);
+          }}
         />
       )}
     </div>

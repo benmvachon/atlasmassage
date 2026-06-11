@@ -75,6 +75,7 @@ export class AppointmentRepository {
       `SELECT
          a.id, a.status, a.scheduled_at, a.duration_minutes, a.notes,
          a.guest_name, a.guest_email, a.guest_phone,
+         a.stripe_payment_method_id,
          s.name AS service_name, s.price_cents,
          th.id AS therapist_id,
          th.first_name AS therapist_first_name,
@@ -83,13 +84,24 @@ export class AppointmentRepository {
          COALESCE(cl.email, a.guest_email) AS client_email,
          cl.phone AS client_phone,
          cs.signed_at AS consent_signed_at,
-         mb.name AS bed_name
+         mb.name AS bed_name,
+         pay.id AS payment_id,
+         pay.status AS payment_status,
+         pay.amount_cents AS payment_amount_cents,
+         pay.source AS payment_source,
+         pay.in_person_method AS payment_in_person_method
        FROM appointments a
        JOIN services s    ON s.id = a.service_id
        JOIN users th      ON th.id = a.therapist_id
        LEFT JOIN users cl ON cl.id = a.client_id
        LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
        LEFT JOIN massage_beds mb ON mb.id = a.bed_id
+       LEFT JOIN LATERAL (
+         SELECT id, status, amount_cents, source, in_person_method
+         FROM payments
+         WHERE appointment_id = a.id AND status = 'succeeded'
+         ORDER BY created_at DESC LIMIT 1
+       ) pay ON TRUE
        WHERE a.scheduled_at::date >= $1::date
          AND a.scheduled_at::date <= $2::date
          ${therapistClause}
@@ -145,6 +157,7 @@ export class AppointmentRepository {
       `SELECT
          a.id, a.status, a.scheduled_at, a.duration_minutes, a.notes,
          a.guest_name, a.guest_email, a.guest_phone,
+         a.stripe_payment_method_id,
          s.name AS service_name, s.price_cents,
          COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) AS client_name,
          COALESCE(cl.email, a.guest_email) AS client_email,
@@ -154,7 +167,12 @@ export class AppointmentRepository {
          tr.reason AS transfer_reason,
          cs.signed_at AS consent_signed_at,
          EXISTS (SELECT 1 FROM soap_notes sn WHERE sn.appointment_id = a.id) AS has_soap_notes,
-         mb.name AS bed_name
+         mb.name AS bed_name,
+         pay.id AS payment_id,
+         pay.status AS payment_status,
+         pay.amount_cents AS payment_amount_cents,
+         pay.source AS payment_source,
+         pay.in_person_method AS payment_in_person_method
        FROM appointments a
        JOIN services s ON s.id = a.service_id
        LEFT JOIN users cl ON cl.id = a.client_id
@@ -162,6 +180,12 @@ export class AppointmentRepository {
          ON tr.appointment_id = a.id AND tr.status = 'pending'
        LEFT JOIN consent_signatures cs ON cs.id = a.consent_signature_id
        LEFT JOIN massage_beds mb ON mb.id = a.bed_id
+       LEFT JOIN LATERAL (
+         SELECT id, status, amount_cents, source, in_person_method
+         FROM payments
+         WHERE appointment_id = a.id AND status = 'succeeded'
+         ORDER BY created_at DESC LIMIT 1
+       ) pay ON TRUE
        WHERE ${conditions.join(' AND ')}
        ORDER BY a.scheduled_at DESC`,
       params
@@ -297,6 +321,22 @@ export class AppointmentRepository {
       params
     );
     return rows[0] ?? null;
+  }
+
+  async updateStripePaymentMethodId(id, stripePaymentMethodId) {
+    const { rows: [appt] } = await this.pool.query(
+      `UPDATE appointments SET stripe_payment_method_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [stripePaymentMethodId, id]
+    );
+    return appt;
+  }
+
+  async updateStripeCustomerId(id, stripeCustomerId) {
+    const { rows: [appt] } = await this.pool.query(
+      `UPDATE appointments SET stripe_customer_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [stripeCustomerId, id]
+    );
+    return appt;
   }
 
   async create({

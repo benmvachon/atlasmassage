@@ -205,7 +205,6 @@ function BookingWizard({
   // Payment
   const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
   const [serviceId] = useState(services[0]?.id ?? '');
-  const [stagedPaymentMethodId, setStagedPaymentMethodId] = useState(null);
 
   const dialogRef = useRef(null);
   useFocusTrap(dialogRef, { onEscape: onClose });
@@ -289,13 +288,12 @@ function BookingWizard({
     goNext();
   }
 
-  async function submitBooking(waiverSignature, overridePaymentMethodId) {
+  async function submitBooking(waiverSignature) {
     setSubmitting(true);
     setError('');
 
     const scheduledAt = `${date}T${slot.startTime}:00.000Z`;
     const savedMethod = paymentMethods.find(m => m.id === selectedMethodId);
-    const newCardPmId = overridePaymentMethodId ?? stagedPaymentMethodId;
 
     try {
       const result = await bookingService.createAppointment({
@@ -326,22 +324,22 @@ function BookingWizard({
 
       const { appointment, clientSecret } = result;
 
+      // clientSecret is null when the appointment was already confirmed server-side
+      // (membership credit, existing saved card, or Stripe not configured).
       if (clientSecret && stripe) {
-        let confirmResult;
-        if (isNewCard) {
-          confirmResult = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: newCardPmId,
-          });
-        } else if (savedMethod) {
-          confirmResult = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: savedMethod.stripe_payment_method_id,
-          });
-        }
+        const cardElement = elements.getElement(CardElement);
+        const confirmResult = await stripe.confirmCardSetup(clientSecret, {
+          payment_method: isNewCard
+            ? { card: cardElement }
+            : savedMethod?.stripe_payment_method_id,
+        });
         if (confirmResult?.error) {
           bookingService.cancelAppointment(appointment.id, appointment.cancel_token).catch(() => {});
           throw new Error(confirmResult.error.message);
         }
-        await bookingService.confirmAppointment(appointment.id, appointment.cancel_token);
+        // Send the Stripe PM ID back so the server can store it for no-show charges.
+        const stripePaymentMethodId = confirmResult.setupIntent?.payment_method;
+        await bookingService.confirmAppointment(appointment.id, appointment.cancel_token, stripePaymentMethodId);
       }
 
       setCurrentStep('success');
@@ -357,24 +355,8 @@ function BookingWizard({
       setError('Please select a payment method.');
       return;
     }
-
-    // Tokenize new card while CardElement is still mounted
-    let newCardPmId = null;
-    if (needsPayment && isNewCard && stripe) {
-      setSubmitting(true);
-      const cardElement = elements.getElement(CardElement);
-      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-      });
-      setSubmitting(false);
-      if (pmError) { setError(pmError.message); return; }
-      newCardPmId = paymentMethod.id;
-      setStagedPaymentMethodId(newCardPmId);
-    }
-
     const waiverSig = hasConsent ? null : signature;
-    await submitBooking(waiverSig, newCardPmId);
+    await submitBooking(waiverSig);
   }
 
   // ── Loading state ────────────────────────────────────────────────────────────
@@ -811,13 +793,17 @@ function BookingWizard({
               ) : needsPayment ? (
                 <>
                   <div className="booking-divider">
-                    Payment
+                    Card on File
                     {selectedService && (
                       <span className="booking-divider__amount">
-                        ${(selectedService.priceCents / 100).toFixed(0)}
+                        Due at appointment: ${(selectedService.priceCents / 100).toFixed(0)}
                       </span>
                     )}
                   </div>
+
+                  <p className="booking-payment-note booking-payment-note--card-on-file">
+                    Your card will not be charged now. Payment is collected in-person after your session. Your card is saved only in case you miss your appointment without cancelling in advance.
+                  </p>
 
                   {loadingMethods ? (
                     <p className="booking-payment-loading">Loading saved cards…</p>
@@ -866,9 +852,7 @@ function BookingWizard({
                 </>
               ) : (
                 <div className="booking-payment-note">
-                  {user
-                    ? 'Payment processing is not configured — payment will be collected at time of service.'
-                    : 'Payment will be collected at time of service.'}
+                  Payment is collected in-person at time of service.
                 </div>
               )}
             </div>

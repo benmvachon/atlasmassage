@@ -8,6 +8,7 @@ import { TherapistRepository } from '../repositories/therapistRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { MembershipService } from '../services/membershipService.js';
+import { PaymentService } from '../services/paymentService.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 function getStripe() {
@@ -319,6 +320,52 @@ export async function updateAppointmentStatus(req, res, next) {
     const appt = await repos().appointment.updateStatus(req.params.id, status);
     if (!appt) throw new AppError('Appointment not found', 404, 'NOT_FOUND');
     res.json({ success: true, data: appt });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function chargeNoShow(req, res, next) {
+  try {
+    const appt = await repos().appointment.findById(req.params.id);
+    if (!appt) throw new AppError('Appointment not found', 404, 'NOT_FOUND');
+
+    // Use the service's price if no amount was specified.
+    let amountCents = req.body.amountCents;
+    if (!amountCents) {
+      const service = await repos().appointment.findServiceById(appt.service_id);
+      amountCents = service?.price_cents ?? 0;
+    }
+    if (!amountCents || amountCents <= 0) {
+      throw new AppError('A positive amount is required to charge a no-show fee', 400, 'BAD_REQUEST');
+    }
+
+    const svc = new PaymentService(getPool());
+    const { payment } = await svc.chargeNoShow(appt.id, amountCents);
+    res.json({ success: true, data: { payment } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function recordInPersonPayment(req, res, next) {
+  try {
+    const { amountCents, method } = req.body;
+    if (!amountCents || amountCents <= 0) {
+      throw new AppError('A positive amountCents is required', 400, 'BAD_REQUEST');
+    }
+    const VALID_METHODS = ['cash', 'card', 'check'];
+    if (method && !VALID_METHODS.includes(method)) {
+      throw new AppError(`method must be one of: ${VALID_METHODS.join(', ')}`, 400, 'BAD_REQUEST');
+    }
+
+    const svc = new PaymentService(getPool());
+    const payment = await svc.recordInPersonPayment({
+      appointmentId: req.params.id,
+      amountCents,
+      method: method ?? 'cash',
+    });
+    res.status(201).json({ success: true, data: { payment } });
   } catch (err) {
     next(err);
   }

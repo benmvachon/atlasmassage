@@ -19,6 +19,8 @@ router.post('/:id/reschedule', optionalAuthenticate, rescheduleAppointmentRules,
 // Clients confirm their own booking after successful payment; guests pass cancelToken; staff can also confirm
 router.post('/:id/confirm', optionalAuthenticate, appointmentController.confirmAppointment);
 router.post('/:id/complete', authenticate, authorize('therapist', 'owner'), appointmentController.completeAppointment);
+router.post('/:id/record-payment', authenticate, authorize('therapist', 'owner'), appointmentController.recordPayment);
+router.post('/:id/charge-no-show', authenticate, authorize('therapist', 'owner'), appointmentController.chargeNoShow);
 router.post('/:id/transfer-request', authenticate, authorize('therapist'), appointmentController.requestTransfer);
 
 // SOAP notes — therapist writes clinical notes after a completed session

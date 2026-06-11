@@ -48,6 +48,8 @@ router.get('/dashboard', adminController.getDashboard);
 // ── Appointments (calendar) ───────────────────────────────────────────────────
 router.get('/appointments', adminController.listAppointments);
 router.patch('/appointments/:id/status', adminController.updateAppointmentStatus);
+router.post('/appointments/:id/charge-no-show', adminController.chargeNoShow);
+router.post('/appointments/:id/record-payment', adminController.recordInPersonPayment);
 
 // ── Revenue ───────────────────────────────────────────────────────────────────
 router.get('/revenue', adminController.getRevenue);

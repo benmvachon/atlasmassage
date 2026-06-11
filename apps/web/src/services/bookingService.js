@@ -32,8 +32,11 @@ export const bookingService = {
     return res.data;
   },
 
-  async confirmAppointment(id, cancelToken) {
-    const res = await api.post(`/appointments/${id}/confirm`, cancelToken ? { cancelToken } : {});
+  async confirmAppointment(id, cancelToken, stripePaymentMethodId) {
+    const body = {};
+    if (cancelToken) body.cancelToken = cancelToken;
+    if (stripePaymentMethodId) body.stripePaymentMethodId = stripePaymentMethodId;
+    const res = await api.post(`/appointments/${id}/confirm`, body);
     return res.data;
   },
 

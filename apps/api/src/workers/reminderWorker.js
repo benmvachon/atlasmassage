@@ -14,6 +14,11 @@ async function runReminders() {
     logger.error('reminder_worker_error', { message: err.message });
   }
   try {
+    await svc.sendPendingPaymentPrompts();
+  } catch (err) {
+    logger.error('payment_prompt_worker_error', { message: err.message });
+  }
+  try {
     await svc.sendPendingFeedbackRequests();
   } catch (err) {
     logger.error('feedback_worker_error', { message: err.message });

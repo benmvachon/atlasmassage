@@ -2,6 +2,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService.js';
 
+const IN_PERSON_METHOD_LABELS = { cash: 'Cash', card: 'Card terminal', check: 'Check' };
+const PAYMENT_SOURCE_LABELS = { stripe: 'Charged to card', in_person: 'Paid in-person', membership_credit: 'Membership credit' };
+
 const STATUS_LABELS = {
   pending:   'Pending',
   confirmed: 'Confirmed',
@@ -53,8 +56,102 @@ function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
-function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
+function InPersonPaymentForm({ appt, onDone, onCancel }) {
+  const [amount, setAmount] = useState(((appt.price_cents ?? 0) / 100).toFixed(2));
+  const [method, setMethod] = useState('cash');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const cents = Math.round(parseFloat(amount) * 100);
+    if (!cents || cents <= 0) { setError('Enter a valid amount.'); return; }
+    setSaving(true);
+    setError('');
+    try {
+      await adminService.recordInPersonPayment(appt.id, cents, method);
+      onDone(cents, method);
+    } catch (err) {
+      setError(err.message || 'Failed to record payment.');
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="cal-payment-form" onSubmit={handleSubmit}>
+      <p className="cal-payment-form__title">Record In-Person Payment</p>
+      <div className="cal-payment-form__row">
+        <label className="cal-payment-form__label">
+          Amount ($)
+          <input
+            className="cal-payment-form__input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="cal-payment-form__label">
+          Method
+          <select
+            className="cal-payment-form__input"
+            value={method}
+            onChange={e => setMethod(e.target.value)}
+            disabled={saving}
+          >
+            <option value="cash">Cash</option>
+            <option value="card">Card terminal</option>
+            <option value="check">Check</option>
+          </select>
+        </label>
+      </div>
+      {error && <p className="cal-payment-form__error">{error}</p>}
+      <div className="cal-payment-form__btns">
+        <button className="btn btn--sm btn--primary" type="submit" disabled={saving}>
+          {saving ? 'Recording…' : 'Record Payment'}
+        </button>
+        <button className="btn btn--sm btn--ghost" type="button" onClick={onCancel} disabled={saving}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function AppointmentDetail({ appt, onClose, onStatusChange, onPaymentRecorded, saving }) {
   const nexts = STATUS_NEXT[appt.status] || [];
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [chargingNoShow, setChargingNoShow] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [localPayment, setLocalPayment] = useState(
+    appt.payment_id ? { status: appt.payment_status, source: appt.payment_source, amountCents: appt.payment_amount_cents, inPersonMethod: appt.payment_in_person_method } : null
+  );
+
+  const canChargeNoShow = appt.status === 'no_show' && appt.stripe_payment_method_id && !localPayment;
+  const canRecordInPerson = appt.status === 'completed' && !localPayment;
+
+  async function handleChargeNoShow() {
+    setChargingNoShow(true);
+    setPaymentError('');
+    try {
+      const res = await adminService.chargeNoShow(appt.id);
+      const p = res.data.payment;
+      setLocalPayment({ status: p.status, source: 'stripe', amountCents: p.amount_cents });
+      onPaymentRecorded(appt.id);
+    } catch (err) {
+      setPaymentError(err.message || 'Failed to charge card.');
+      setChargingNoShow(false);
+    }
+  }
+
+  function handleInPersonDone(amountCents, method) {
+    setLocalPayment({ status: 'succeeded', source: 'in_person', amountCents, inPersonMethod: method });
+    setShowPaymentForm(false);
+    onPaymentRecorded(appt.id);
+  }
+
   return (
     <div className="cal-detail-overlay" onClick={onClose}>
       <div className="cal-detail" onClick={e => e.stopPropagation()}>
@@ -79,6 +176,20 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
           <dd>${(appt.price_cents / 100).toFixed(2)}</dd>
           <dt>Status</dt>
           <dd><span className={`cal-status cal-status--${appt.status}`}>{STATUS_LABELS[appt.status]}</span></dd>
+          <dt>Payment</dt>
+          <dd>
+            {localPayment ? (
+              <span className="cal-payment-badge cal-payment-badge--paid">
+                {PAYMENT_SOURCE_LABELS[localPayment.source] ?? localPayment.source}
+                {localPayment.inPersonMethod ? ` (${IN_PERSON_METHOD_LABELS[localPayment.inPersonMethod] ?? localPayment.inPersonMethod})` : ''}
+                {' — '}${(localPayment.amountCents / 100).toFixed(2)}
+              </span>
+            ) : appt.stripe_payment_method_id ? (
+              <span className="cal-payment-badge cal-payment-badge--card-on-file">Card on file</span>
+            ) : (
+              <span className="cal-payment-badge">—</span>
+            )}
+          </dd>
           <dt>Consent</dt>
           <dd>
             {appt.consent_signed_at
@@ -88,6 +199,7 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
           </dd>
           {appt.notes && <><dt>Notes</dt><dd>{appt.notes}</dd></>}
         </dl>
+
         {nexts.length > 0 && (
           <div className="cal-detail__actions">
             <p className="cal-detail__actions-label">Update status:</p>
@@ -104,6 +216,40 @@ function AppointmentDetail({ appt, onClose, onStatusChange, saving }) {
               ))}
             </div>
           </div>
+        )}
+
+        {(canRecordInPerson || canChargeNoShow) && !showPaymentForm && (
+          <div className="cal-detail__actions">
+            <p className="cal-detail__actions-label">Payment:</p>
+            <div className="cal-detail__btns">
+              {canRecordInPerson && (
+                <button
+                  className="btn btn--sm btn--primary"
+                  onClick={() => setShowPaymentForm(true)}
+                >
+                  Record In-Person Payment
+                </button>
+              )}
+              {canChargeNoShow && (
+                <button
+                  className="btn btn--sm cal-detail__status-btn cal-detail__status-btn--no-show"
+                  onClick={handleChargeNoShow}
+                  disabled={chargingNoShow}
+                >
+                  {chargingNoShow ? 'Charging…' : `Charge No-Show Fee ($${(appt.price_cents / 100).toFixed(0)})`}
+                </button>
+              )}
+            </div>
+            {paymentError && <p className="cal-payment-form__error">{paymentError}</p>}
+          </div>
+        )}
+
+        {showPaymentForm && (
+          <InPersonPaymentForm
+            appt={appt}
+            onDone={handleInPersonDone}
+            onCancel={() => setShowPaymentForm(false)}
+          />
         )}
       </div>
     </div>
@@ -405,6 +551,10 @@ export default function AppointmentsCalendarPage() {
           appt={selected}
           onClose={() => setSelected(null)}
           onStatusChange={handleStatusChange}
+          onPaymentRecorded={() => {
+            load();
+            setSelected(null);
+          }}
           saving={saving}
         />
       )}

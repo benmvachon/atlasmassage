@@ -184,4 +184,26 @@ export class NotificationRepository {
       [appointmentId]
     );
   }
+
+  // Find appointments whose slot just ended, are not cancelled, have no payment
+  // prompt sent yet, and whose therapist has an email address. We look back 48 h
+  // so the worker recovers gracefully from downtime without flooding old records.
+  async findAppointmentsNeedingPaymentPrompt() {
+    const { rows } = await this.pool.query(
+      `${APPT_DETAILS}
+       WHERE a.status NOT IN ('cancelled')
+         AND (a.scheduled_at + (a.duration_minutes * INTERVAL '1 minute')) < NOW()
+         AND (a.scheduled_at + (a.duration_minutes * INTERVAL '1 minute')) > NOW() - INTERVAL '48 hours'
+         AND a.payment_prompt_sent_at IS NULL
+         AND t.email IS NOT NULL`
+    );
+    return rows;
+  }
+
+  async markPaymentPromptSent(appointmentId) {
+    await this.pool.query(
+      `UPDATE appointments SET payment_prompt_sent_at = NOW() WHERE id = $1`,
+      [appointmentId]
+    );
+  }
 }

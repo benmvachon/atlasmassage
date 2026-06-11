@@ -56,13 +56,23 @@ export class PaymentRepository {
     await this.pool.query('DELETE FROM payment_methods WHERE id = $1', [id]);
   }
 
-  async createPayment({ clientId, appointmentId, membershipId, amountCents, currency, status, stripePaymentIntentId }) {
+  async createPayment({ clientId, appointmentId, membershipId, amountCents, currency, status, stripePaymentIntentId, source, inPersonMethod }) {
     const { rows: [payment] } = await this.pool.query(
       `INSERT INTO payments
-         (client_id, appointment_id, membership_id, amount_cents, currency, status, stripe_payment_intent_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+         (client_id, appointment_id, membership_id, amount_cents, currency, status, stripe_payment_intent_id, source, in_person_method)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [clientId, appointmentId ?? null, membershipId ?? null, amountCents, currency ?? 'USD', status ?? 'pending', stripePaymentIntentId ?? null]
+      [
+        clientId ?? null,
+        appointmentId ?? null,
+        membershipId ?? null,
+        amountCents,
+        currency ?? 'USD',
+        status ?? 'pending',
+        stripePaymentIntentId ?? null,
+        source ?? 'stripe',
+        inPersonMethod ?? null,
+      ]
     );
     return payment;
   }
@@ -89,6 +99,14 @@ export class PaymentRepository {
     const { rows } = await this.pool.query(
       'SELECT * FROM payments WHERE client_id = $1 ORDER BY created_at DESC',
       [clientId]
+    );
+    return rows;
+  }
+
+  async findPaymentsByAppointmentId(appointmentId) {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM payments WHERE appointment_id = $1 ORDER BY created_at DESC',
+      [appointmentId]
     );
     return rows;
   }

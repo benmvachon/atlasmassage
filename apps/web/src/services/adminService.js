@@ -39,6 +39,10 @@ export const adminService = {
   },
   updateAppointmentStatus: (id, status) =>
     api.patch(`/admin/appointments/${id}/status`, { status }),
+  chargeNoShow: (id, amountCents) =>
+    api.post(`/admin/appointments/${id}/charge-no-show`, amountCents ? { amountCents } : {}),
+  recordInPersonPayment: (id, amountCents, method) =>
+    api.post(`/admin/appointments/${id}/record-payment`, { amountCents, method }),
 
   // Revenue
   getRevenue: (start, end) => {

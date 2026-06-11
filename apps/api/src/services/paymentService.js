@@ -37,6 +37,17 @@ export class PaymentService {
     return customer.id;
   }
 
+  // Creates a Stripe customer for a guest using their name and email.
+  async createGuestStripeCustomer({ guestEmail, guestName }) {
+    const stripe = getStripe();
+    const customer = await stripe.customers.create({
+      email: guestEmail,
+      name: guestName,
+      metadata: { guest: 'true' },
+    });
+    return customer.id;
+  }
+
   async createSetupIntent(userId) {
     const customerId = await this.ensureStripeCustomer(userId);
     const stripe = getStripe();
@@ -45,6 +56,35 @@ export class PaymentService {
       payment_method_types: ['card'],
     });
     return { clientSecret: intent.client_secret };
+  }
+
+  // Creates a SetupIntent for an appointment booking. For registered clients the
+  // intent is attached to their existing Stripe customer. For guests a new
+  // Stripe customer is created and the customer ID is stored on the appointment.
+  async createBookingSetupIntent({ appointmentId, userId, guestEmail, guestName }) {
+    const stripe = getStripe();
+
+    let customerId;
+    let stripeCustomerIdForGuest = null;
+
+    if (userId) {
+      customerId = await this.ensureStripeCustomer(userId);
+    } else {
+      customerId = await this.createGuestStripeCustomer({ guestEmail, guestName });
+      stripeCustomerIdForGuest = customerId;
+    }
+
+    const intent = await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      metadata: { appointmentId: appointmentId ?? '' },
+    });
+
+    if (stripeCustomerIdForGuest) {
+      await this.appointments.updateStripeCustomerId(appointmentId, stripeCustomerIdForGuest);
+    }
+
+    return { clientSecret: intent.client_secret, stripeCustomerId: customerId };
   }
 
   async addPaymentMethod(userId, stripePaymentMethodId) {
@@ -119,27 +159,8 @@ export class PaymentService {
     });
   }
 
-  async createGuestPaymentIntent({ amountCents, currency, appointmentId }) {
-    const stripe = getStripe();
-    const intent = await stripe.paymentIntents.create({
-      amount: amountCents,
-      currency: currency ?? 'usd',
-      payment_method_types: ['card'],
-      metadata: { appointmentId: appointmentId ?? '' },
-    });
-
-    const payment = await this.payments.createPayment({
-      clientId: null,
-      appointmentId: appointmentId ?? null,
-      amountCents,
-      currency: (currency ?? 'usd').toUpperCase(),
-      status: 'pending',
-      stripePaymentIntentId: intent.id,
-    });
-
-    return { clientSecret: intent.client_secret, paymentId: payment.id };
-  }
-
+  // Creates a payment intent for a direct/manual charge (not used in the
+  // standard booking flow, which uses SetupIntents instead).
   async createPaymentIntent(userId, { amountCents, currency, paymentMethodId, appointmentId }) {
     const customerId = await this.ensureStripeCustomer(userId);
 
@@ -168,9 +189,87 @@ export class PaymentService {
       currency: (currency ?? 'usd').toUpperCase(),
       status: 'pending',
       stripePaymentIntentId: intent.id,
+      source: 'stripe',
     });
 
     return { clientSecret: intent.client_secret, paymentId: payment.id };
+  }
+
+  // Charges the card on file for a no-show appointment. The payment method and
+  // Stripe customer are resolved from the appointment record.
+  async chargeNoShow(appointmentId, amountCents) {
+    const appt = await this.appointments.findById(appointmentId);
+    if (!appt) throw new AppError('Appointment not found', 404, 'NOT_FOUND');
+
+    if (appt.status !== 'no_show') {
+      throw new AppError('Only no-show appointments can be charged this way', 400, 'BAD_REQUEST');
+    }
+
+    if (!appt.stripe_payment_method_id) {
+      throw new AppError('No payment method on file for this appointment', 400, 'NO_PAYMENT_METHOD');
+    }
+
+    let customerId;
+    if (appt.client_id) {
+      customerId = await this.ensureStripeCustomer(appt.client_id);
+    } else {
+      customerId = appt.stripe_customer_id;
+    }
+
+    if (!customerId) {
+      throw new AppError('No Stripe customer found for this appointment', 400, 'NO_PAYMENT_METHOD');
+    }
+
+    const stripe = getStripe();
+    const intent = await stripe.paymentIntents.create({
+      amount: amountCents,
+      currency: 'usd',
+      customer: customerId,
+      payment_method: appt.stripe_payment_method_id,
+      confirm: true,
+      off_session: true,
+      metadata: { appointmentId, reason: 'no_show' },
+    });
+
+    const payment = await this.payments.createPayment({
+      clientId: appt.client_id ?? null,
+      appointmentId,
+      amountCents,
+      currency: 'USD',
+      status: intent.status === 'succeeded' ? 'succeeded' : 'pending',
+      stripePaymentIntentId: intent.id,
+      source: 'stripe',
+    });
+
+    return { payment, stripeIntent: intent };
+  }
+
+  // Records a payment collected in-person (cash, card terminal, check, etc.)
+  async recordInPersonPayment({ appointmentId, amountCents, method }) {
+    const appt = await this.appointments.findById(appointmentId);
+    if (!appt) throw new AppError('Appointment not found', 404, 'NOT_FOUND');
+
+    if (appt.status !== 'completed') {
+      throw new AppError('In-person payments can only be recorded for completed appointments', 400, 'BAD_REQUEST');
+    }
+
+    const existing = await this.payments.findPaymentsByAppointmentId(appointmentId);
+    if (existing.some(p => p.status === 'succeeded')) {
+      throw new AppError('A payment has already been recorded for this appointment', 409, 'CONFLICT');
+    }
+
+    const payment = await this.payments.createPayment({
+      clientId: appt.client_id ?? null,
+      appointmentId,
+      amountCents,
+      currency: 'USD',
+      status: 'succeeded',
+      stripePaymentIntentId: null,
+      source: 'in_person',
+      inPersonMethod: method ?? 'cash',
+    });
+
+    return payment;
   }
 
   async handleWebhook(rawBody, signature) {

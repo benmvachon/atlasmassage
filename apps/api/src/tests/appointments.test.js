@@ -62,6 +62,14 @@ await jest.unstable_mockModule('../services/membershipService.js', () => ({
   MembershipService: jest.fn(() => mockMembershipSvc),
 }));
 
+const mockPaymentSvc = {
+  payments: { findPaymentMethodById: jest.fn().mockResolvedValue(null) },
+  createBookingSetupIntent: jest.fn().mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null }),
+};
+await jest.unstable_mockModule('../services/paymentService.js', () => ({
+  PaymentService: jest.fn(() => mockPaymentSvc),
+}));
+
 const mockGenerateSlots = jest.fn();
 await jest.unstable_mockModule('../services/slotService.js', () => ({
   generateSlots:        mockGenerateSlots,
@@ -105,6 +113,8 @@ beforeEach(() => {
   ]);
   mockMembershipSvc.getMyStatus.mockResolvedValue({ active: false });
   mockMembershipSvc.consumeCredit.mockResolvedValue(0);
+  mockPaymentSvc.payments.findPaymentMethodById.mockResolvedValue(null);
+  mockPaymentSvc.createBookingSetupIntent.mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null });
 
   const GUEST_APPT_DETAIL = {
     id: APPT_ID, status: 'pending', scheduled_at: FUTURE_AT,
@@ -114,15 +124,17 @@ beforeEach(() => {
   };
 
   Object.assign(mockApptRepo, {
-    create:               jest.fn().mockResolvedValue(APPT),
-    findById:             jest.fn().mockResolvedValue(APPT),
-    findGuestAppointment: jest.fn().mockResolvedValue(GUEST_APPT_DETAIL),
-    findServiceById:      jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 0, duration_minutes: 60 }),
-    updateStatus:         jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
-    setMembership:        jest.fn().mockResolvedValue({ ...APPT }),
-    getByDateRange:       jest.fn().mockResolvedValue([]),
-    listForTherapist:     jest.fn().mockResolvedValue([]),
-    reschedule:           jest.fn().mockResolvedValue(APPT),
+    create:                       jest.fn().mockResolvedValue(APPT),
+    findById:                     jest.fn().mockResolvedValue(APPT),
+    findGuestAppointment:         jest.fn().mockResolvedValue(GUEST_APPT_DETAIL),
+    findServiceById:              jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 9000, duration_minutes: 60 }),
+    updateStatus:                 jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
+    updateStripePaymentMethodId:  jest.fn().mockResolvedValue({ ...APPT }),
+    updateStripeCustomerId:       jest.fn().mockResolvedValue({ ...APPT }),
+    setMembership:                jest.fn().mockResolvedValue({ ...APPT }),
+    getByDateRange:               jest.fn().mockResolvedValue([]),
+    listForTherapist:             jest.fn().mockResolvedValue([]),
+    reschedule:                   jest.fn().mockResolvedValue(APPT),
   });
   Object.assign(mockAvailRepo, {
     getForDateRange: jest.fn().mockResolvedValue([]),

@@ -299,6 +299,10 @@
   opacity: 0.55;
 }
 
+.owner-row--highlighted td {
+  background: rgba($color-accent, 0.08);
+}
+
 .hours-row--closed td:not(:first-child):not(:last-child) {
   color: $color-text-muted;
 }

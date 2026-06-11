@@ -139,6 +139,33 @@ function therapistReminderHtml(therapistName, clientName, appt) {
     <p style="margin-bottom:0"><strong>Client:</strong> ${clientName}</p>`);
 }
 
+function paymentPromptHtml(therapistName, clientName, appt, actionUrl) {
+  const isNoShow = appt.status === 'no_show';
+  const hasCard  = !!appt.stripe_payment_method_id;
+  const price    = appt.price_cents ? `$${(appt.price_cents / 100).toFixed(2)}` : null;
+
+  let intro, actionLabel;
+  if (isNoShow && hasCard) {
+    intro       = `<strong>${clientName}</strong> did not appear for their ${appt.service_name} session. Their card is on file — you can charge the no-show fee directly from your bookings dashboard.`;
+    actionLabel = `Charge No-Show Fee${price ? ` (${price})` : ''}`;
+  } else if (isNoShow) {
+    intro       = `<strong>${clientName}</strong> did not appear for their ${appt.service_name} session. No card is on file, so no automatic charge is possible — please note this in your records.`;
+    actionLabel = 'View Appointment';
+  } else {
+    intro       = `Your ${appt.service_name} session with <strong>${clientName}</strong> has ended. Please record the in-person payment when you&rsquo;re ready.`;
+    actionLabel = `Record In-Person Payment${price ? ` (${price})` : ''}`;
+  }
+
+  return baseLayout('Payment Action Required', `
+    <p style="margin-bottom:16px">Hi ${therapistName},</p>
+    <p style="margin-bottom:24px">${intro}</p>
+    ${apptCard(appt)}
+    ${ctaButton(actionUrl, actionLabel)}
+    <p style="color:#806b6b;font-size:13px;text-align:center">
+      This link takes you directly to your bookings dashboard where you can complete the action in one click.
+    </p>`);
+}
+
 // ── SMS templates ──────────────────────────────────────────────────────────────
 
 function confirmSms(name, appt) {
@@ -305,6 +332,29 @@ export class NotificationService {
         await this.repo.markFeedbackSent(appt.id);
       } catch (err) {
         logger.error('feedback_send_error', { appointmentId: appt.id, message: err.message });
+      }
+    }
+  }
+
+  async sendPendingPaymentPrompts() {
+    const appointments = await this.repo.findAppointmentsNeedingPaymentPrompt();
+    logger.info('payment_prompt_worker_found', { count: appointments.length });
+
+    for (const appt of appointments) {
+      try {
+        const actionUrl = `${config.app.url}/therapist/bookings?appt=${appt.id}`;
+        const clientName = appt.client_first_name ?? appt.guest_name ?? 'your client';
+        await this._email({
+          userId: appt.therapist_user_id,
+          to: appt.therapist_email,
+          subject: appt.status === 'no_show'
+            ? `No-show: ${clientName} — ${appt.service_name}`
+            : `Please record payment: ${clientName} — ${appt.service_name}`,
+          html: paymentPromptHtml(appt.therapist_first_name, clientName, appt, actionUrl),
+        });
+        await this.repo.markPaymentPromptSent(appt.id);
+      } catch (err) {
+        logger.error('payment_prompt_send_error', { appointmentId: appt.id, message: err.message });
       }
     }
   }
