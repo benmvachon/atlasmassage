@@ -51,6 +51,7 @@ await jest.unstable_mockModule('../repositories/transferRequestRepository.js', (
 await jest.unstable_mockModule('../services/notificationService.js', () => ({
   NotificationService: jest.fn(() => ({
     sendBookingConfirmation: jest.fn().mockResolvedValue(),
+    sendFeedbackRequest: jest.fn().mockResolvedValue(),
   })),
 }));
 
