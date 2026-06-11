@@ -237,7 +237,7 @@ export async function confirmAppointment(req, res, next) {
     const appt = await apptRepo.findById(req.params.id);
     if (!appt) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
 
-    const { isOwner, allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
+    const { allowed } = checkModificationAuth(appt, req.user, req.body.cancelToken);
     if (!allowed) return next(new AppError('Forbidden', 403, 'FORBIDDEN'));
 
     const updated = await apptRepo.updateStatus(req.params.id, 'confirmed');
