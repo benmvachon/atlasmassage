@@ -4,6 +4,10 @@ import { dirname, resolve } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Prevent e2e tests from sending real emails regardless of .env config.
+// dotenv does not override already-set env vars, so this wins over EMAIL_HOST in .env.
+process.env.EMAIL_HOST = '';
+
 export default defineConfig({
   testDir: './tests',
   globalSetup: './tests/globalSetup.js',
