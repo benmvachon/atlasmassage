@@ -76,7 +76,6 @@ beforeEach(() => {
   Object.assign(mockRepoInstance, {
     findAppointmentWithDetails: jest.fn().mockResolvedValue(CLIENT_APPT),
     findAppointmentsNeedingReminders: jest.fn().mockResolvedValue([]),
-    findAppointmentsNeedingFeedback: jest.fn().mockResolvedValue([]),
     findAppointmentsNeedingWeekFollowup: jest.fn().mockResolvedValue([]),
     findAppointmentsNeedingMonthFollowup: jest.fn().mockResolvedValue([]),
     getOrCreatePreferences: jest.fn().mockResolvedValue(PREFS_ALL_ON),
@@ -196,17 +195,11 @@ describe('NotificationService.sendPendingReminders', () => {
   });
 });
 
-// ── sendPendingFeedbackRequests ───────────────────────────────────────────────
+// ── sendFeedbackRequest ───────────────────────────────────────────────────────
 
-describe('NotificationService.sendPendingFeedbackRequests', () => {
-  it('does nothing when no appointments need feedback', async () => {
-    await service.sendPendingFeedbackRequests();
-    expect(mockSend).not.toHaveBeenCalled();
-  });
-
-  it('sends feedback request email when prefs allow', async () => {
-    mockRepoInstance.findAppointmentsNeedingFeedback.mockResolvedValue([CLIENT_APPT]);
-    await service.sendPendingFeedbackRequests();
+describe('NotificationService.sendFeedbackRequest', () => {
+  it('sends feedback request email to client when prefs allow', async () => {
+    await service.sendFeedbackRequest('appt-uuid');
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({ to: 'client@example.com' })
     );
@@ -214,24 +207,32 @@ describe('NotificationService.sendPendingFeedbackRequests', () => {
   });
 
   it('sends to guest without prefs check', async () => {
-    mockRepoInstance.findAppointmentsNeedingFeedback.mockResolvedValue([GUEST_APPT]);
-    await service.sendPendingFeedbackRequests();
+    mockRepoInstance.findAppointmentWithDetails.mockResolvedValue(GUEST_APPT);
+    await service.sendFeedbackRequest('appt-uuid');
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({ to: 'guest@example.com' })
     );
   });
 
-  it('skips appointments with no client email', async () => {
-    const noEmail = { ...CLIENT_APPT, client_email: null, guest_email: null };
-    mockRepoInstance.findAppointmentsNeedingFeedback.mockResolvedValue([noEmail]);
-    await service.sendPendingFeedbackRequests();
+  it('skips when appointment has no client email', async () => {
+    mockRepoInstance.findAppointmentWithDetails.mockResolvedValue(
+      { ...CLIENT_APPT, client_email: null, guest_email: null }
+    );
+    await service.sendFeedbackRequest('appt-uuid');
     expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it('handles send errors without crashing', async () => {
-    mockRepoInstance.findAppointmentsNeedingFeedback.mockResolvedValue([CLIENT_APPT]);
-    mockSend.mockRejectedValueOnce(new Error('fail'));
-    await expect(service.sendPendingFeedbackRequests()).resolves.toBeUndefined();
+  it('skips when client prefs are off', async () => {
+    mockRepoInstance.getOrCreatePreferences.mockResolvedValue(PREFS_ALL_OFF);
+    await service.sendFeedbackRequest('appt-uuid');
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(mockRepoInstance.markFeedbackSent).toHaveBeenCalledWith('appt-uuid');
+  });
+
+  it('does nothing when appointment is not found', async () => {
+    mockRepoInstance.findAppointmentWithDetails.mockResolvedValue(null);
+    await service.sendFeedbackRequest('appt-uuid');
+    expect(mockSend).not.toHaveBeenCalled();
   });
 });
 

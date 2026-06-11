@@ -109,7 +109,7 @@ function feedbackRequestHtml(name, appt) {
   const feedbackUrl = `${config.app.url}/feedback?id=${appt.id}&token=${appt.feedback_token}`;
   return baseLayout('How was your visit?', `
     <p style="margin-bottom:16px">Hi ${name},</p>
-    <p style="margin-bottom:24px">We hope you enjoyed your ${appt.service_name} yesterday. Your feedback helps us continue to improve &mdash; we&rsquo;d love to hear how it went.</p>
+    <p style="margin-bottom:24px">We hope you enjoyed your ${appt.service_name} today. Your feedback helps us continue to improve &mdash; we&rsquo;d love to hear how it went.</p>
     ${apptCard(appt)}
     ${ctaButton(feedbackUrl, 'Leave Feedback')}
     <p style="color:#806b6b;font-size:14px;text-align:center">Thank you for choosing Atlas Bodywork!</p>`);
@@ -235,6 +235,29 @@ export class NotificationService {
         ),
       });
     }
+  }
+
+  async sendFeedbackRequest(appointmentId) {
+    const appt = await this.repo.findAppointmentWithDetails(appointmentId);
+    if (!appt) return;
+
+    const clientName = appt.client_first_name ?? appt.guest_name ?? 'there';
+    const clientEmail = appt.client_email ?? appt.guest_email;
+    if (!clientEmail) return;
+
+    const shouldSend = appt.client_id
+      ? (await this.repo.getOrCreatePreferences(appt.client_id)).email_appointment_remind
+      : true;
+
+    if (shouldSend) {
+      await this._email({
+        userId: appt.client_id,
+        to: clientEmail,
+        subject: 'How was your Atlas Bodywork visit?',
+        html: feedbackRequestHtml(clientName, appt),
+      });
+    }
+    await this.repo.markFeedbackSent(appointmentId);
   }
 
   async sendPendingReminders() {
