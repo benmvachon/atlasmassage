@@ -6,7 +6,7 @@
 .hero {
   background-image:
     linear-gradient(rgba($color-text, 0.72), rgba($color-primary-dark, 0.9)),
-    url('src/assets/banner.png');
+    url('/banner.png');
   background-size: cover;
   background-position: center;
   color: $color-white;
