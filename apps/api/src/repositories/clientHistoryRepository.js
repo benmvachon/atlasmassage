@@ -32,6 +32,7 @@ export class ClientHistoryRepository {
          t.first_name               AS therapist_first_name,
          t.last_name                AS therapist_last_name,
          hr.id                      AS health_record_id,
+         hr.date_of_birth,
          hr.current_medications,
          hr.recent_surgeries,
          hr.pregnancy_status,

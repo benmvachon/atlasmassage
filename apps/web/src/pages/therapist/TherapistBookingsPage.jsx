@@ -258,6 +258,12 @@ function SessionEntry({ session }) {
             <div className="history-record history-record--intake">
               <div className="history-record__type">Medical Intake</div>
               <dl className="history-record__dl">
+                {session.date_of_birth && (
+                  <>
+                    <dt>Date of birth</dt>
+                    <dd>{new Date(session.date_of_birth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</dd>
+                  </>
+                )}
                 {session.pregnancy_status && (
                   <>
                     <dt>Pregnancy status</dt>
@@ -282,7 +288,7 @@ function SessionEntry({ session }) {
                     <dd>{session.injuries}</dd>
                   </>
                 )}
-                {!session.pregnancy_status && !session.current_medications && !session.recent_surgeries && !session.injuries && (
+                {!session.date_of_birth && !session.pregnancy_status && !session.current_medications && !session.recent_surgeries && !session.injuries && (
                   <dd className="history-record__empty">No details provided.</dd>
                 )}
               </dl>

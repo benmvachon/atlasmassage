@@ -192,6 +192,7 @@ function BookingWizard({
   const [zip, setZip] = useState('');
 
   // Health
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [medications, setMedications] = useState('');
   const [surgeries, setSurgeries] = useState('');
   const [pregnancyStatus, setPregnancyStatus] = useState('not_pregnant');
@@ -315,6 +316,7 @@ function BookingWizard({
         }),
         // Health fields only when no existing record is on file
         ...(!hasHealthRecord && {
+          healthDateOfBirth: dateOfBirth || undefined,
           healthCurrentMedications: medications.trim() || undefined,
           healthRecentSurgeries: surgeries.trim() || undefined,
           healthPregnancyStatus: pregnancyStatus || undefined,
@@ -578,6 +580,21 @@ function BookingWizard({
                 This information helps your therapist provide the safest and most effective session.
                 All fields are optional.
               </p>
+
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-dob">
+                  Date of birth <span className="booking-field__optional">(optional)</span>
+                </label>
+                <input
+                  type="date"
+                  id="bm-dob"
+                  className="booking-field__input"
+                  value={dateOfBirth}
+                  onChange={e => setDateOfBirth(e.target.value)}
+                  disabled={submitting}
+                  max={new Date().toISOString().slice(0, 10)}
+                />
+              </div>
 
               <div className="booking-field">
                 <label className="booking-field__label" htmlFor="bm-medications">

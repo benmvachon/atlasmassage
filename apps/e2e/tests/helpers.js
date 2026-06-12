@@ -138,18 +138,22 @@ export async function getServiceId(request) {
 
 /**
  * Create a guest appointment via the public booking API.
- * Returns { appointment } (no payment intent because Stripe is not invoked
- * for fixture setup — only the DB record matters for constraint verification).
+ * Returns the appointment object (no payment intent — only the DB record
+ * matters for constraint verification).
+ *
+ * Pass `healthDateOfBirth` (YYYY-MM-DD) to include a date of birth in the
+ * health record attached to this appointment.
  */
-export async function createGuestAppointment(request, { therapistId, serviceId, scheduledAt }) {
+export async function createGuestAppointment(request, { therapistId, serviceId, scheduledAt, healthDateOfBirth, guestEmail = 'e2e@test.invalid' }) {
   const res = await request.post('/api/v1/appointments', {
     data: {
       therapistId,
       serviceId,
       scheduledAt,
       guestName: 'E2E Test',
-      guestEmail: 'e2e@test.invalid',
+      guestEmail,
       waiverSignature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      ...(healthDateOfBirth && { healthDateOfBirth }),
     },
   });
   const body = await res.json();

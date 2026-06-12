@@ -57,7 +57,7 @@ export async function createAppointment(req, res, next) {
       guestName, guestEmail, guestPhone,
       guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
       notes, paymentMethodId, waiverSignature,
-      healthCurrentMedications, healthRecentSurgeries, healthPregnancyStatus, healthInjuries,
+      healthCurrentMedications, healthRecentSurgeries, healthPregnancyStatus, healthInjuries, healthDateOfBirth,
     } = req.body;
 
     const clientId = req.user?.sub ?? null;
@@ -122,6 +122,7 @@ export async function createAppointment(req, res, next) {
           recentSurgeries: healthRecentSurgeries,
           pregnancyStatus: healthPregnancyStatus,
           injuries: healthInjuries,
+          dateOfBirth: healthDateOfBirth,
         });
         healthRecordId = created.id;
       }
@@ -132,6 +133,7 @@ export async function createAppointment(req, res, next) {
         recentSurgeries: healthRecentSurgeries,
         pregnancyStatus: healthPregnancyStatus,
         injuries: healthInjuries,
+        dateOfBirth: healthDateOfBirth,
       });
       healthRecordId = created.id;
     }

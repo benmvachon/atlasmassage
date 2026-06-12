@@ -190,9 +190,11 @@ test('booking modal: payment section is shown with a card option for authenticat
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
   // Payment section with the saved card should be visible.
-  // Payment methods load asynchronously after the modal mounts, so use a generous
-  // timeout to wait past the "Loading saved cards…" phase.
-  await expect(page.locator('.booking-divider').filter({ hasText: /payment/i })).toBeVisible();
+  // The section header says "Card on File" (not "Payment") because returning
+  // clients with health/consent on file skip straight to the payment step and
+  // the progress nav is hidden (single-step flow). Use a generous timeout to
+  // wait past the "Loading saved cards…" phase.
+  await expect(page.locator('.booking-divider').filter({ hasText: /card on file/i })).toBeVisible({ timeout: 15000 });
   await expect(page.locator('.booking-pm-option').first()).toBeVisible({ timeout: 15000 });
 });
 

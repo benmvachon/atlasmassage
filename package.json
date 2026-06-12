@@ -16,6 +16,7 @@
     "dev:api": "npm run dev --workspace=apps/api",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces --if-present",
+    "test:e2e": "lsof -ti:3099 | xargs kill -9 2>/dev/null; lsof -ti:5174 | xargs kill -9 2>/dev/null; cd apps/e2e && npx playwright test",
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,scss}\" --ignore-path .gitignore"

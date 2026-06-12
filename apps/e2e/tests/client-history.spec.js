@@ -14,7 +14,8 @@ import {
 test.describe.configure({ mode: 'serial' });
 
 // January 2031 — dedicated month to avoid conflicts with all other test suites
-const HIST_DATE = '2031-01-06'; // Monday
+const HIST_DATE     = '2031-01-06'; // Monday — main history / SOAP tests
+const HIST_DATE_DOB = '2031-01-07'; // Tuesday — DOB-specific UI tests
 
 const { owner, sarah } = getAuthState();
 const SARAH_ID    = sarah.userId;
@@ -22,19 +23,24 @@ const SARAH_TOKEN = sarah.token;
 const OWNER_TOKEN = owner.token;
 
 let completedApptId = null;
+let dobApptId       = null;
+let noDobApptId     = null;
 
 test.beforeAll(async ({ request }) => {
   // Remove any leftover data from previous runs
-  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE}`, {
-    headers: debugHeaders(),
-  });
+  await Promise.all([
+    request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE}`,     { headers: debugHeaders() }),
+    request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE_DOB}`, { headers: debugHeaders() }),
+  ]);
 
   const serviceId = await getServiceId(request);
 
   await setAvailability(request, SARAH_ID, SARAH_TOKEN, [
-    { date: HIST_DATE, startTime: '09:00', endTime: '17:00' },
+    { date: HIST_DATE,     startTime: '09:00', endTime: '17:00' },
+    { date: HIST_DATE_DOB, startTime: '09:00', endTime: '17:00' },
   ]);
 
+  // Main appointment — no DOB (tests the SOAP flow)
   const appt = await createGuestAppointment(request, {
     therapistId: SARAH_ID,
     serviceId,
@@ -42,20 +48,42 @@ test.beforeAll(async ({ request }) => {
   });
   expect(appt).not.toBeNull();
 
-  // Owner can mark any appointment as completed regardless of date
-  const completeRes = await request.post(`/api/v1/appointments/${appt.id}/complete`, {
-    headers: { Authorization: `Bearer ${OWNER_TOKEN}` },
+  // DOB appointment — unique guest email so history has exactly one session
+  const dobAppt = await createGuestAppointment(request, {
+    therapistId: SARAH_ID,
+    serviceId,
+    scheduledAt: `${HIST_DATE_DOB}T10:00:00.000Z`,
+    healthDateOfBirth: '1985-03-22',
+    guestEmail: 'e2e-dob@test.invalid',
   });
-  expect(completeRes.ok()).toBe(true);
+  expect(dobAppt).not.toBeNull();
+
+  // No-DOB appointment on same day at 13:00 (clear gap after DOB at 10:00), unique email
+  const noDobAppt = await createGuestAppointment(request, {
+    therapistId: SARAH_ID,
+    serviceId,
+    scheduledAt: `${HIST_DATE_DOB}T13:00:00.000Z`,
+    guestEmail: 'e2e-nodob@test.invalid',
+  });
+  expect(noDobAppt).not.toBeNull();
+
+  await Promise.all([
+    request.post(`/api/v1/appointments/${appt.id}/complete`,     { headers: { Authorization: `Bearer ${OWNER_TOKEN}` } }),
+    request.post(`/api/v1/appointments/${dobAppt.id}/complete`,  { headers: { Authorization: `Bearer ${OWNER_TOKEN}` } }),
+    request.post(`/api/v1/appointments/${noDobAppt.id}/complete`, { headers: { Authorization: `Bearer ${OWNER_TOKEN}` } }),
+  ]);
 
   completedApptId = appt.id;
+  dobApptId       = dobAppt.id;
+  noDobApptId     = noDobAppt.id;
 });
 
 test.afterAll(async ({ request }) => {
-  await request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE}`, {
-    headers: debugHeaders(),
-  });
-  await deleteAvailability(request, SARAH_ID, SARAH_TOKEN, [HIST_DATE]);
+  await Promise.all([
+    request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE}`,     { headers: debugHeaders() }),
+    request.delete(`/api/v1/debug/appointments/${SARAH_ID}/${HIST_DATE_DOB}`, { headers: debugHeaders() }),
+  ]);
+  await deleteAvailability(request, SARAH_ID, SARAH_TOKEN, [HIST_DATE, HIST_DATE_DOB]);
 });
 
 async function goToBookings(page) {
@@ -163,4 +191,43 @@ test('expanding a history session reveals the SOAP notes record', async ({ page 
   await expect(page.locator('div.history-record--soap')).toBeVisible();
   await expect(page.locator('div.history-record--soap')).toContainText('Subjective');
   await expect(page.locator('div.history-record--soap')).toContainText('neck stiffness');
+});
+
+// ── Date of birth ─────────────────────────────────────────────────────────────
+
+test('date of birth appears in the Medical Intake record when provided', async ({ page }) => {
+  await goToBookings(page);
+
+  // Find the row for the DOB appointment and open client history for it
+  const dobRow = page.locator('tr', { hasText: 'e2e-dob@test.invalid' }).first();
+  await dobRow.locator('button:has-text("Client History")').click();
+  await page.waitForSelector('.history-session');
+
+  // Expand the session entry
+  await page.locator('.history-session__header').first().click();
+  await page.waitForSelector('.history-session__records');
+
+  // The Medical Intake record should show the date of birth
+  const intakeRecord = page.locator('div.history-record--intake');
+  await expect(intakeRecord).toBeVisible();
+  await expect(intakeRecord.locator('dt', { hasText: 'Date of birth' })).toBeVisible();
+  // Formatted as long-form date: "March 22, 1985"
+  await expect(intakeRecord.locator('dd', { hasText: 'March 22, 1985' })).toBeVisible();
+});
+
+test('date of birth is absent from Medical Intake when not provided', async ({ page }) => {
+  await goToBookings(page);
+
+  // Use the dedicated no-DOB guest (one session in history — avoids multi-session
+  // layout issues that can make the session header unclickable)
+  const noDobRow = page.locator('tr', { hasText: 'e2e-nodob@test.invalid' }).first();
+  await noDobRow.locator('button:has-text("Client History")').click();
+  await page.waitForSelector('.history-session');
+
+  await page.locator('.history-session__header').first().click();
+  await page.waitForSelector('.history-session__records');
+
+  const intakeRecord = page.locator('div.history-record--intake');
+  await expect(intakeRecord).toBeVisible();
+  await expect(intakeRecord.locator('dt', { hasText: 'Date of birth' })).not.toBeVisible();
 });

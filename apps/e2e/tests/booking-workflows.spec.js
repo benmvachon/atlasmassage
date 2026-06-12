@@ -201,6 +201,23 @@ test('closing the booking modal returns to the slot list', async ({ page }) => {
   await expect(page.locator('.slot-panel__grid')).toBeVisible();
 });
 
+test('health step: date of birth field is present and persists through the flow', async ({ page }) => {
+  await mockStripeDisabled(page);
+  await openModal(page);
+
+  await fillContactStep(page);
+  await advancePastContact(page); // now on health step
+
+  // DOB field should be visible and accept a date value
+  await expect(page.locator('#bm-dob')).toBeVisible();
+  await page.fill('#bm-dob', '1990-06-15');
+  await expect(page.locator('#bm-dob')).toHaveValue('1990-06-15');
+
+  // Advance past health (DOB is optional — no required validation)
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+  await page.waitForSelector('.waiver-sig__canvas'); // consent step
+});
+
 test('Back button on the health step returns to the contact step with values preserved', async ({ page }) => {
   await openModal(page);
 

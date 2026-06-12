@@ -48,6 +48,9 @@ export const createAppointmentRules = [
   body('healthInjuries')
     .optional({ values: 'falsy' })
     .isString().isLength({ max: 2000 }).withMessage('healthInjuries must be 2000 characters or fewer'),
+  body('healthDateOfBirth')
+    .optional({ values: 'falsy' })
+    .isDate({ format: 'YYYY-MM-DD' }).withMessage('healthDateOfBirth must be a valid date (YYYY-MM-DD)'),
 ];
 
 export const soapNotesRules = [

@@ -294,6 +294,9 @@ export class PaymentService {
           if (payment.appointment_id) {
             await this.appointments.updateStatus(payment.appointment_id, 'confirmed');
           }
+        } else if (intent.metadata?.appointmentId) {
+          // No payment record yet (e.g. in-person terminal charge): confirm via metadata.
+          await this.appointments.updateStatus(intent.metadata.appointmentId, 'confirmed');
         }
         break;
       }
