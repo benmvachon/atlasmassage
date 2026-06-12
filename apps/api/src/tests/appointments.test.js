@@ -52,6 +52,7 @@ await jest.unstable_mockModule('../services/notificationService.js', () => ({
   NotificationService: jest.fn(() => ({
     sendBookingConfirmation: jest.fn().mockResolvedValue(),
     sendFeedbackRequest: jest.fn().mockResolvedValue(),
+    sendSoapNotesRequest: jest.fn().mockResolvedValue(),
   })),
 }));
 
@@ -77,9 +78,10 @@ await jest.unstable_mockModule('../services/slotService.js', () => ({
   availableDaysForMonth: jest.fn(() => []),
 }));
 
-const { default: request }     = await import('supertest');
-const { default: app }         = await import('../app.js');
-const { issueAccessToken }     = await import('../services/tokenService.js');
+const { default: request }       = await import('supertest');
+const { default: app }           = await import('../app.js');
+const { issueAccessToken }       = await import('../services/tokenService.js');
+const { NotificationService }    = await import('../services/notificationService.js');
 
 const CLIENT_ID    = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const THERAPIST_ID = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22';
@@ -100,6 +102,7 @@ const APPT = {
   status:         'pending',
   cancel_token:   'tok-cancel',
   feedback_token: FEEDBACK_TOKEN,
+  soap_token:     'tok-soap',
   notes:          null,
 };
 
@@ -783,6 +786,34 @@ describe('POST /api/v1/appointments/:id/complete', () => {
       .post(`/api/v1/appointments/${APPT_ID}/complete`)
       .set('Authorization', bearer('other-therapist', ['therapist']));
     expect(res.status).toBe(403);
+  });
+
+  it('fires sendFeedbackRequest after completion', async () => {
+    mockApptRepo.updateStatus.mockResolvedValue({ ...APPT, status: 'completed' });
+    await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/complete`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    const instance = NotificationService.mock.results.at(-1).value;
+    expect(instance.sendFeedbackRequest).toHaveBeenCalledWith(APPT_ID);
+  });
+
+  it('fires sendSoapNotesRequest after completion', async () => {
+    mockApptRepo.updateStatus.mockResolvedValue({ ...APPT, status: 'completed' });
+    await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/complete`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    const instance = NotificationService.mock.results.at(-1).value;
+    expect(instance.sendSoapNotesRequest).toHaveBeenCalledWith(APPT_ID);
+  });
+
+  it('fires both sendFeedbackRequest and sendSoapNotesRequest on the same service instance', async () => {
+    mockApptRepo.updateStatus.mockResolvedValue({ ...APPT, status: 'completed' });
+    await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/complete`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    const instance = NotificationService.mock.results.at(-1).value;
+    expect(instance.sendFeedbackRequest).toHaveBeenCalledTimes(1);
+    expect(instance.sendSoapNotesRequest).toHaveBeenCalledTimes(1);
   });
 });
 

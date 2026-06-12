@@ -33,6 +33,7 @@ const CLIENT_APPT = {
   guest_name: null,
   guest_email: null,
   cancel_token: null,
+  soap_token: 'soap-tok-abc',
   therapist_user_id: 'therapist-uuid',
   therapist_email: 'therapist@example.com',
   therapist_first_name: 'Alice',
@@ -283,5 +284,56 @@ describe('NotificationService.sendPendingMonthFollowups', () => {
     mockRepoInstance.findAppointmentsNeedingMonthFollowup.mockResolvedValue([noEmail]);
     await service.sendPendingMonthFollowups();
     expect(mockSend).not.toHaveBeenCalled();
+  });
+});
+
+// ── sendSoapNotesRequest ──────────────────────────────────────────────────────
+
+describe('NotificationService.sendSoapNotesRequest', () => {
+  it('sends SOAP notes email to therapist with correct subject and tokenized URL', async () => {
+    await service.sendSoapNotesRequest('appt-uuid');
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'therapist@example.com',
+        subject: expect.stringContaining('SOAP notes required'),
+        html: expect.stringContaining('soap-tok-abc'),
+      })
+    );
+  });
+
+  it('email HTML links to therapist bookings page with appt id and soap token', async () => {
+    await service.sendSoapNotesRequest('appt-uuid');
+    const { html } = mockSend.mock.calls[0][0];
+    expect(html).toContain('/therapist/bookings?appt=appt-uuid&token=soap-tok-abc');
+  });
+
+  it('email subject includes client name and service name', async () => {
+    await service.sendSoapNotesRequest('appt-uuid');
+    const { subject } = mockSend.mock.calls[0][0];
+    expect(subject).toContain('Jane');
+    expect(subject).toContain('Deep Tissue');
+  });
+
+  it('does nothing when appointment is not found', async () => {
+    mockRepoInstance.findAppointmentWithDetails.mockResolvedValue(null);
+    await service.sendSoapNotesRequest('missing-uuid');
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when therapist has no email', async () => {
+    mockRepoInstance.findAppointmentWithDetails.mockResolvedValue(
+      { ...CLIENT_APPT, therapist_email: null }
+    );
+    await service.sendSoapNotesRequest('appt-uuid');
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('logs failure but does not throw when send fails', async () => {
+    mockSend.mockRejectedValueOnce(new Error('SMTP down'));
+    await expect(service.sendSoapNotesRequest('appt-uuid')).resolves.toBeUndefined();
+    expect(mockRepoInstance.logNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'failed' })
+    );
   });
 });

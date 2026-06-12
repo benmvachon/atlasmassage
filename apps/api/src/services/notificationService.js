@@ -131,6 +131,17 @@ function monthFollowupHtml(name, bookingUrl) {
     <p style="color:#806b6b;font-size:14px;text-align:center">We look forward to seeing you soon.</p>`);
 }
 
+function soapNotesRequestHtml(therapistName, clientName, appt, soapUrl) {
+  return baseLayout('SOAP Notes Required', `
+    <p style="margin-bottom:16px">Hi ${therapistName},</p>
+    <p style="margin-bottom:24px">Please submit your SOAP notes for the session you just completed with <strong>${clientName}</strong>.</p>
+    ${apptCard(appt)}
+    ${ctaButton(soapUrl, 'Submit SOAP Notes')}
+    <p style="color:#806b6b;font-size:14px;text-align:center">
+      Timely documentation helps ensure continuity of care and keeps client records up to date.
+    </p>`);
+}
+
 function therapistReminderHtml(therapistName, clientName, appt) {
   return baseLayout('Appointment Reminder', `
     <p style="margin-bottom:16px">Hi ${therapistName},</p>
@@ -235,6 +246,21 @@ export class NotificationService {
         ),
       });
     }
+  }
+
+  async sendSoapNotesRequest(appointmentId) {
+    const appt = await this.repo.findAppointmentWithDetails(appointmentId);
+    if (!appt || !appt.therapist_email) return;
+
+    const clientName = appt.client_first_name ?? appt.guest_name ?? 'your client';
+    const soapUrl = `${config.app.url}/therapist/bookings?appt=${appt.id}&token=${appt.soap_token}`;
+
+    await this._email({
+      userId: appt.therapist_user_id,
+      to: appt.therapist_email,
+      subject: `SOAP notes required: ${clientName} — ${appt.service_name}`,
+      html: soapNotesRequestHtml(appt.therapist_first_name, clientName, appt, soapUrl),
+    });
   }
 
   async sendFeedbackRequest(appointmentId) {

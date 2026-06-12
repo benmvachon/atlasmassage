@@ -418,8 +418,12 @@ export async function completeAppointment(req, res, next) {
 
     const updated = await apptRepo.updateStatus(req.params.id, 'completed');
 
-    new NotificationService(getPool()).sendFeedbackRequest(req.params.id).catch(err => {
+    const notifSvc = new NotificationService(getPool());
+    notifSvc.sendFeedbackRequest(req.params.id).catch(err => {
       logger.error('feedback_send_error', { appointmentId: req.params.id, message: err.message });
+    });
+    notifSvc.sendSoapNotesRequest(req.params.id).catch(err => {
+      logger.error('soap_notes_request_send_error', { appointmentId: req.params.id, message: err.message });
     });
 
     res.json({ success: true, data: updated });
