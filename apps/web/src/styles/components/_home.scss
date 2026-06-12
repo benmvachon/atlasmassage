@@ -4,7 +4,11 @@
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 .hero {
-  background: $color-primary-dark;
+  background-image:
+    linear-gradient(rgba($color-text, 0.72), rgba($color-primary-dark, 0.9)),
+    url('src/assets/banner.png');
+  background-size: cover;
+  background-position: center;
   color: $color-white;
   text-align: center;
   // Bleed to the edges of .layout__content (which has padding: $space-8 $space-4)

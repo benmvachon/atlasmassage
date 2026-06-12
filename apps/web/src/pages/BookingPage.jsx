@@ -84,7 +84,7 @@ export default function BookingPage() {
       <div className="booking-page__header">
         <h1 className="booking-page__title">Book an Appointment</h1>
         <p className="booking-page__subtitle">
-          It&rsquo;s quick and easy and future you will be grateful.
+          It&rsquo;s quick and easy and future-you will be grateful.
         </p>
       </div>
 
