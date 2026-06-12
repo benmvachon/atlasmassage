@@ -9,18 +9,6 @@ $taupe:         #8d7471;
 $taupe-2:       #816f68;
 $prussian-blue: #101935;
 
-// ── Gradients (reference palette vars, no inline hex) ─────────────────────────
-
-$gradient-top:          linear-gradient(0deg,   $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-right:        linear-gradient(90deg,  $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-bottom:       linear-gradient(180deg, $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-left:         linear-gradient(270deg, $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-top-right:    linear-gradient(45deg,  $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-bottom-right: linear-gradient(135deg, $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-top-left:     linear-gradient(225deg, $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-bottom-left:  linear-gradient(315deg, $lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-$gradient-radial:       radial-gradient($lilac-ash, $dusty-mauve, $taupe, $taupe-2);
-
 // ── Brand / semantic colors ───────────────────────────────────────────────────
 
 $color-primary:        #af3e4d;
