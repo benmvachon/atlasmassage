@@ -1,14 +1,3 @@
-// ── Raw palette ───────────────────────────────────────────────────────────────
-// Named exactly as the design uses them; never reference these directly in
-// components — use the semantic tokens below.
-
-$dark-khaki:    #3e442b;
-$lilac-ash:     #baabbd;
-$dusty-mauve:   #9f838c;
-$taupe:         #8d7471;
-$taupe-2:       #816f68;
-$prussian-blue: #101935;
-
 // ── Brand / semantic colors ───────────────────────────────────────────────────
 
 $color-primary:        #af3e4d;
@@ -31,6 +20,7 @@ $color-error-dark:     #b91c1c;
 $color-error-bg:       #fef2f2;
 $color-success:        #16a34a;
 $color-success-bg:     #f0fdf4;
+$lilac-ash:            #baabbd;
 
 // ── Primary color tints ───────────────────────────────────────────────────────
 // Used for hover states, selection backgrounds, and overlays.
