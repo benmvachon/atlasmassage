@@ -87,3 +87,17 @@ jobs:
         run: npm run build --workspace=apps/web
         env:
           NODE_ENV: production
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [lint, test-api, test-web, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: /home/deploy/atlas-deploy.sh
