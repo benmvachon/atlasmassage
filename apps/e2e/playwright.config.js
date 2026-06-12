@@ -16,6 +16,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const E2E_ENV = {
   NODE_ENV: 'test',
   EMAIL_HOST: '',
+  EMAIL_DISABLED: 'true',
   PORT: '3099',
   API_PORT: '3099',
   VITE_PORT: '5174',

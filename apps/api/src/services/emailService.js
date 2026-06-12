@@ -3,7 +3,7 @@ import { config } from '../config/index.js';
 import { logger } from '../logging/logger.js';
 
 function createTransport() {
-  if (!config.email.host || process.env.NODE_ENV === 'test') return null;
+  if (!config.email.host || process.env.EMAIL_DISABLED === 'true') return null;
   return nodemailer.createTransport({
     host: config.email.host,
     port: config.email.port,
