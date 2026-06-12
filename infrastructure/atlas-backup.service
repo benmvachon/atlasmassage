@@ -1,0 +1,10 @@
+[Unit]
+Description=Atlas Massage database backup
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=deploy
+ExecStart=/var/www/atlasmassage/scripts/backup.sh
+StandardOutput=append:/var/log/atlasmassage/backup.log
+StandardError=append:/var/log/atlasmassage/backup.log

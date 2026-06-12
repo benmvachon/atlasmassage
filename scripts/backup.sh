@@ -2,17 +2,18 @@
 set -euo pipefail
 
 ENV_FILE="/var/www/atlasmassage/apps/api/.env"
-BACKUP_DIR="/var/backups/atlasmassage"
-DAILY_DIR="$BACKUP_DIR/daily"
-WEEKLY_DIR="$BACKUP_DIR/weekly"
-KEEP_DAILY=7
-KEEP_WEEKLY=4
 
-# Load DB credentials from app .env
+# Load DB credentials and optional overrides from app .env
 set -a
 # shellcheck source=/dev/null
 source "$ENV_FILE"
 set +a
+
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/atlasmassage}"
+DAILY_DIR="$BACKUP_DIR/daily"
+WEEKLY_DIR="$BACKUP_DIR/weekly"
+KEEP_DAILY=7
+KEEP_WEEKLY=4
 
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
