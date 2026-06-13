@@ -256,7 +256,7 @@
   padding: $space-4;
   border: 1px solid $color-border;
   border-radius: $border-radius-md;
-  background: $color-white;
+  background: $color-surface;
   margin-bottom: $space-3;
   gap: $space-4;
 
@@ -322,7 +322,7 @@
   padding: $space-3 $space-4;
   border: 1px solid $color-border;
   border-radius: $border-radius-sm;
-  background: $color-white;
+  background: $color-bg-alt;
 
   &:focus-within {
     border-color: $color-primary;
@@ -576,7 +576,7 @@
   padding: $space-3 $space-4;
   border: 1px solid $color-border;
   border-radius: $border-radius-md;
-  background: $color-white;
+  background: $color-surface;
   cursor: pointer;
   transition: border-color $transition-fast;
   touch-action: manipulation;

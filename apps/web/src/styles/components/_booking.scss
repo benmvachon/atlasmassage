@@ -127,7 +127,7 @@
   gap: 2px;
   padding: $space-3 $space-4;
   width: 120px;
-  background: $color-white;
+  background: $color-surface;
   border: 1px solid $color-border;
   border-radius: $border-radius-md;
   cursor: pointer;
@@ -468,7 +468,7 @@
   padding: $space-3 $space-4;
   border: 1px solid $color-primary-light;
   border-radius: $border-radius-md;
-  background: $color-white;
+  background: $color-bg-alt;
   margin-top: $space-1;
 
   &:focus-within {
@@ -515,7 +515,7 @@
     height: 28px;
     border-radius: $border-radius-full;
     border: 2px solid $color-border;
-    background: $color-white;
+    background: $color-surface;
     color: $color-text-muted;
     font-family: $font-family-ui;
     font-size: $font-size-xs;
@@ -768,7 +768,7 @@
 }
 
 .feedback-card {
-  background: $color-white;
+  background: $color-surface;
   border: 1px solid $color-border;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-md;
@@ -916,7 +916,7 @@
 }
 
 .guest-manage-card {
-  background: $color-bg-alt;
+  background: $color-surface;
   border-radius: $border-radius-md;
   border-left: 3px solid $color-primary;
   padding: $space-5 $space-6;

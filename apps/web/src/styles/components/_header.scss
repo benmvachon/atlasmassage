@@ -6,7 +6,7 @@
   top: 0;
   z-index: 100;
   height: $header-height;
-  background-color: $color-white;
+  background-color: $color-surface;
   box-shadow: $shadow-sm;
 
   &__inner {
@@ -129,7 +129,7 @@
       top: 100%;
       left: calc(-1 * $space-4);
       right: calc(-1 * $space-4);
-      background: $color-white;
+      background: $color-surface;
       box-shadow: $shadow-lg;
       border-top: 1px solid $color-border;
       padding: $space-4 $space-4 0;
@@ -151,7 +151,7 @@
         text-align: left;
         border-radius: 0;
 
-        &:hover { background: $color-bg-alt; text-decoration: none; }
+        &:hover { background: $color-bg; text-decoration: none; }
         &.active { color: $color-primary; background: $color-primary-tint-xs; text-decoration: none; }
       }
 

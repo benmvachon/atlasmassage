@@ -3,8 +3,8 @@
 .footer {
   margin-top: auto;
   padding: $space-4 0;
-  background-color: $color-text;
-  color: $color-bg;
+  background-color: $color-surface;
+  color: $color-primary;
 
   &__inner {
     display: flex;
@@ -24,7 +24,7 @@
   &__copy {
     font-family: $font-family-ui;
     font-size: $font-size-sm;
-    color: $color-white;
+    color: $color-primary;
     margin-bottom: 0;
   }
 
@@ -41,14 +41,14 @@
     a {
       font-family: $font-family-ui;
       font-size: $font-size-sm;
-      color: $color-bg-alt;
+      color: $color-primary;
       transition: color $transition-fast;
       min-height: 44px;
       display: flex;
       align-items: center;
       touch-action: manipulation;
 
-      &:hover { color: $color-white; }
+      &:hover { color: $color-primary-light; }
     }
   }
 }

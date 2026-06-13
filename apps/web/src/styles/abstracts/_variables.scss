@@ -1,74 +1,70 @@
 // ── Brand / semantic colors ───────────────────────────────────────────────────
 
-$color-primary:        #af3e4d;
-$color-primary-dark:   #681b25;
-$color-primary-light:  #e56c7c;
-$color-secondary:      #dd9955;
-$color-secondary-dark: #ab6f33;
-$color-secondary-light:#f6b778;
-$color-accent:         #fefae0;
+$color-primary:        #cc4860;
+$color-primary-dark:   #dc6878;
+$color-primary-light:  #f090a8;
+$color-secondary:      #e8a858;
+$color-secondary-dark: #c07838;
+$color-secondary-light:#f6c880;
+$color-accent:         #3a2810;
 
-$color-text:           #2e1a1a;
-$color-text-muted:     #806b6b;
-$color-bg:             #faf9f9;
-$color-bg-alt:         #f6f5f3;
+$color-text:           #ede0ea;
+$color-text-muted:     #a890a8;
+$color-bg:             #1c0d0d;
+$color-bg-alt:         #301515;
+$color-surface:        #3c1818;
 $color-white:          #ffffff;
-$color-border:         #d1d5db;
+$color-border:         #5a2c2c;
 
-$color-error:          #dc2626;
-$color-error-dark:     #b91c1c;
-$color-error-bg:       #fef2f2;
-$color-success:        #16a34a;
-$color-success-bg:     #f0fdf4;
+$color-error:          #f47272;
+$color-error-dark:     #d04040;
+$color-error-bg:       #3c0e18;
+$color-success:        #38c068;
+$color-success-bg:     #0a2c18;
 $lilac-ash:            #baabbd;
 
 // ── Primary color tints ───────────────────────────────────────────────────────
-// Used for hover states, selection backgrounds, and overlays.
-// Defined here so changing $color-primary cascades through all tints.
 
-$color-primary-tint-xs:     rgba($color-primary, 0.04);  // subtle hover / default bg
-$color-primary-tint-sm:     rgba($color-primary, 0.08);  // action-bar bg, appt card bg
-$color-primary-tint-md:     rgba($color-primary, 0.12);  // selected cell, badge bg
-$color-primary-tint-lg:     rgba($color-primary, 0.20);  // strong tint, legend swatch
-$color-primary-tint-active: rgba($color-primary, 0.10);  // active nav link bg
+$color-primary-tint-xs:     rgba($color-primary, 0.07);
+$color-primary-tint-sm:     rgba($color-primary, 0.12);
+$color-primary-tint-md:     rgba($color-primary, 0.18);
+$color-primary-tint-lg:     rgba($color-primary, 0.26);
+$color-primary-tint-active: rgba($color-primary, 0.15);
 
-$color-primary-border-sm:   rgba($color-primary, 0.20);  // action-bar border
-$color-primary-border-md:   rgba($color-primary, 0.30);  // available-day border
+$color-primary-border-sm:   rgba($color-primary, 0.28);
+$color-primary-border-md:   rgba($color-primary, 0.42);
 
-$color-error-border-alpha:  rgba($color-error, 0.30);    // error card outline
+$color-error-border-alpha:  rgba($color-error, 0.35);
 
 // ── Focus / interaction shadows ───────────────────────────────────────────────
-// Components consume these tokens — no inline rgba in component files.
 
-$focus-shadow-sm:    0 0 0 2px rgba($color-primary, 0.15);
-$focus-shadow-md:    0 0 0 3px rgba($color-primary, 0.12);
-$focus-shadow-error: 0 0 0 3px rgba($color-error,   0.12);
+$focus-shadow-sm:    0 0 0 2px rgba($color-primary, 0.25);
+$focus-shadow-md:    0 0 0 3px rgba($color-primary, 0.22);
+$focus-shadow-error: 0 0 0 3px rgba($color-error,   0.22);
 
 // ── Overlay ───────────────────────────────────────────────────────────────────
 
-$color-overlay: rgba(0, 0, 0, 0.45);
+$color-overlay: rgba(0, 0, 0, 0.68);
 
 // ── Status badge tokens ───────────────────────────────────────────────────────
-// Appointment / membership status colours. Kept here so the whole badge
-// system can be re-themed by editing one place.
 
-$color-badge-success-bg:     #dcfce7;
-$color-badge-success-text:   #15803d;
-$color-badge-success-border: #86efac;
+$color-badge-success-bg:     #0a2c18;
+$color-badge-success-text:   #38c068;
+$color-badge-success-border: #186838;
 
-$color-badge-warning-bg:     #fef9c3;
-$color-badge-warning-text:   #854d0e;
+$color-badge-warning-bg:     #2e1a00;
+$color-badge-warning-text:   #d88838;
 
-$color-badge-error-bg:       #fee2e2;
-$color-badge-error-text:     #991b1b;
-$color-badge-error-border:   #fca5a5;
+$color-badge-error-bg:       #3c0e18;
+$color-badge-error-text:     #f47272;
+$color-badge-error-border:   #6c1820;
 
-$color-badge-info-bg:        #dbeafe;
-$color-badge-info-text:      #1d4ed8;
-$color-badge-info-border:    #93c5fd;
+$color-badge-info-bg:        #081428;
+$color-badge-info-text:      #60a0f0;
+$color-badge-info-border:    #183868;
 
-$color-badge-transfer-bg:    #ede9fe;
-$color-badge-transfer-text:  #6d28d9;
+$color-badge-transfer-bg:    #180e38;
+$color-badge-transfer-text:  #a878f0;
 
 // ── Typography ────────────────────────────────────────────────────────────────
 
@@ -118,9 +114,9 @@ $border-radius-md:   8px;
 $border-radius-lg:   16px;
 $border-radius-full: 9999px;
 
-$shadow-sm: 0 1px 2px rgb(0 0 0 / 5%);
-$shadow-md: 0 4px 6px rgb(0 0 0 / 8%);
-$shadow-lg: 0 10px 25px rgb(0 0 0 / 12%);
+$shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
+$shadow-md: 0 4px 12px rgb(0 0 0 / 45%);
+$shadow-lg: 0 10px 30px rgb(0 0 0 / 55%);
 
 // ── Transitions ───────────────────────────────────────────────────────────────
 

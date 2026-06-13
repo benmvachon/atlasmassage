@@ -38,24 +38,24 @@
   }
 
   &--secondary {
-    background-color: $color-secondary-light;
-    color: $color-primary-dark;
-    border-color: $color-secondary-light;
+    background-color: $color-secondary-dark;
+    color: $color-bg;
+    border-color: $color-secondary-dark;
 
     &:hover:not(:disabled) {
-      background-color: $color-secondary-dark;
-      border-color: $color-secondary-dark;
-      color: $color-white;
+      background-color: $color-secondary;
+      border-color: $color-secondary;
+      color: $color-bg;
     }
   }
 
   &--outline {
     background-color: transparent;
-    color: $color-primary-dark;
-    border-color: $color-primary-dark;
+    color: $color-primary-light;
+    border-color: $color-primary;
 
     &:hover:not(:disabled) {
-      background-color: $color-secondary-light;
+      background-color: $color-primary-tint-sm;
     }
   }
 
@@ -64,7 +64,7 @@
     color: $color-text;
     border-color: transparent;
 
-    &:hover:not(:disabled) { background-color: $color-bg-alt; }
+    &:hover:not(:disabled) { background-color: $color-primary-tint-xs; }
   }
 
   &--full { width: 100%; }

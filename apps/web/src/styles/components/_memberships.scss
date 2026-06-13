@@ -8,7 +8,11 @@
 }
 
 .memberships-hero {
-  background: $color-primary-dark;
+  background-image:
+    linear-gradient(rgba(#08040c, 0.78), rgba($color-primary-dark, 0.88)),
+    url('/banner.png');
+  background-size: cover;
+  background-position: center;
   padding: $space-16 $space-4;
   margin: calc(-1 * $space-8) calc(-1 * $space-4) 0;
   text-align: center;
@@ -69,7 +73,7 @@
 // ── Benefits strip ────────────────────────────────────────────────────────────
 
 .memberships-benefits {
-  background: $color-white;
+  background: $color-surface;
   border-bottom: 1px solid $color-border;
   padding: $space-12 $space-4;
 

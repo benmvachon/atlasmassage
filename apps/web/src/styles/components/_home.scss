@@ -5,7 +5,7 @@
 
 .hero {
   background-image:
-    linear-gradient(rgba($color-text, 0.72), rgba($color-primary-dark, 0.9)),
+    linear-gradient(rgba(#08040c, 0.78), rgba($color-primary-dark, 0.88)),
     url('/banner.png');
   background-size: cover;
   background-position: center;
@@ -91,7 +91,7 @@
     iframe {
       display: block;
       width: 100%;
-      filter: grayscale(100%);
+      filter: grayscale(100%) invert(90%) hue-rotate(180deg) brightness(0.85);
     }
   }
 

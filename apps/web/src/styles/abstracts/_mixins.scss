@@ -49,7 +49,7 @@
 // calendar containers, etc. Components add their own padding.
 
 @mixin card {
-  background: $color-white;
+  background: $color-surface;
   border: 1px solid $color-border;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-sm;
@@ -64,7 +64,7 @@
   border-radius: $border-radius-sm;
   font-family: $font-family-ui;
   font-size: $font-size-sm;
-  background: $color-white;
+  background: $color-bg-alt;
   color: $color-text;
 
   &:focus {
