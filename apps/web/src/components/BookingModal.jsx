@@ -302,8 +302,8 @@ function BookingWizard({
     setGiftCardError('');
     setGiftCardLoading(true);
     try {
-      const { data } = await giftCardService.validate(code);
-      setGiftCardApplied({ code: data.code, remainingBalanceCents: data.remainingBalanceCents, originalAmountCents: data.originalAmountCents });
+      const cardData = await giftCardService.validate(code);
+      setGiftCardApplied({ code: cardData.code, remainingBalanceCents: cardData.remainingBalanceCents, originalAmountCents: cardData.originalAmountCents });
       setGiftCardInput('');
     } catch (err) {
       setGiftCardError(err?.response?.data?.message || 'Gift card not found or not valid.');

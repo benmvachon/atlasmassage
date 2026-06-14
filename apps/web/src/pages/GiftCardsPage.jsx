@@ -7,7 +7,7 @@ const PRESET_AMOUNTS = [150, 200, 250, 300];
 export default function GiftCardsPage() {
   const { user } = useAuth();
 
-  const [selectedAmount, setSelectedAmount] = useState(75);
+  const [selectedAmount, setSelectedAmount] = useState(150);
   const [customAmount, setCustomAmount] = useState('');
   const [useCustom, setUseCustom] = useState(false);
 
@@ -46,7 +46,7 @@ export default function GiftCardsPage() {
 
     setSubmitting(true);
     try {
-      const { data } = await giftCardService.purchase({
+      const { url } = await giftCardService.purchase({
         purchaserName: purchaserName.trim(),
         purchaserEmail: purchaserEmail.trim(),
         recipientName: recipientName.trim() || undefined,
@@ -54,7 +54,7 @@ export default function GiftCardsPage() {
         message: message.trim() || undefined,
         amountCents,
       });
-      window.location.href = data.url;
+      window.location.href = url;
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to start checkout. Please try again.');
       setSubmitting(false);
@@ -64,9 +64,9 @@ export default function GiftCardsPage() {
   return (
     <div className="gift-cards-page container">
       <div className="gift-cards-page__hero">
-        <h1 className="gift-cards-page__title">Gift the Gift of Relaxation</h1>
+        <h1 className="gift-cards-page__title">Gift the Gift of Wellness</h1>
         <p className="gift-cards-page__subtitle">
-          Atlas Bodywork gift cards — the perfect present for someone who deserves a little rest.
+          Atlas Bodywork gift cards are the kindest way to tell somebody they need a massage.
         </p>
       </div>
 
@@ -186,7 +186,7 @@ export default function GiftCardsPage() {
                 onChange={e => setMessage(e.target.value)}
                 disabled={submitting}
                 rows={3}
-                placeholder="Enjoy a well-deserved break!"
+                placeholder="Enjoy some well-deserved care!"
               />
             </div>
           </section>
