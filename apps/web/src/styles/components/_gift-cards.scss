@@ -1,0 +1,419 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Gift Cards purchase page ───────────────────────────────────────────────────
+
+.gift-cards-page {
+  padding: $space-10 $space-4;
+  max-width: 1000px;
+
+  &__hero {
+    text-align: center;
+    margin-bottom: $space-10;
+  }
+
+  &__title {
+    font-family: $font-family-logo;
+    font-size: $font-size-2xl;
+    color: $color-primary-dark;
+    margin-bottom: $space-3;
+  }
+
+  &__subtitle {
+    font-size: $font-size-lg;
+    color: $color-text-muted;
+    font-family: $font-family-base;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: $space-10;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+
+    @media (max-width: #{$bp-md - 1px}) {
+      order: -1;
+    }
+  }
+}
+
+// ── Purchase form ─────────────────────────────────────────────────────────────
+
+.gift-card-form {
+  &__section {
+    margin-bottom: $space-8;
+  }
+
+  &__section-title {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text;
+    margin-bottom: $space-4;
+  }
+
+  &__section-desc {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-4;
+  }
+
+  &__optional {
+    font-weight: 400;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
+  &__field {
+    margin-bottom: $space-4;
+
+    label {
+      display: block;
+      font-family: $font-family-ui;
+      font-size: $font-size-sm;
+      font-weight: 500;
+      color: $color-text;
+      margin-bottom: $space-2;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: $space-3 $space-4;
+      border: 1px solid $color-border;
+      border-radius: $border-radius-md;
+      font-size: $font-size-md;
+      font-family: $font-family-ui;
+      background: $color-white;
+      color: $color-text;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: $focus-shadow-sm;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-error;
+    margin-bottom: $space-4;
+  }
+
+  &__submit {
+    margin-bottom: $space-4;
+
+    .btn--lg {
+      width: 100%;
+      padding: $space-4 $space-6;
+      font-size: $font-size-md;
+    }
+  }
+
+  &__secure-note {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-align: center;
+  }
+}
+
+// ── Amount selector ───────────────────────────────────────────────────────────
+
+.gift-card-amounts {
+  display: flex;
+  gap: $space-3;
+  flex-wrap: wrap;
+  margin-bottom: $space-4;
+}
+
+.gift-card-amount-btn {
+  padding: $space-3 $space-5;
+  border: 2px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-white;
+  font-family: $font-family-ui;
+  font-size: $font-size-md;
+  font-weight: 500;
+  color: $color-text;
+  cursor: pointer;
+  transition: border-color $transition-fast, background $transition-fast, color $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: $color-primary;
+    color: $color-primary-dark;
+  }
+
+  &--selected {
+    border-color: $color-primary;
+    background: $color-primary-tint-md;
+    color: $color-primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.gift-card-custom-amount {
+  margin-top: $space-2;
+
+  &__label {
+    display: block;
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    margin-bottom: $space-2;
+    color: $color-text;
+  }
+
+  &__input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+    max-width: 160px;
+
+    &:focus-within {
+      border-color: $color-primary;
+      box-shadow: $focus-shadow-sm;
+    }
+  }
+
+  &__prefix {
+    padding: $space-3 $space-3;
+    background: $color-bg-alt;
+    color: $color-text-muted;
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    border-right: 1px solid $color-border;
+  }
+
+  &__input {
+    flex: 1;
+    border: none;
+    padding: $space-3 $space-3;
+    font-size: $font-size-md;
+    font-family: $font-family-ui;
+    color: $color-text;
+    background: $color-white;
+
+    &:focus {
+      outline: none;
+    }
+
+    // Hide spinner arrows
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+}
+
+// ── Info sidebar cards ────────────────────────────────────────────────────────
+
+.gift-card-info-card {
+  background: $color-bg-alt;
+  border-radius: $border-radius-md;
+  padding: $space-6;
+
+  h3 {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 600;
+    margin-bottom: $space-4;
+    color: $color-primary-dark;
+  }
+}
+
+.gift-card-info-steps {
+  list-style: decimal;
+  padding-left: $space-6;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text;
+  line-height: 1.6;
+
+  li + li { margin-top: $space-3; }
+}
+
+.gift-card-info-details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text;
+
+  li {
+    padding: $space-2 0;
+    border-bottom: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+
+    &::before {
+      content: '✓';
+      color: $color-success;
+      font-weight: 600;
+    }
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+// ── Success page ──────────────────────────────────────────────────────────────
+
+.gift-card-success {
+  padding: $space-16 $space-4;
+  text-align: center;
+
+  &__inner {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: $border-radius-full;
+    background: $color-success-bg;
+    color: $color-success;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $space-6;
+  }
+
+  &__title {
+    font-family: $font-family-logo;
+    font-size: $font-size-2xl;
+    color: $color-primary-dark;
+    margin-bottom: $space-4;
+  }
+
+  &__body {
+    font-family: $font-family-base;
+    font-size: $font-size-md;
+    color: $color-text-muted;
+    line-height: 1.7;
+    margin-bottom: $space-4;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-4;
+    justify-content: center;
+    margin-top: $space-8;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Booking modal — gift card redemption section ───────────────────────────────
+
+.booking-gift-card {
+  margin-bottom: $space-4;
+  padding: $space-4;
+  background: $color-bg-alt;
+  border-radius: $border-radius-md;
+  border: 1px solid $color-border;
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text;
+    margin-bottom: $space-3;
+  }
+
+  &__input-row {
+    display: flex;
+    gap: $space-2;
+  }
+
+  &__input {
+    flex: 1;
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-sm;
+    font-family: $font-family-ui;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: $color-text;
+    background: $color-white;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: $focus-shadow-sm;
+    }
+
+    &:disabled { opacity: 0.5; }
+  }
+
+  &__applied {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__applied-text {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-success;
+    font-weight: 500;
+  }
+
+  &__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-decoration: underline;
+    padding: 0;
+
+    &:hover { color: $color-error; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__error {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-error;
+    margin-top: $space-2;
+  }
+}

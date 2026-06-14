@@ -30,6 +30,8 @@ import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
 import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
 import FeedbackPage from '../pages/FeedbackPage.jsx';
 import GuestManagePage from '../pages/GuestManagePage.jsx';
+import GiftCardsPage from '../pages/GiftCardsPage.jsx';
+import GiftCardSuccessPage from '../pages/GiftCardSuccessPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
 
 export default function AppRoutes() {
@@ -44,6 +46,8 @@ export default function AppRoutes() {
         <Route path="/memberships" element={<MembershipsPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/booking/manage" element={<GuestManagePage />} />
+        <Route path="/gift-cards" element={<GiftCardsPage />} />
+        <Route path="/gift-cards/success" element={<GiftCardSuccessPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>

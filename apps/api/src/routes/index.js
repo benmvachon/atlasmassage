@@ -11,6 +11,7 @@ import adminRoutes from './admin.js';
 import businessRoutes from './business.js';
 import teamRoutes from './team.js';
 import testimonialsRoutes from './testimonials.js';
+import giftCardRoutes from './giftCards.js';
 import debugRoutes from './debug.js';
 
 const router = Router();
@@ -26,6 +27,7 @@ router.use('/admin', adminRoutes);
 router.use('/business', businessRoutes);
 router.use('/team', teamRoutes);
 router.use('/testimonials', testimonialsRoutes);
+router.use('/gift-cards', giftCardRoutes);
 
 if (config.env !== 'production') {
   router.use('/debug', (req, res, next) => {

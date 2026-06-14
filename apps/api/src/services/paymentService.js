@@ -4,6 +4,7 @@ import { PaymentRepository } from '../repositories/paymentRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
 import { MembershipRepository } from '../repositories/membershipRepository.js';
+import { GiftCardService } from './giftCardService.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 function getStripe() {
@@ -15,6 +16,7 @@ function getStripe() {
 
 export class PaymentService {
   constructor(pool) {
+    this.pool = pool;
     this.payments = new PaymentRepository(pool);
     this.users = new UserRepository(pool);
     this.appointments = new AppointmentRepository(pool);
@@ -333,6 +335,14 @@ export class PaymentService {
             status: 'cancelled',
             endDate: today,
           });
+        }
+        break;
+      }
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        if (session.payment_status === 'paid') {
+          const giftCardSvc = new GiftCardService(this.pool);
+          await giftCardSvc.handleCheckoutCompleted(session);
         }
         break;
       }

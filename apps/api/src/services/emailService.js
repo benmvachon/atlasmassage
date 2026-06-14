@@ -28,6 +28,29 @@ export async function send({ to, subject, html }) {
   }
 }
 
+export async function sendGiftCardEmail({ to, purchaserName, recipientName, recipientEmail, code, amountCents, message }) {
+  const displayAmount = `$${(amountCents / 100).toFixed(0)}`;
+  const isRecipient = !!recipientEmail;
+  const greeting = recipientName ? `Hi ${recipientName},` : 'Hi there,';
+  const fromLine = purchaserName ? `<p>This gift card was sent to you by ${purchaserName}.</p>` : '';
+  const messageHtml = message ? `<blockquote style="border-left:3px solid #ccc;padding:8px 16px;margin:16px 0;color:#555">${message}</blockquote>` : '';
+
+  await send({
+    to,
+    subject: `Your ${displayAmount} Atlas Bodywork Gift Card`,
+    html: `
+      <p>${isRecipient ? greeting : `Hi ${purchaserName || 'there'},`}</p>
+      ${isRecipient ? fromLine : ''}
+      ${messageHtml}
+      <p>You have received a <strong>${displayAmount} Atlas Bodywork gift card</strong>. Use the code below when booking your massage:</p>
+      <p style="font-size:24px;font-weight:bold;letter-spacing:4px;text-align:center;padding:16px;background:#f5f5f5;border-radius:8px">${code}</p>
+      <p>To redeem, enter this code in the "Have a gift card?" section during checkout at <a href="${config.app.url}/booking">${config.app.url}/booking</a>.</p>
+      <p>This gift card does not expire.</p>
+      <p>— The Atlas Bodywork Team</p>
+    `,
+  });
+}
+
 export async function sendPasswordResetEmail({ to, firstName, token }) {
   const resetUrl = `${config.app.url}/reset-password?token=${token}`;
   await send({

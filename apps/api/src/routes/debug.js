@@ -12,6 +12,7 @@ import { getPool } from '../database/pool.js';
 import { generateResetToken } from '../services/tokenService.js';
 import { PaymentService } from '../services/paymentService.js';
 import { NotificationService } from '../services/notificationService.js';
+import { GiftCardRepository } from '../repositories/giftCardRepository.js';
 
 const router = Router();
 
@@ -282,6 +283,43 @@ router.delete('/appointments/:appointmentId', async (req, res, next) => {
       [appointmentId]
     );
     res.json({ success: true, data: { cancelled: true } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── Gift Cards ────────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/v1/debug/gift-cards
+ * Body: { amountCents?, purchaserEmail? }
+ * Creates an active gift card directly in the DB for E2E test setup.
+ */
+router.post('/gift-cards', async (req, res, next) => {
+  try {
+    const { amountCents = 15000, purchaserEmail = 'test@example.com' } = req.body;
+    const pool = getPool();
+    const repo = new GiftCardRepository(pool);
+    const card = await repo.create({ originalAmountCents: amountCents, purchaserEmail });
+    const activated = await repo.activate(card.id);
+    res.json({ success: true, data: { giftCard: activated } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * DELETE /api/v1/debug/gift-cards/:code
+ * Hard-deletes a gift card by code (cascades to transactions).
+ */
+router.delete('/gift-cards/:code', async (req, res, next) => {
+  try {
+    const pool = getPool();
+    const { rowCount } = await pool.query(
+      'DELETE FROM gift_cards WHERE code = $1',
+      [req.params.code.toUpperCase()]
+    );
+    res.json({ success: true, data: { deleted: rowCount } });
   } catch (err) {
     next(err);
   }

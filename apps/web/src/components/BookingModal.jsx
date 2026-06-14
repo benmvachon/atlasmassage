@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
 import { paymentService } from '../services/paymentService.js';
 import { membershipService } from '../services/membershipService.js';
+import { giftCardService } from '../services/giftCardService.js';
 import { getStripePromise, stripePublishableKey } from '../services/stripe.js';
 
 function formatDate(dateStr) {
@@ -207,6 +208,12 @@ function BookingWizard({
   const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
   const [serviceId] = useState(services[0]?.id ?? '');
 
+  // Gift card
+  const [giftCardInput, setGiftCardInput] = useState('');
+  const [giftCardApplied, setGiftCardApplied] = useState(null); // { code, remainingBalanceCents, originalAmountCents }
+  const [giftCardError, setGiftCardError] = useState('');
+  const [giftCardLoading, setGiftCardLoading] = useState(false);
+
   const dialogRef = useRef(null);
   useFocusTrap(dialogRef, { onEscape: onClose });
 
@@ -289,6 +296,28 @@ function BookingWizard({
     goNext();
   }
 
+  async function applyGiftCard() {
+    const code = giftCardInput.trim().toUpperCase();
+    if (!code) return;
+    setGiftCardError('');
+    setGiftCardLoading(true);
+    try {
+      const { data } = await giftCardService.validate(code);
+      setGiftCardApplied({ code: data.code, remainingBalanceCents: data.remainingBalanceCents, originalAmountCents: data.originalAmountCents });
+      setGiftCardInput('');
+    } catch (err) {
+      setGiftCardError(err?.response?.data?.message || 'Gift card not found or not valid.');
+    } finally {
+      setGiftCardLoading(false);
+    }
+  }
+
+  function removeGiftCard() {
+    setGiftCardApplied(null);
+    setGiftCardError('');
+    setGiftCardInput('');
+  }
+
   async function submitBooking(waiverSignature) {
     setSubmitting(true);
     setError('');
@@ -303,6 +332,7 @@ function BookingWizard({
         scheduledAt,
         notes: notes.trim() || undefined,
         paymentMethodId: savedMethod ? savedMethod.id : undefined,
+        ...(giftCardApplied && { giftCardCode: giftCardApplied.code }),
         ...(waiverSignature && { waiverSignature }),
         ...(!user && {
           guestName: name.trim(),
@@ -794,6 +824,54 @@ function BookingWizard({
                     rows={3}
                     placeholder="Any updates to your health condition, new concerns, or focus areas for this visit."
                   />
+                </div>
+              )}
+
+              {!membershipCoversBooking && (
+                <div className="booking-gift-card">
+                  <p className="booking-gift-card__label">Have a gift card?</p>
+                  {giftCardApplied ? (
+                    <div className="booking-gift-card__applied">
+                      <span className="booking-gift-card__applied-text">
+                        Gift card applied — ${(Math.min(giftCardApplied.remainingBalanceCents, selectedService?.priceCents ?? 0) / 100).toFixed(0)} credit
+                        {giftCardApplied.remainingBalanceCents > (selectedService?.priceCents ?? 0) && (
+                          <> (${((giftCardApplied.remainingBalanceCents - (selectedService?.priceCents ?? 0)) / 100).toFixed(0)} will remain on the card)</>
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        className="booking-gift-card__remove"
+                        onClick={removeGiftCard}
+                        disabled={submitting}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="booking-gift-card__input-row">
+                      <input
+                        type="text"
+                        className="booking-gift-card__input"
+                        placeholder="XXXX-XXXX-XXXX"
+                        value={giftCardInput}
+                        onChange={e => { setGiftCardInput(e.target.value.toUpperCase()); setGiftCardError(''); }}
+                        disabled={submitting || giftCardLoading}
+                        maxLength={14}
+                        aria-label="Gift card code"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn--outline btn--sm"
+                        onClick={applyGiftCard}
+                        disabled={!giftCardInput.trim() || submitting || giftCardLoading}
+                      >
+                        {giftCardLoading ? 'Checking…' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+                  {giftCardError && (
+                    <p className="booking-gift-card__error" role="alert">{giftCardError}</p>
+                  )}
                 </div>
               )}
 

@@ -10,6 +10,7 @@ import { ClientHistoryRepository } from '../repositories/clientHistoryRepository
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
 import { PaymentService } from '../services/paymentService.js';
 import { MembershipService } from '../services/membershipService.js';
+import { GiftCardService } from '../services/giftCardService.js';
 import { NotificationService } from '../services/notificationService.js';
 import { generateSlots } from '../services/slotService.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -56,7 +57,7 @@ export async function createAppointment(req, res, next) {
       therapistId, serviceId, scheduledAt,
       guestName, guestEmail, guestPhone,
       guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
-      notes, paymentMethodId, waiverSignature,
+      notes, paymentMethodId, waiverSignature, giftCardCode,
       healthCurrentMedications, healthRecentSurgeries, healthPregnancyStatus, healthInjuries, healthDateOfBirth,
     } = req.body;
 
@@ -197,6 +198,31 @@ export async function createAppointment(req, res, next) {
         });
 
         return res.status(201).json({ success: true, data: { appointment, clientSecret: null } });
+      }
+    }
+
+    // Apply gift card if a code was provided.
+    if (giftCardCode) {
+      const pool = getPool();
+      const service = await apptRepo.findServiceById(serviceId);
+      const giftCardSvc = new GiftCardService(pool);
+      const dbClient = await pool.connect();
+      try {
+        await dbClient.query('BEGIN');
+        await giftCardSvc.applyToAppointment(dbClient, {
+          code: giftCardCode.trim().toUpperCase(),
+          appointmentId: appointment.id,
+          clientId: clientId ?? null,
+          servicePriceCents: service?.price_cents ?? 0,
+        });
+        await dbClient.query('COMMIT');
+      } catch (err) {
+        await dbClient.query('ROLLBACK');
+        // Cancel the pending appointment so it doesn't linger
+        await apptRepo.updateStatus(appointment.id, 'cancelled').catch(() => {});
+        throw err;
+      } finally {
+        dbClient.release();
       }
     }
 
@@ -345,6 +371,12 @@ export async function cancelAppointment(req, res, next) {
     }
 
     const updated = await apptRepo.updateStatus(req.params.id, 'cancelled');
+
+    // Restore any gift card balance that was applied to this appointment
+    new GiftCardService(getPool()).giftCards
+      .restoreForAppointment(req.params.id)
+      .catch(err => logger.error('gift_card_restore_error', { appointmentId: req.params.id, message: err.message }));
+
     res.json({ success: true, data: updated });
   } catch (err) {
     next(err);
