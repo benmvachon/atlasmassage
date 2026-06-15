@@ -101,4 +101,21 @@ export class BusinessRepository {
     );
     return rows[0] ?? null;
   }
+
+  async getBookingRestrictions() {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM booking_restrictions LIMIT 1'
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateBookingRestrictions({ restrictPregnancy, restrictMinors }) {
+    const { rows } = await this.pool.query(
+      `UPDATE booking_restrictions
+       SET restrict_pregnancy = $1, restrict_minors = $2, updated_at = NOW()
+       RETURNING *`,
+      [restrictPregnancy, restrictMinors]
+    );
+    return rows[0];
+  }
 }

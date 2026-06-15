@@ -14,4 +14,14 @@ router.get('/hours', async (req, res, next) => {
   }
 });
 
+router.get('/restrictions', async (req, res, next) => {
+  try {
+    const repo = new BusinessRepository(getPool());
+    const restrictions = await repo.getBookingRestrictions();
+    res.json({ success: true, data: restrictions ?? { restrict_pregnancy: true, restrict_minors: true } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

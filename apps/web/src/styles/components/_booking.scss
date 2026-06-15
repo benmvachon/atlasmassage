@@ -328,6 +328,11 @@
     color: $color-text-muted;
   }
 
+  &__required {
+    color: $color-error;
+    margin-left: $space-1;
+  }
+
   &__input {
     padding: $space-2 $space-3;
     @include input-base;

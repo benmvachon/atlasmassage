@@ -61,13 +61,13 @@ const PREGNANCY_OPTIONS = [
   { value: 'not_pregnant', label: 'Not pregnant' },
   { value: 'pregnant', label: 'Currently pregnant' },
   { value: 'recently_pregnant', label: 'Recently pregnant (within 3 months)' },
-  { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ];
 
-function computeSteps(user, hasHealthRecord, hasConsent) {
+function computeSteps(user, hasHealthRecord, hasConsent, restrictions) {
   const steps = [];
   if (!user) steps.push('contact');
-  if (!user || !hasHealthRecord) steps.push('health');
+  const anyRestriction = restrictions?.restrict_pregnancy || restrictions?.restrict_minors;
+  if (!user || !hasHealthRecord || anyRestriction) steps.push('health');
   if (!user || !hasConsent) steps.push('consent');
   steps.push('payment');
   return steps;
@@ -172,6 +172,7 @@ function BookingWizard({
   membershipStatus,
   consentStatus, loadingConsent,
   healthStatus, loadingHealth,
+  restrictions,
   onClose, onComplete,
 }) {
   const { user } = useAuth();
@@ -222,8 +223,8 @@ function BookingWizard({
   const isReturnClient = hasHealthRecord && hasConsent;
 
   const steps = useMemo(
-    () => computeSteps(user, hasHealthRecord, hasConsent),
-    [user, hasHealthRecord, hasConsent]
+    () => computeSteps(user, hasHealthRecord, hasConsent, restrictions),
+    [user, hasHealthRecord, hasConsent, restrictions]
   );
 
   // Initialize first step once status data has loaded; also re-initialize if
@@ -286,6 +287,33 @@ function BookingWizard({
   function handleHealthNext(e) {
     e.preventDefault();
     setError('');
+
+    if (restrictions?.restrict_pregnancy &&
+        (pregnancyStatus === 'pregnant' || pregnancyStatus === 'recently_pregnant')) {
+      setError(
+        'We are not currently certified for prenatal or postnatal massage. Please contact us for more information.'
+      );
+      return;
+    }
+
+    if (restrictions?.restrict_minors) {
+      if (!dateOfBirth) {
+        setError('Date of birth is required.');
+        return;
+      }
+      const birth = new Date(dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      if (age < 18) {
+        setError(
+          'We are not currently certified for pediatric massage. Please contact us for more information.'
+        );
+        return;
+      }
+    }
+
     goNext();
   }
 
@@ -613,7 +641,11 @@ function BookingWizard({
 
               <div className="booking-field">
                 <label className="booking-field__label" htmlFor="bm-dob">
-                  Date of birth <span className="booking-field__optional">(optional)</span>
+                  Date of birth{' '}
+                  {restrictions?.restrict_minors
+                    ? <span className="booking-field__required">*</span>
+                    : <span className="booking-field__optional">(optional)</span>
+                  }
                 </label>
                 <input
                   type="date"
@@ -623,6 +655,7 @@ function BookingWizard({
                   onChange={e => setDateOfBirth(e.target.value)}
                   disabled={submitting}
                   max={new Date().toISOString().slice(0, 10)}
+                  required={!!restrictions?.restrict_minors}
                 />
               </div>
 
@@ -995,11 +1028,18 @@ export default function BookingModal({
   const [loadingConsent, setLoadingConsent] = useState(!!user);
   const [healthStatus, setHealthStatus] = useState(null);
   const [loadingHealth, setLoadingHealth] = useState(!!user);
+  const [restrictions, setRestrictions] = useState(null);
 
   const therapistOptions = useMemo(() => {
     if (lockedTherapist) return [lockedTherapist];
     return slot.availableTherapists;
   }, [lockedTherapist, slot.availableTherapists]);
+
+  useEffect(() => {
+    bookingService.getBookingRestrictions()
+      .then(data => setRestrictions(data))
+      .catch(() => setRestrictions({ restrict_pregnancy: true, restrict_minors: true }));
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -1057,6 +1097,7 @@ export default function BookingModal({
         loadingConsent={loadingConsent}
         healthStatus={healthStatus}
         loadingHealth={loadingHealth}
+        restrictions={restrictions}
         onClose={onClose}
         onComplete={onComplete}
       />

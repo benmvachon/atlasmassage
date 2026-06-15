@@ -7,6 +7,8 @@ export const adminService = {
   // Business overview
   getBusinessDetails: () => api.get('/admin/business'),
   updateBusinessHours: (dayOfWeek, data) => api.put(`/admin/business/hours/${dayOfWeek}`, data),
+  getBookingRestrictions: () => api.get('/admin/business/restrictions'),
+  updateBookingRestrictions: (data) => api.put('/admin/business/restrictions', data),
 
   // Massage tables
   listMassageBeds: () => api.get('/admin/business/beds'),

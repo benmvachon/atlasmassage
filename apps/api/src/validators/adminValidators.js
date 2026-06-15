@@ -12,6 +12,13 @@ export const businessHoursRules = [
     .isBoolean().withMessage('isClosed must be a boolean'),
 ];
 
+export const bookingRestrictionsRules = [
+  body('restrictPregnancy')
+    .isBoolean().withMessage('restrictPregnancy must be a boolean'),
+  body('restrictMinors')
+    .isBoolean().withMessage('restrictMinors must be a boolean'),
+];
+
 export const massageBedCreateRules = [
   body('name')
     .trim().notEmpty().withMessage('Bed name is required')

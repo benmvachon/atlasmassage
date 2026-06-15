@@ -36,6 +36,15 @@ function repos() {
   };
 }
 
+function computeAge(dobStr) {
+  const birth = new Date(dobStr);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
 function pickAvailableBed(activeBeds, existingAppts, slotStartMs, slotDurationMs) {
   const slotEnd = slotStartMs + slotDurationMs;
   const occupiedBedIds = new Set(
@@ -108,6 +117,28 @@ export async function createAppointment(req, res, next) {
       throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
     }
     const resolvedBedId = bed.id;
+
+    // Enforce booking restrictions.
+    const restrictions = await businessRepo.getBookingRestrictions();
+    if (restrictions) {
+      if (restrictions.restrict_pregnancy &&
+          (healthPregnancyStatus === 'pregnant' || healthPregnancyStatus === 'recently_pregnant')) {
+        throw new AppError(
+          'We are not currently certified for prenatal or postnatal massage. Please contact us for more information.',
+          400,
+          'RESTRICTION_PREGNANCY'
+        );
+      }
+      if (restrictions.restrict_minors && healthDateOfBirth) {
+        if (computeAge(healthDateOfBirth) < 18) {
+          throw new AppError(
+            'We are not currently certified for pediatric massage. Please contact us for more information.',
+            400,
+            'RESTRICTION_MINORS'
+          );
+        }
+      }
+    }
 
     // Resolve or create health record.
     // Authenticated clients reuse their most recent record; guests always create a new one.

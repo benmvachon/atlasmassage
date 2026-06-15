@@ -520,6 +520,64 @@
   margin-left: $space-2;
 }
 
+.owner-inline-success {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-success;
+  margin-left: $space-2;
+}
+
+.owner-section__desc {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-bottom: $space-4;
+}
+
+.owner-restrictions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-4;
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+}
+
+.owner-restriction-row {
+  display: flex;
+  gap: $space-3;
+  align-items: flex-start;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &__desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    line-height: 1.5;
+  }
+}
+
 .owner-form-error {
   font-family: $font-family-ui;
   font-size: $font-size-sm;

@@ -817,6 +817,94 @@ function MembershipPlansSection({ plans, onPlansChange }) {
   );
 }
 
+// ── Booking Restrictions ──────────────────────────────────────────────────────
+
+function BookingRestrictionsSection({ restrictions, onRestrictionsChange }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const [form, setForm] = useState({
+    restrict_pregnancy: restrictions?.restrict_pregnancy ?? true,
+    restrict_minors: restrictions?.restrict_minors ?? true,
+  });
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError('');
+    setSaved(false);
+    try {
+      const res = await adminService.updateBookingRestrictions({
+        restrictPregnancy: form.restrict_pregnancy,
+        restrictMinors: form.restrict_minors,
+      });
+      onRestrictionsChange(res.data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="owner-section">
+      <h2 className="owner-section__title">Booking Restrictions</h2>
+      <p className="owner-section__desc">
+        These restrictions prevent clients from booking if they meet the specified criteria.
+        Turn them off once your staff has obtained the relevant certification.
+      </p>
+
+      <div className="owner-restrictions">
+        <label className="owner-restriction-row">
+          <input
+            type="checkbox"
+            checked={form.restrict_pregnancy}
+            onChange={e => setForm(f => ({ ...f, restrict_pregnancy: e.target.checked }))}
+            disabled={saving}
+          />
+          <div className="owner-restriction-row__text">
+            <span className="owner-restriction-row__label">Restrict pregnant and recently-pregnant clients</span>
+            <span className="owner-restriction-row__desc">
+              Clients who indicate they are currently pregnant or were pregnant within the last 3 months
+              will not be able to complete a booking. Disable once certified for prenatal and postnatal massage.
+            </span>
+          </div>
+        </label>
+
+        <label className="owner-restriction-row">
+          <input
+            type="checkbox"
+            checked={form.restrict_minors}
+            onChange={e => setForm(f => ({ ...f, restrict_minors: e.target.checked }))}
+            disabled={saving}
+          />
+          <div className="owner-restriction-row__text">
+            <span className="owner-restriction-row__label">Restrict clients under 18</span>
+            <span className="owner-restriction-row__desc">
+              Clients who enter a date of birth indicating they are under 18 will not be able
+              to complete a booking. Disable once certified for pediatric massage.
+            </span>
+          </div>
+        </label>
+      </div>
+
+      <div className="owner-restrictions__footer">
+        <button
+          className="btn btn--primary btn--sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        {saved && <span className="owner-inline-success">Saved.</span>}
+        {saveError && <span className="owner-inline-error">{saveError}</span>}
+      </div>
+    </section>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BusinessDetailsPage() {
@@ -826,16 +914,19 @@ export default function BusinessDetailsPage() {
   const [beds, setBeds] = useState([]);
   const [services, setServices] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [restrictions, setRestrictions] = useState(null);
 
   useEffect(() => {
     Promise.all([
       adminService.getBusinessDetails(),
       adminService.listMembershipPlans(),
-    ]).then(([biz, mem]) => {
+      adminService.getBookingRestrictions(),
+    ]).then(([biz, mem, rest]) => {
       setHours(biz.data.hours);
       setBeds(biz.data.beds);
       setServices(biz.data.services);
       setPlans(mem.data.plans);
+      setRestrictions(rest.data);
     })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
@@ -861,6 +952,7 @@ export default function BusinessDetailsPage() {
       <MassageBedsSection beds={beds} onBedsChange={setBeds} />
       <ServicesSection services={services} onServicesChange={setServices} />
       <MembershipPlansSection plans={plans} onPlansChange={setPlans} />
+      <BookingRestrictionsSection restrictions={restrictions} onRestrictionsChange={setRestrictions} />
     </div>
   );
 }

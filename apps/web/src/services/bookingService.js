@@ -17,6 +17,11 @@ export const bookingService = {
     return res.data;
   },
 
+  async getBookingRestrictions() {
+    const res = await api.get('/business/restrictions');
+    return res.data;
+  },
+
   async getConsentStatus() {
     const res = await api.get('/appointments/consent/status');
     return res.data;

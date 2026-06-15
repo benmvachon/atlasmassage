@@ -145,6 +145,7 @@ beforeEach(() => {
   });
   Object.assign(mockBusinessRepo, {
     getMassageBeds: jest.fn().mockResolvedValue([{ id: BED_ID, name: 'Table 1', is_active: true }]),
+    getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
   });
   Object.assign(mockConsentRepo, {
     findByClientId: jest.fn().mockResolvedValue(null),

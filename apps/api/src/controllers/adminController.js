@@ -57,6 +57,27 @@ export async function updateBusinessHours(req, res, next) {
   }
 }
 
+// ── Booking restrictions ──────────────────────────────────────────────────────
+
+export async function getBookingRestrictions(req, res, next) {
+  try {
+    const restrictions = await repos().business.getBookingRestrictions();
+    res.json({ success: true, data: restrictions ?? { restrict_pregnancy: true, restrict_minors: true } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateBookingRestrictions(req, res, next) {
+  try {
+    const { restrictPregnancy, restrictMinors } = req.body;
+    const updated = await repos().business.updateBookingRestrictions({ restrictPregnancy, restrictMinors });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Massage beds ──────────────────────────────────────────────────────────────
 
 export async function listMassageBeds(req, res, next) {
