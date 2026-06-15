@@ -64,7 +64,7 @@ export default function GiftCardsPage() {
   return (
     <div className="gift-cards-page container">
       <div className="gift-cards-page__hero">
-        <h1 className="gift-cards-page__title">Gift the Gift of Wellness</h1>
+        <h1 className="gift-cards-page__title">Give the Gift of Wellness</h1>
         <p className="gift-cards-page__subtitle">
           Atlas Bodywork gift cards are the kindest way to tell somebody they need a massage.
         </p>
