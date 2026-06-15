@@ -25,11 +25,12 @@ jest.mock('../../services/stripe.js', () => ({
 
 jest.mock('../../services/bookingService.js', () => ({
   bookingService: {
-    createAppointment:  jest.fn(),
-    confirmAppointment: jest.fn().mockResolvedValue({}),
-    cancelAppointment:  jest.fn().mockResolvedValue({}),
-    getConsentStatus:   jest.fn().mockResolvedValue({ data: { hasSigned: false, signedAt: null } }),
-    getHealthStatus:    jest.fn().mockResolvedValue({ data: { hasRecord: false } }),
+    createAppointment:      jest.fn(),
+    confirmAppointment:     jest.fn().mockResolvedValue({}),
+    cancelAppointment:      jest.fn().mockResolvedValue({}),
+    getConsentStatus:       jest.fn().mockResolvedValue({ data: { hasSigned: false, signedAt: null } }),
+    getHealthStatus:        jest.fn().mockResolvedValue({ data: { hasRecord: false } }),
+    getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
   },
 }));
 
