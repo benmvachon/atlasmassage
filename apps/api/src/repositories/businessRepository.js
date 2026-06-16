@@ -118,4 +118,38 @@ export class BusinessRepository {
     );
     return rows[0];
   }
+
+  async getSchedulingSettings() {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM scheduling_settings LIMIT 1'
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateSchedulingSettings({ bufferMinutes }) {
+    const { rows } = await this.pool.query(
+      `UPDATE scheduling_settings
+       SET buffer_minutes = $1, updated_at = NOW()
+       RETURNING *`,
+      [bufferMinutes]
+    );
+    return rows[0];
+  }
+
+  async getBusinessContactInfo() {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM business_contact_info LIMIT 1'
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateBusinessContactInfo({ addressLine1, addressLine2, city, state, zip, phone, email }) {
+    const { rows } = await this.pool.query(
+      `UPDATE business_contact_info
+       SET address_line1 = $1, address_line2 = $2, city = $3, state = $4, zip = $5, phone = $6, email = $7, updated_at = NOW()
+       RETURNING *`,
+      [addressLine1, addressLine2 ?? '', city, state, zip, phone, email]
+    );
+    return rows[0];
+  }
 }

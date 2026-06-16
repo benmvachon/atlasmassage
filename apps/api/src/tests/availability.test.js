@@ -80,6 +80,7 @@ beforeEach(() => {
     getBusinessHours: jest.fn().mockResolvedValue(BIZ_HOURS),
     getServices: jest.fn().mockResolvedValue(SERVICES),
     getMassageBeds: jest.fn().mockResolvedValue([{ id: 'bed-1', name: 'Table 1', is_active: true }]),
+    getSchedulingSettings: jest.fn().mockResolvedValue({ buffer_minutes: 15 }),
   });
 
   Object.assign(mockTherapistRepo, {

@@ -31,6 +31,7 @@ jest.mock('../../services/bookingService.js', () => ({
     getConsentStatus:       jest.fn().mockResolvedValue({ data: { hasSigned: false, signedAt: null } }),
     getHealthStatus:        jest.fn().mockResolvedValue({ data: { hasRecord: false } }),
     getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
+    validateAddress:        jest.fn(),
   },
 }));
 
@@ -96,6 +97,7 @@ beforeEach(() => {
     appointment: APPT,
     clientSecret: 'cs_test_secret',
   });
+  bookingService.validateAddress.mockResolvedValue({ valid: true, formattedAddress: null, unconfirmedComponentTypes: [] });
   mockStripe.confirmCardSetup.mockResolvedValue({
     setupIntent: { payment_method: 'pm_test_123' },
     error: null,
@@ -236,6 +238,48 @@ describe('BookingModal — contact step disabled state', () => {
     renderModal();
     fillContactFields();
     expect(screen.getByRole('button', { name: /continue/i })).not.toBeDisabled();
+  });
+});
+
+// ── Contact step — address verification ───────────────────────────────────────
+
+describe('BookingModal — contact step address verification', () => {
+  it('calls validateAddress with the entered address before advancing', async () => {
+    renderModal();
+    fillContactFields();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+    expect(bookingService.validateAddress).toHaveBeenCalledWith({
+      addressLine1: '123 Test St',
+      addressLine2: undefined,
+      city: 'Test City',
+      state: 'CA',
+      zip: '12345',
+    });
+    expect(screen.queryByLabelText(/street address/i)).not.toBeInTheDocument();
+  });
+
+  it('blocks navigation and shows an error when the address cannot be verified', async () => {
+    bookingService.validateAddress.mockResolvedValue({ valid: false, formattedAddress: null, unconfirmedComponentTypes: ['locality'] });
+    renderModal();
+    fillContactFields();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(/couldn't verify this address/i);
+    // Still on the contact step
+    expect(screen.getByLabelText(/street address/i)).toBeInTheDocument();
+  });
+
+  it('shows an error when the verification request fails', async () => {
+    bookingService.validateAddress.mockRejectedValue(new Error('Address verification service is unavailable. Please try again.'));
+    renderModal();
+    fillContactFields();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(/unavailable/i);
   });
 });
 

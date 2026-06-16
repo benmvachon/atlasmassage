@@ -1,6 +1,6 @@
-const SLOT_DURATION = 60; // all appointments are 1 hour
-const BUFFER = 15;        // minutes required between appointments
-const INCREMENT = 15;     // slot start-time step
+const SLOT_DURATION = 60;      // all appointments are 1 hour
+const DEFAULT_BUFFER = 15;     // fallback minutes required between appointments
+const INCREMENT = 15;          // slot start-time step
 
 const TOD_BOUNDS = {
   morning:   [0,        12 * 60],
@@ -28,10 +28,12 @@ function scheduledAtToMinutes(scheduledAt) {
  * availability:    [{ therapist_id, first_name, last_name, start_time, end_time }]
  * appointments:    [{ therapist_id, scheduled_at, duration_minutes }]
  * activeBedCount:  number of active massage beds (0 = no bed constraint)
+ * bufferMinutes:   minutes required between appointments for the same therapist or bed
  * Returns sorted [{ startTime, endTime, availableTherapists: [{id, firstName, lastName}] }]
  */
-export function generateSlots(availability, appointments, { timeOfDay, notBefore, activeBedCount = 0 } = {}) {
+export function generateSlots(availability, appointments, { timeOfDay, notBefore, activeBedCount = 0, bufferMinutes = DEFAULT_BUFFER } = {}) {
   const todBounds = timeOfDay ? TOD_BOUNDS[timeOfDay] : null;
+  const BUFFER = bufferMinutes;
 
   // Pre-compute appointment ranges for bed-level conflict checking.
   // Only appointments with a bed_id actually occupy a bed slot.

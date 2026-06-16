@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as appointmentController from '../controllers/appointmentController.js';
 import { authenticate, authorize, optionalAuthenticate } from '../middleware/auth.js';
-import { createAppointmentRules, rescheduleAppointmentRules, soapNotesRules, feedbackRules, validate } from '../validators/appointmentValidators.js';
+import { createAppointmentRules, rescheduleAppointmentRules, soapNotesRules, feedbackRules, validateAddressRules, validate } from '../validators/appointmentValidators.js';
 
 const router = Router();
 
@@ -11,6 +11,8 @@ router.get('/consent/status', authenticate, appointmentController.getConsentStat
 router.get('/health/status', authenticate, appointmentController.getHealthStatus);
 // Guest checkout: authentication is optional — unauthenticated callers provide guest fields in the body
 router.post('/', optionalAuthenticate, createAppointmentRules, validate, appointmentController.createAppointment);
+// Verifies a guest's mailing address before the booking step can proceed
+router.post('/validate-address', validateAddressRules, validate, appointmentController.validateGuestAddress);
 router.get('/:id', authenticate, appointmentController.getAppointment);
 router.put('/:id', authenticate, appointmentController.updateAppointment);
 // Cancel and reschedule: open to guests (cancelToken in body) and authenticated clients/owners

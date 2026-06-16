@@ -49,4 +49,9 @@ export const bookingService = {
     const res = await api.post(`/appointments/${id}/cancel`, { cancelToken });
     return res.data;
   },
+
+  async validateAddress({ addressLine1, addressLine2, city, state, zip }) {
+    const res = await api.post('/appointments/validate-address', { addressLine1, addressLine2, city, state, zip });
+    return res.data;
+  },
 };

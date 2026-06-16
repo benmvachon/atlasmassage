@@ -40,6 +40,10 @@ export const config = {
     webhookSecret: optional('STRIPE_WEBHOOK_SECRET', ''),
   },
 
+  googleMaps: {
+    addressValidationApiKey: optional('GOOGLE_ADDRESS_VALIDATION_API_KEY', ''),
+  },
+
   email: {
     host: optional('EMAIL_HOST', ''),
     port: parseInt(optional('EMAIL_PORT', '587'), 10),

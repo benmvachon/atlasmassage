@@ -78,6 +78,50 @@ export async function updateBookingRestrictions(req, res, next) {
   }
 }
 
+// ── Scheduling settings ──────────────────────────────────────────────────────
+
+export async function getSchedulingSettings(req, res, next) {
+  try {
+    const settings = await repos().business.getSchedulingSettings();
+    res.json({ success: true, data: settings ?? { buffer_minutes: 15 } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateSchedulingSettings(req, res, next) {
+  try {
+    const { bufferMinutes } = req.body;
+    const updated = await repos().business.updateSchedulingSettings({ bufferMinutes });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ── Business contact info ────────────────────────────────────────────────────
+
+export async function getBusinessContactInfo(req, res, next) {
+  try {
+    const contactInfo = await repos().business.getBusinessContactInfo();
+    res.json({ success: true, data: contactInfo });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateBusinessContactInfo(req, res, next) {
+  try {
+    const { addressLine1, addressLine2, city, state, zip, phone, email } = req.body;
+    const updated = await repos().business.updateBusinessContactInfo({
+      addressLine1, addressLine2, city, state, zip, phone, email,
+    });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Massage beds ──────────────────────────────────────────────────────────────
 
 export async function listMassageBeds(req, res, next) {

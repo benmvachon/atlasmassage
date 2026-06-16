@@ -178,15 +178,17 @@ export async function getBookingCalendar(req, res, next) {
     const lastDay = new Date(year, month, 0).getDate();
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-    const [availRows, apptRows, businessHours, allTherapists, services, allBeds] = await Promise.all([
+    const [availRows, apptRows, businessHours, allTherapists, services, allBeds, schedulingSettings] = await Promise.all([
       availRepo.getForDateRange(startDate, endDate, therapistId || null),
       apptRepo.getByDateRange(startDate, endDate),
       businessRepo.getBusinessHours(),
       therapistRepo.findAll(),
       businessRepo.getServices(),
       businessRepo.getMassageBeds(),
+      businessRepo.getSchedulingSettings(),
     ]);
     const activeBedCount = allBeds.filter(b => b.is_active).length;
+    const bufferMinutes = schedulingSettings?.buffer_minutes ?? 15;
 
     // Group by ISO date string — use toISOString() to avoid locale-string pitfall with Date objects
     const availByDate = {};
@@ -210,7 +212,7 @@ export async function getBookingCalendar(req, res, next) {
     }
 
     const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const availableDays = availableDaysForMonth(filteredAvailByDate, apptsByDate, { timeOfDay, notBefore, activeBedCount });
+    const availableDays = availableDaysForMonth(filteredAvailByDate, apptsByDate, { timeOfDay, notBefore, activeBedCount, bufferMinutes });
 
     res.json({
       success: true,
@@ -240,12 +242,13 @@ export async function getBookingSlots(req, res, next) {
     const { availability: availRepo, appointment: apptRepo, therapist: therapistRepo, business: businessRepo } = repos();
     const [weekStart, weekEnd] = weekBoundsFor(date);
 
-    const [availRows, apptRows, weekApptRows, therapists, allBeds] = await Promise.all([
+    const [availRows, apptRows, weekApptRows, therapists, allBeds, schedulingSettings] = await Promise.all([
       availRepo.getForDateRange(date, date, therapistId || null),
       apptRepo.getByDateRange(date, date),
       apptRepo.getByDateRange(weekStart, weekEnd),
       therapistRepo.findAll(),
       businessRepo.getMassageBeds(),
+      businessRepo.getSchedulingSettings(),
     ]);
 
     const therapistMap = Object.fromEntries(therapists.map(t => [t.id, t]));
@@ -254,8 +257,9 @@ export async function getBookingSlots(req, res, next) {
     const filteredAvailRows = filterByCapacity(availRows, dailyCounts, weeklyCounts, therapistMap);
 
     const activeBedCount = allBeds.filter(b => b.is_active).length;
+    const bufferMinutes = schedulingSettings?.buffer_minutes ?? 15;
     const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const slots = generateSlots(filteredAvailRows, apptRows, { timeOfDay, notBefore, activeBedCount });
+    const slots = generateSlots(filteredAvailRows, apptRows, { timeOfDay, notBefore, activeBedCount, bufferMinutes });
     res.json({ success: true, data: { slots } });
   } catch (err) {
     next(err);

@@ -11,6 +11,12 @@ function formatTime(t) {
   return m === 0 ? `${hour} ${period}` : `${hour}:${String(m).padStart(2, '0')} ${period}`;
 }
 
+function telHref(phone) {
+  const digits = phone.replace(/\D/g, '');
+  if (!digits) return '';
+  return `tel:+${digits.length === 10 ? '1' : ''}${digits}`;
+}
+
 function sameHours(a, b) {
   if (!a && !b) return true;
   if (!a || !b) return false;
@@ -40,6 +46,13 @@ export default function HomePage() {
   const { data, loading } = useAsync(() => businessService.getHours());
   const hours = data?.data ?? [];
 
+  const { data: contactData, loading: loadingContact } = useAsync(() => businessService.getContactInfo());
+  const contact = contactData?.data ?? null;
+
+  const mapQuery = contact
+    ? encodeURIComponent(`${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`)
+    : encodeURIComponent('Boston, Massachusetts');
+
   return (
     <>
       <section className="hero">
@@ -60,7 +73,7 @@ export default function HomePage() {
           <div className="location-section__map">
             <iframe
               title="Atlas Bodywork location"
-              src="https://maps.google.com/maps?q=Boston%2C+Massachusetts&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
               width="100%"
               height="420"
               style={{ border: 0 }}
@@ -95,25 +108,33 @@ export default function HomePage() {
 
             <div className="biz-info">
               <h2 className="biz-info__heading">Contact</h2>
-              <ul className="biz-contact">
-                <li className="biz-contact__item">
-                  <span className="biz-contact__label">Address</span>
-                  <span>
-                    123 Boylston Street<br />
-                    Boston, MA 02116
-                  </span>
-                </li>
-                <li className="biz-contact__item">
-                  <span className="biz-contact__label">Phone</span>
-                  <a href="tel:+16175550100" className="biz-contact__link">(617) 555-0100</a>
-                </li>
-                <li className="biz-contact__item">
-                  <span className="biz-contact__label">Email</span>
-                  <a href="mailto:hello@atlasmassage.com" className="biz-contact__link">
-                    hello@atlasmassage.com
-                  </a>
-                </li>
-              </ul>
+              {loadingContact ? (
+                <p className="biz-info__muted">Loading contact info&hellip;</p>
+              ) : !contact ? (
+                <p className="biz-info__muted">Contact info is not available right now.</p>
+              ) : (
+                <ul className="biz-contact">
+                  <li className="biz-contact__item">
+                    <span className="biz-contact__label">Address</span>
+                    <span>
+                      {contact.address_line1}
+                      {contact.address_line2 && <><br />{contact.address_line2}</>}
+                      <br />
+                      {contact.city}, {contact.state} {contact.zip}
+                    </span>
+                  </li>
+                  <li className="biz-contact__item">
+                    <span className="biz-contact__label">Phone</span>
+                    <a href={telHref(contact.phone)} className="biz-contact__link">{contact.phone}</a>
+                  </li>
+                  <li className="biz-contact__item">
+                    <span className="biz-contact__label">Email</span>
+                    <a href={`mailto:${contact.email}`} className="biz-contact__link">
+                      {contact.email}
+                    </a>
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
         </section>

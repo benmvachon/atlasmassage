@@ -103,6 +103,13 @@ beforeEach(() => {
     findServiceById: jest.fn().mockResolvedValue(SERVICES[0]),
     updateService: jest.fn(),
     deactivateService: jest.fn(),
+    getSchedulingSettings: jest.fn().mockResolvedValue({ id: 1, buffer_minutes: 15 }),
+    updateSchedulingSettings: jest.fn(),
+    getBusinessContactInfo: jest.fn().mockResolvedValue({
+      id: 1, address_line1: '123 Boylston Street', address_line2: '', city: 'Boston',
+      state: 'MA', zip: '02116', phone: '(617) 555-0100', email: 'hello@atlasmassage.com',
+    }),
+    updateBusinessContactInfo: jest.fn(),
   });
 
   Object.assign(mockTherapistRepo, {
@@ -199,6 +206,150 @@ describe('PUT /api/v1/admin/business/hours/:dayOfWeek', () => {
 
     expect(res.status).toBe(422);
     expect(res.body.error.details).toHaveProperty('dayOfWeek');
+  });
+});
+
+// ── Scheduling settings ─────────────────────────────────────────────────────
+
+describe('GET /api/v1/admin/business/scheduling-settings', () => {
+  it('returns the current buffer setting for an owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/business/scheduling-settings')
+      .set('Authorization', ownerBearer());
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ id: 1, buffer_minutes: 15 });
+  });
+
+  it('returns 401 without a token', async () => {
+    const res = await request(app).get('/api/v1/admin/business/scheduling-settings');
+    expect(res.status).toBe(401);
+  });
+});
+
+describe('PUT /api/v1/admin/business/scheduling-settings', () => {
+  it('updates the buffer setting and returns the updated row', async () => {
+    mockBusiness.updateSchedulingSettings.mockResolvedValue({ id: 1, buffer_minutes: 30 });
+
+    const res = await request(app)
+      .put('/api/v1/admin/business/scheduling-settings')
+      .set('Authorization', ownerBearer())
+      .send({ bufferMinutes: 30 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ buffer_minutes: 30 });
+    expect(mockBusiness.updateSchedulingSettings).toHaveBeenCalledWith({ bufferMinutes: 30 });
+  });
+
+  it('returns 422 when bufferMinutes is missing', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/scheduling-settings')
+      .set('Authorization', ownerBearer())
+      .send({});
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('bufferMinutes');
+  });
+
+  it('returns 422 when bufferMinutes is out of range', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/scheduling-settings')
+      .set('Authorization', ownerBearer())
+      .send({ bufferMinutes: 200 });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('returns 403 for a non-owner', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/scheduling-settings')
+      .set('Authorization', therapistBearer())
+      .send({ bufferMinutes: 30 });
+
+    expect(res.status).toBe(403);
+  });
+});
+
+// ── Business contact info ──────────────────────────────────────────────────
+
+describe('GET /api/v1/admin/business/contact-info', () => {
+  it('returns the current contact info for an owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/business/contact-info')
+      .set('Authorization', ownerBearer());
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ address_line1: '123 Boylston Street', phone: '(617) 555-0100', email: 'hello@atlasmassage.com' });
+  });
+
+  it('returns 401 without a token', async () => {
+    const res = await request(app).get('/api/v1/admin/business/contact-info');
+    expect(res.status).toBe(401);
+  });
+});
+
+describe('PUT /api/v1/admin/business/contact-info', () => {
+  const valid = {
+    addressLine1: '456 Newbury St',
+    addressLine2: 'Suite 2',
+    city: 'Boston',
+    state: 'MA',
+    zip: '02115',
+    phone: '(617) 555-9999',
+    email: 'contact@atlasmassage.com',
+  };
+
+  it('updates the contact info and returns the updated row', async () => {
+    mockBusiness.updateBusinessContactInfo.mockResolvedValue({ id: 1, address_line1: '456 Newbury St' });
+
+    const res = await request(app)
+      .put('/api/v1/admin/business/contact-info')
+      .set('Authorization', ownerBearer())
+      .send(valid);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ address_line1: '456 Newbury St' });
+    expect(mockBusiness.updateBusinessContactInfo).toHaveBeenCalledWith(valid);
+  });
+
+  it('returns 422 when addressLine1 is missing', async () => {
+    const { addressLine1: _omit, ...rest } = valid;
+    const res = await request(app)
+      .put('/api/v1/admin/business/contact-info')
+      .set('Authorization', ownerBearer())
+      .send(rest);
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('addressLine1');
+  });
+
+  it('returns 422 when email is invalid', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/contact-info')
+      .set('Authorization', ownerBearer())
+      .send({ ...valid, email: 'not-an-email' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('email');
+  });
+
+  it('returns 422 when phone is invalid', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/contact-info')
+      .set('Authorization', ownerBearer())
+      .send({ ...valid, phone: 'not-a-phone' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('phone');
+  });
+
+  it('returns 403 for a non-owner', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/contact-info')
+      .set('Authorization', therapistBearer())
+      .send(valid);
+
+    expect(res.status).toBe(403);
   });
 });
 

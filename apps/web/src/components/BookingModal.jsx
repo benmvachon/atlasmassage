@@ -181,6 +181,7 @@ function BookingWizard({
 
   const [currentStep, setCurrentStep] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [verifyingAddress, setVerifyingAddress] = useState(false);
   const [error, setError] = useState('');
 
   // Contact
@@ -270,7 +271,7 @@ function BookingWizard({
     zip.trim()
   );
 
-  function handleContactNext(e) {
+  async function handleContactNext(e) {
     e.preventDefault();
     if (!name.trim()) { setError('Full name is required.'); return; }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -281,6 +282,27 @@ function BookingWizard({
     if (!addressState.trim()) { setError('State is required.'); return; }
     if (!zip.trim()) { setError('ZIP code is required.'); return; }
     setError('');
+
+    setVerifyingAddress(true);
+    try {
+      const result = await bookingService.validateAddress({
+        addressLine1: addressLine1.trim(),
+        addressLine2: addressLine2.trim() || undefined,
+        city: city.trim(),
+        state: addressState.trim(),
+        zip: zip.trim(),
+      });
+      if (!result.valid) {
+        setError("We couldn't verify this address. Please check it for typos and try again.");
+        return;
+      }
+    } catch (err) {
+      setError(err.message || 'Could not verify this address. Please try again.');
+      return;
+    } finally {
+      setVerifyingAddress(false);
+    }
+
     goNext();
   }
 
@@ -618,11 +640,11 @@ function BookingWizard({
                 <button
                   className="btn btn--primary"
                   type="submit"
-                  disabled={submitting || !isContactReady}
+                  disabled={submitting || verifyingAddress || !isContactReady}
                 >
-                  Continue →
+                  {verifyingAddress ? 'Verifying address…' : 'Continue →'}
                 </button>
-                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting}>
+                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting || verifyingAddress}>
                   Cancel
                 </button>
               </div>

@@ -7,11 +7,13 @@ import * as testimonialController from '../controllers/testimonialController.js'
 import { authenticate, authorize } from '../middleware/auth.js';
 import {
   bookingRestrictionsRules,
+  businessContactInfoRules,
   businessHoursRules,
   massageBedCreateRules,
   massageBedUpdateRules,
   membershipPlanCreateRules,
   membershipPlanUpdateRules,
+  schedulingSettingsRules,
   serviceCreateRules,
   serviceUpdateRules,
   therapistCreateRules,
@@ -70,6 +72,10 @@ router.get('/business', adminController.getBusinessDetails);
 router.put('/business/hours/:dayOfWeek', businessHoursRules, validate, adminController.updateBusinessHours);
 router.get('/business/restrictions', adminController.getBookingRestrictions);
 router.put('/business/restrictions', bookingRestrictionsRules, validate, adminController.updateBookingRestrictions);
+router.get('/business/scheduling-settings', adminController.getSchedulingSettings);
+router.put('/business/scheduling-settings', schedulingSettingsRules, validate, adminController.updateSchedulingSettings);
+router.get('/business/contact-info', adminController.getBusinessContactInfo);
+router.put('/business/contact-info', businessContactInfoRules, validate, adminController.updateBusinessContactInfo);
 
 // ── Massage tables ────────────────────────────────────────────────────────────
 router.get('/business/beds', adminController.listMassageBeds);

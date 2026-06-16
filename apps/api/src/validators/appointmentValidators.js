@@ -66,6 +66,14 @@ export const feedbackRules = [
   body('comments').optional({ values: 'falsy' }).isString().isLength({ max: 2000 }),
 ];
 
+export const validateAddressRules = [
+  body('addressLine1').isString().notEmpty().isLength({ max: 200 }).withMessage('addressLine1 is required'),
+  body('addressLine2').optional({ values: 'falsy' }).isString().isLength({ max: 200 }),
+  body('city').isString().notEmpty().isLength({ max: 100 }).withMessage('city is required'),
+  body('state').isString().notEmpty().isLength({ max: 100 }).withMessage('state is required'),
+  body('zip').isString().notEmpty().isLength({ max: 20 }).withMessage('zip is required'),
+];
+
 export const rescheduleAppointmentRules = [
   body('scheduledAt').isISO8601().withMessage('scheduledAt must be an ISO 8601 datetime'),
   body('therapistId').optional().isUUID().withMessage('therapistId must be a valid UUID'),

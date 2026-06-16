@@ -78,6 +78,11 @@ await jest.unstable_mockModule('../services/slotService.js', () => ({
   availableDaysForMonth: jest.fn(() => []),
 }));
 
+const mockValidateAddress = jest.fn();
+await jest.unstable_mockModule('../services/addressValidationService.js', () => ({
+  validateAddress: mockValidateAddress,
+}));
+
 const { default: request }       = await import('supertest');
 const { default: app }           = await import('../app.js');
 const { issueAccessToken }       = await import('../services/tokenService.js');
@@ -119,6 +124,7 @@ beforeEach(() => {
   mockMembershipSvc.consumeCredit.mockResolvedValue(0);
   mockPaymentSvc.payments.findPaymentMethodById.mockResolvedValue(null);
   mockPaymentSvc.createBookingSetupIntent.mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null });
+  mockValidateAddress.mockResolvedValue({ valid: true, formattedAddress: '123 Main St, Springfield, IL 62704, USA', unconfirmedComponentTypes: [] });
 
   const GUEST_APPT_DETAIL = {
     id: APPT_ID, status: 'pending', scheduled_at: FUTURE_AT,
@@ -146,6 +152,7 @@ beforeEach(() => {
   Object.assign(mockBusinessRepo, {
     getMassageBeds: jest.fn().mockResolvedValue([{ id: BED_ID, name: 'Table 1', is_active: true }]),
     getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
+    getSchedulingSettings: jest.fn().mockResolvedValue({ buffer_minutes: 15 }),
   });
   Object.assign(mockConsentRepo, {
     findByClientId: jest.fn().mockResolvedValue(null),
@@ -292,6 +299,53 @@ describe('POST /api/v1/appointments', () => {
       .set('Authorization', bearer(CLIENT_ID))
       .send({ therapistId: THERAPIST_ID, serviceId: SERVICE_ID }); // missing scheduledAt
     expect(res.status).toBe(422);
+  });
+
+  describe('configurable buffer time for bed assignment', () => {
+    // Existing appointment on the only active bed ends at 09:40 — 20 minutes
+    // before the new 10:00 booking starts.
+    const bedAppt = {
+      bed_id: BED_ID,
+      scheduled_at: '2030-06-15T08:40:00.000Z',
+      duration_minutes: 60,
+    };
+
+    it('assigns the bed when the gap exceeds the configured buffer', async () => {
+      mockApptRepo.getByDateRange.mockResolvedValue([bedAppt]);
+      mockBusinessRepo.getSchedulingSettings.mockResolvedValue({ buffer_minutes: 15 });
+
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(body);
+
+      expect(res.status).toBe(201);
+    });
+
+    it('rejects the booking when the gap is smaller than the configured buffer', async () => {
+      mockApptRepo.getByDateRange.mockResolvedValue([bedAppt]);
+      mockBusinessRepo.getSchedulingSettings.mockResolvedValue({ buffer_minutes: 30 });
+
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(body);
+
+      expect(res.status).toBe(409);
+      expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
+    });
+
+    it('falls back to a 15-minute buffer when no scheduling settings row exists', async () => {
+      mockApptRepo.getByDateRange.mockResolvedValue([bedAppt]);
+      mockBusinessRepo.getSchedulingSettings.mockResolvedValue(null);
+
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(body);
+
+      expect(res.status).toBe(201);
+    });
   });
 });
 
@@ -877,5 +931,48 @@ describe('POST /api/v1/appointments/:id/reschedule', () => {
       .set('Authorization', bearer(CLIENT_ID))
       .send({ scheduledAt: SOON_AT, therapistId: THERAPIST_ID });
     expect(res.status).toBe(400);
+  });
+});
+
+// ── POST /appointments/validate-address ───────────────────────────────────────
+
+describe('POST /api/v1/appointments/validate-address', () => {
+  const VALID_BODY = { addressLine1: '123 Main St', city: 'Springfield', state: 'IL', zip: '62704' };
+
+  it('returns valid for a confirmed address, with no auth required', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(200);
+    expect(res.body.data.valid).toBe(true);
+    expect(mockValidateAddress).toHaveBeenCalledWith(
+      expect.objectContaining({ addressLine1: '123 Main St', city: 'Springfield', state: 'IL', zip: '62704' })
+    );
+  });
+
+  it('returns valid: false when the provider cannot confirm the address', async () => {
+    mockValidateAddress.mockResolvedValue({ valid: false, formattedAddress: null, unconfirmedComponentTypes: ['locality'] });
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(200);
+    expect(res.body.data.valid).toBe(false);
+  });
+
+  it('returns 422 when required fields are missing', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send({ addressLine1: '123 Main St' });
+    expect(res.status).toBe(422);
+  });
+
+  it('propagates a 502 when the validation provider is unavailable', async () => {
+    mockValidateAddress.mockRejectedValue(
+      Object.assign(new Error('Address verification service is unavailable. Please try again.'), { statusCode: 502, code: 'ADDRESS_VALIDATION_UNAVAILABLE' })
+    );
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(502);
   });
 });

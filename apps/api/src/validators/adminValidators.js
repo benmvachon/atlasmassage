@@ -19,6 +19,34 @@ export const bookingRestrictionsRules = [
     .isBoolean().withMessage('restrictMinors must be a boolean'),
 ];
 
+export const schedulingSettingsRules = [
+  body('bufferMinutes')
+    .isInt({ min: 0, max: 120 }).withMessage('bufferMinutes must be an integer between 0 and 120'),
+];
+
+export const businessContactInfoRules = [
+  body('addressLine1')
+    .trim().notEmpty().withMessage('Address is required')
+    .isLength({ max: 200 }).withMessage('Address must be 200 characters or fewer'),
+  body('addressLine2')
+    .optional({ values: 'falsy' }).trim()
+    .isLength({ max: 200 }).withMessage('Address line 2 must be 200 characters or fewer'),
+  body('city')
+    .trim().notEmpty().withMessage('City is required')
+    .isLength({ max: 100 }).withMessage('City must be 100 characters or fewer'),
+  body('state')
+    .trim().notEmpty().withMessage('State is required')
+    .isLength({ max: 100 }).withMessage('State must be 100 characters or fewer'),
+  body('zip')
+    .trim().notEmpty().withMessage('ZIP code is required')
+    .isLength({ max: 20 }).withMessage('ZIP code must be 20 characters or fewer'),
+  body('phone')
+    .trim().notEmpty().withMessage('Phone number is required')
+    .isMobilePhone().withMessage('Must be a valid phone number'),
+  body('email')
+    .isEmail().normalizeEmail().withMessage('Must be a valid email address'),
+];
+
 export const massageBedCreateRules = [
   body('name')
     .trim().notEmpty().withMessage('Bed name is required')

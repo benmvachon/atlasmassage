@@ -905,6 +905,191 @@ function BookingRestrictionsSection({ restrictions, onRestrictionsChange }) {
   );
 }
 
+function SchedulingSettingsSection({ settings, onSettingsChange }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [bufferMinutes, setBufferMinutes] = useState(settings?.buffer_minutes ?? 15);
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError('');
+    setSaved(false);
+    try {
+      const res = await adminService.updateSchedulingSettings({ bufferMinutes: Number(bufferMinutes) });
+      onSettingsChange(res.data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="owner-section">
+      <h2 className="owner-section__title">Scheduling</h2>
+      <p className="owner-section__desc">
+        The minimum gap required between appointments for the same therapist or the same massage table.
+      </p>
+
+      <label className="owner-label">
+        Buffer time (minutes)
+        <input
+          className="owner-input owner-input--narrow"
+          type="number"
+          min={0}
+          max={120}
+          step={5}
+          value={bufferMinutes}
+          onChange={e => setBufferMinutes(e.target.value)}
+          disabled={saving}
+        />
+      </label>
+
+      <div className="owner-restrictions__footer">
+        <button
+          className="btn btn--primary btn--sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        {saved && <span className="owner-inline-success">Saved.</span>}
+        {saveError && <span className="owner-inline-error">{saveError}</span>}
+      </div>
+    </section>
+  );
+}
+
+function ContactInfoSection({ contactInfo, onContactInfoChange }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const [form, setForm] = useState({
+    addressLine1: contactInfo?.address_line1 ?? '',
+    addressLine2: contactInfo?.address_line2 ?? '',
+    city: contactInfo?.city ?? '',
+    state: contactInfo?.state ?? '',
+    zip: contactInfo?.zip ?? '',
+    phone: contactInfo?.phone ?? '',
+    email: contactInfo?.email ?? '',
+  });
+
+  function setField(field, value) {
+    setForm(f => ({ ...f, [field]: value }));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError('');
+    setSaved(false);
+    try {
+      const res = await adminService.updateBusinessContactInfo(form);
+      onContactInfoChange(res.data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="owner-section">
+      <h2 className="owner-section__title">Contact Info</h2>
+      <p className="owner-section__desc">
+        The address, phone number, and email shown in the Contact section of the public website.
+      </p>
+
+      <div className="owner-add-panel__fields owner-add-panel__fields--two-col">
+        <label className="owner-label">
+          Street address
+          <input
+            className="owner-input"
+            value={form.addressLine1}
+            onChange={e => setField('addressLine1', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          Apt, suite, etc. <span className="booking-field__optional">(optional)</span>
+          <input
+            className="owner-input"
+            value={form.addressLine2}
+            onChange={e => setField('addressLine2', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          City
+          <input
+            className="owner-input"
+            value={form.city}
+            onChange={e => setField('city', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          State
+          <input
+            className="owner-input owner-input--narrow"
+            value={form.state}
+            onChange={e => setField('state', e.target.value)}
+            maxLength={2}
+            placeholder="MA"
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          ZIP code
+          <input
+            className="owner-input owner-input--narrow"
+            value={form.zip}
+            onChange={e => setField('zip', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          Phone
+          <input
+            className="owner-input"
+            type="tel"
+            value={form.phone}
+            onChange={e => setField('phone', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+        <label className="owner-label">
+          Email
+          <input
+            className="owner-input"
+            type="email"
+            value={form.email}
+            onChange={e => setField('email', e.target.value)}
+            disabled={saving}
+          />
+        </label>
+      </div>
+
+      <div className="owner-restrictions__footer">
+        <button
+          className="btn btn--primary btn--sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        {saved && <span className="owner-inline-success">Saved.</span>}
+        {saveError && <span className="owner-inline-error">{saveError}</span>}
+      </div>
+    </section>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BusinessDetailsPage() {
@@ -915,18 +1100,24 @@ export default function BusinessDetailsPage() {
   const [services, setServices] = useState([]);
   const [plans, setPlans] = useState([]);
   const [restrictions, setRestrictions] = useState(null);
+  const [schedulingSettings, setSchedulingSettings] = useState(null);
+  const [contactInfo, setContactInfo] = useState(null);
 
   useEffect(() => {
     Promise.all([
       adminService.getBusinessDetails(),
       adminService.listMembershipPlans(),
       adminService.getBookingRestrictions(),
-    ]).then(([biz, mem, rest]) => {
+      adminService.getSchedulingSettings(),
+      adminService.getBusinessContactInfo(),
+    ]).then(([biz, mem, rest, scheduling, contact]) => {
       setHours(biz.data.hours);
       setBeds(biz.data.beds);
       setServices(biz.data.services);
       setPlans(mem.data.plans);
       setRestrictions(rest.data);
+      setSchedulingSettings(scheduling.data);
+      setContactInfo(contact.data);
     })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
@@ -953,6 +1144,8 @@ export default function BusinessDetailsPage() {
       <ServicesSection services={services} onServicesChange={setServices} />
       <MembershipPlansSection plans={plans} onPlansChange={setPlans} />
       <BookingRestrictionsSection restrictions={restrictions} onRestrictionsChange={setRestrictions} />
+      <SchedulingSettingsSection settings={schedulingSettings} onSettingsChange={setSchedulingSettings} />
+      <ContactInfoSection contactInfo={contactInfo} onContactInfoChange={setContactInfo} />
     </div>
   );
 }

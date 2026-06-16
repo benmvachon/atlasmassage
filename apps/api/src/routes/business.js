@@ -24,4 +24,14 @@ router.get('/restrictions', async (req, res, next) => {
   }
 });
 
+router.get('/contact-info', async (req, res, next) => {
+  try {
+    const repo = new BusinessRepository(getPool());
+    const contactInfo = await repo.getBusinessContactInfo();
+    res.json({ success: true, data: contactInfo });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

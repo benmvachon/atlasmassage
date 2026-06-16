@@ -514,6 +514,45 @@ describe('BusinessRepository', () => {
     const result = await new BusinessRepository(pool).deactivateService('svc1');
     expect(result.is_active).toBe(false);
   });
+
+  it('getSchedulingSettings returns the single settings row', async () => {
+    const pool = makePool([{ id: 1, buffer_minutes: 15 }]);
+    expect(await new BusinessRepository(pool).getSchedulingSettings()).toEqual({ id: 1, buffer_minutes: 15 });
+  });
+
+  it('getSchedulingSettings returns null when no row exists', async () => {
+    expect(await new BusinessRepository(makePool([])).getSchedulingSettings()).toBeNull();
+  });
+
+  it('updateSchedulingSettings updates and returns the buffer setting', async () => {
+    const pool = makePool([{ id: 1, buffer_minutes: 30 }]);
+    const result = await new BusinessRepository(pool).updateSchedulingSettings({ bufferMinutes: 30 });
+    expect(result).toEqual({ id: 1, buffer_minutes: 30 });
+  });
+
+  const CONTACT_ROW = {
+    id: 1, address_line1: '123 Boylston Street', address_line2: '', city: 'Boston',
+    state: 'MA', zip: '02116', phone: '(617) 555-0100', email: 'hello@atlasmassage.com',
+  };
+
+  it('getBusinessContactInfo returns the single contact info row', async () => {
+    const pool = makePool([CONTACT_ROW]);
+    expect(await new BusinessRepository(pool).getBusinessContactInfo()).toEqual(CONTACT_ROW);
+  });
+
+  it('getBusinessContactInfo returns null when no row exists', async () => {
+    expect(await new BusinessRepository(makePool([])).getBusinessContactInfo()).toBeNull();
+  });
+
+  it('updateBusinessContactInfo updates and returns the contact info', async () => {
+    const updatedRow = { ...CONTACT_ROW, address_line1: '456 Newbury St' };
+    const pool = makePool([updatedRow]);
+    const result = await new BusinessRepository(pool).updateBusinessContactInfo({
+      addressLine1: '456 Newbury St', addressLine2: '', city: 'Boston', state: 'MA',
+      zip: '02116', phone: '(617) 555-0100', email: 'hello@atlasmassage.com',
+    });
+    expect(result).toEqual(updatedRow);
+  });
 });
 
 // ── MembershipRepository ──────────────────────────────────────────────────────

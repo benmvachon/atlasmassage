@@ -9,6 +9,10 @@ export const adminService = {
   updateBusinessHours: (dayOfWeek, data) => api.put(`/admin/business/hours/${dayOfWeek}`, data),
   getBookingRestrictions: () => api.get('/admin/business/restrictions'),
   updateBookingRestrictions: (data) => api.put('/admin/business/restrictions', data),
+  getSchedulingSettings: () => api.get('/admin/business/scheduling-settings'),
+  updateSchedulingSettings: (data) => api.put('/admin/business/scheduling-settings', data),
+  getBusinessContactInfo: () => api.get('/admin/business/contact-info'),
+  updateBusinessContactInfo: (data) => api.put('/admin/business/contact-info', data),
 
   // Massage tables
   listMassageBeds: () => api.get('/admin/business/beds'),

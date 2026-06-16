@@ -137,6 +137,42 @@ describe('generateSlots', () => {
     const slots = generateSlots([avail(T1, '09:00', '10:00')], [bedAppt], { activeBedCount: 0 });
     expect(slots.map(s => s.startTime)).toContain('09:00');
   });
+
+  it('defaults to a 15-minute therapist buffer when bufferMinutes is not specified', () => {
+    const availability = [avail(T1, '09:00', '12:00')];
+    const appointments = [{ therapist_id: 't1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 }];
+    const slots = generateSlots(availability, appointments);
+    const times = slots.map(s => s.startTime);
+    expect(times).not.toContain('10:00');
+    expect(times).toContain('10:15');
+  });
+
+  it('honors a configured bufferMinutes for therapist conflicts', () => {
+    const availability = [avail(T1, '09:00', '12:00')];
+    const appointments = [{ therapist_id: 't1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 }];
+    const slots = generateSlots(availability, appointments, { bufferMinutes: 30 });
+    const times = slots.map(s => s.startTime);
+    // With a 30-min buffer, the appointment blocks until 10:30 instead of 10:15
+    expect(times).not.toContain('10:15');
+    expect(times).toContain('10:30');
+  });
+
+  it('allows a bufferMinutes of 0 (back-to-back appointments)', () => {
+    const availability = [avail(T1, '09:00', '12:00')];
+    const appointments = [{ therapist_id: 't1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 }];
+    const slots = generateSlots(availability, appointments, { bufferMinutes: 0 });
+    const times = slots.map(s => s.startTime);
+    expect(times).not.toContain('09:45');
+    expect(times).toContain('10:00');
+  });
+
+  it('honors a configured bufferMinutes for bed conflicts', () => {
+    const bedAppt = { therapist_id: 't2', bed_id: 'bed-1', scheduled_at: '2030-01-10T09:00:00Z', duration_minutes: 60 };
+    const slots = generateSlots([avail(T1, '09:00', '12:00')], [bedAppt], { activeBedCount: 1, bufferMinutes: 30 });
+    const times = slots.map(s => s.startTime);
+    expect(times).not.toContain('10:15');
+    expect(times).toContain('10:30');
+  });
 });
 
 // ── availableDaysForMonth ─────────────────────────────────────────────────────
