@@ -13,6 +13,8 @@ export const adminService = {
   updateSchedulingSettings: (data) => api.put('/admin/business/scheduling-settings', data),
   getBusinessContactInfo: () => api.get('/admin/business/contact-info'),
   updateBusinessContactInfo: (data) => api.put('/admin/business/contact-info', data),
+  getTravelSettings: () => api.get('/admin/business/travel-settings'),
+  updateTravelSettings: (data) => api.put('/admin/business/travel-settings', data),
 
   // Massage tables
   listMassageBeds: () => api.get('/admin/business/beds'),

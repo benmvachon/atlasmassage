@@ -905,6 +905,74 @@ function BookingRestrictionsSection({ restrictions, onRestrictionsChange }) {
   );
 }
 
+// ── Travel Settings ────────────────────────────────────────────────────────────
+
+function TravelSettingsSection({ settings, onSettingsChange }) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const [form, setForm] = useState({
+    travel_mode_enabled: settings?.travel_mode_enabled ?? true,
+  });
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError('');
+    setSaved(false);
+    try {
+      const res = await adminService.updateTravelSettings({
+        travelModeEnabled: form.travel_mode_enabled,
+      });
+      onSettingsChange(res.data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="owner-section">
+      <h2 className="owner-section__title">Travel Massage Mode</h2>
+      <p className="owner-section__desc">
+        While enabled, the landing page shows a service-area map instead of a fixed address, the
+        office address is hidden from the Contact section, and bookings are rejected if the
+        guest&rsquo;s address is outside our 20-minute peak-traffic drive-time range. Disable once you
+        operate from a fixed location clients visit.
+      </p>
+
+      <div className="owner-restrictions">
+        <label className="owner-restriction-row">
+          <input
+            type="checkbox"
+            checked={form.travel_mode_enabled}
+            onChange={e => setForm(f => ({ ...f, travel_mode_enabled: e.target.checked }))}
+            disabled={saving}
+          />
+          <div className="owner-restriction-row__text">
+            <span className="owner-restriction-row__label">Enable travel massage mode</span>
+          </div>
+        </label>
+      </div>
+
+      <div className="owner-restrictions__footer">
+        <button
+          className="btn btn--primary btn--sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        {saved && <span className="owner-inline-success">Saved.</span>}
+        {saveError && <span className="owner-inline-error">{saveError}</span>}
+      </div>
+    </section>
+  );
+}
+
 function SchedulingSettingsSection({ settings, onSettingsChange }) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -1102,6 +1170,7 @@ export default function BusinessDetailsPage() {
   const [restrictions, setRestrictions] = useState(null);
   const [schedulingSettings, setSchedulingSettings] = useState(null);
   const [contactInfo, setContactInfo] = useState(null);
+  const [travelSettings, setTravelSettings] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -1110,7 +1179,8 @@ export default function BusinessDetailsPage() {
       adminService.getBookingRestrictions(),
       adminService.getSchedulingSettings(),
       adminService.getBusinessContactInfo(),
-    ]).then(([biz, mem, rest, scheduling, contact]) => {
+      adminService.getTravelSettings(),
+    ]).then(([biz, mem, rest, scheduling, contact, travel]) => {
       setHours(biz.data.hours);
       setBeds(biz.data.beds);
       setServices(biz.data.services);
@@ -1118,6 +1188,7 @@ export default function BusinessDetailsPage() {
       setRestrictions(rest.data);
       setSchedulingSettings(scheduling.data);
       setContactInfo(contact.data);
+      setTravelSettings(travel.data);
     })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
@@ -1144,6 +1215,7 @@ export default function BusinessDetailsPage() {
       <ServicesSection services={services} onServicesChange={setServices} />
       <MembershipPlansSection plans={plans} onPlansChange={setPlans} />
       <BookingRestrictionsSection restrictions={restrictions} onRestrictionsChange={setRestrictions} />
+      <TravelSettingsSection settings={travelSettings} onSettingsChange={setTravelSettings} />
       <SchedulingSettingsSection settings={schedulingSettings} onSettingsChange={setSchedulingSettings} />
       <ContactInfoSection contactInfo={contactInfo} onContactInfoChange={setContactInfo} />
     </div>

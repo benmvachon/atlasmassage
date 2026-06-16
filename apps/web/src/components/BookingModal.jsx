@@ -293,7 +293,11 @@ function BookingWizard({
         zip: zip.trim(),
       });
       if (!result.valid) {
-        setError("We couldn't verify this address. Please check it for typos and try again.");
+        setError(
+          result.outOfServiceArea
+            ? "We're sorry — this address is outside our 20-minute travel service area."
+            : "We couldn't verify this address. Please check it for typos and try again."
+        );
         return;
       }
     } catch (err) {

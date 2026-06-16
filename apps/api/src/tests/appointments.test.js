@@ -83,6 +83,11 @@ await jest.unstable_mockModule('../services/addressValidationService.js', () => 
   validateAddress: mockValidateAddress,
 }));
 
+const mockIsWithinServiceArea = jest.fn();
+await jest.unstable_mockModule('../services/travelDistanceService.js', () => ({
+  isWithinServiceArea: mockIsWithinServiceArea,
+}));
+
 const { default: request }       = await import('supertest');
 const { default: app }           = await import('../app.js');
 const { issueAccessToken }       = await import('../services/tokenService.js');
@@ -125,6 +130,7 @@ beforeEach(() => {
   mockPaymentSvc.payments.findPaymentMethodById.mockResolvedValue(null);
   mockPaymentSvc.createBookingSetupIntent.mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null });
   mockValidateAddress.mockResolvedValue({ valid: true, formattedAddress: '123 Main St, Springfield, IL 62704, USA', unconfirmedComponentTypes: [] });
+  mockIsWithinServiceArea.mockResolvedValue({ withinRange: true, driveMinutes: 12 });
 
   const GUEST_APPT_DETAIL = {
     id: APPT_ID, status: 'pending', scheduled_at: FUTURE_AT,
@@ -153,6 +159,10 @@ beforeEach(() => {
     getMassageBeds: jest.fn().mockResolvedValue([{ id: BED_ID, name: 'Table 1', is_active: true }]),
     getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
     getSchedulingSettings: jest.fn().mockResolvedValue({ buffer_minutes: 15 }),
+    getTravelSettings: jest.fn().mockResolvedValue({ travel_mode_enabled: false }),
+    getBusinessContactInfo: jest.fn().mockResolvedValue({
+      address_line1: '101 Bellevue Street', city: 'Newton', state: 'MA', zip: '02458',
+    }),
   });
   Object.assign(mockConsentRepo, {
     findByClientId: jest.fn().mockResolvedValue(null),
@@ -974,5 +984,41 @@ describe('POST /api/v1/appointments/validate-address', () => {
       .post('/api/v1/appointments/validate-address')
       .send(VALID_BODY);
     expect(res.status).toBe(502);
+  });
+
+  it('does not check drive time when travel mode is disabled', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: false });
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(200);
+    expect(res.body.data.valid).toBe(true);
+    expect(mockIsWithinServiceArea).not.toHaveBeenCalled();
+  });
+
+  it('returns valid when travel mode is enabled and the address is within range', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    mockIsWithinServiceArea.mockResolvedValue({ withinRange: true, driveMinutes: 14 });
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(200);
+    expect(res.body.data.valid).toBe(true);
+    expect(mockIsWithinServiceArea).toHaveBeenCalledWith(
+      expect.objectContaining({
+        originAddress: expect.stringContaining('101 Bellevue Street'),
+        destinationAddress: expect.stringContaining('123 Main St'),
+      })
+    );
+  });
+
+  it('returns outOfServiceArea when travel mode is enabled and the address is too far', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    mockIsWithinServiceArea.mockResolvedValue({ withinRange: false, driveMinutes: 35 });
+    const res = await request(app)
+      .post('/api/v1/appointments/validate-address')
+      .send(VALID_BODY);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ valid: false, outOfServiceArea: true, driveMinutes: 35 });
   });
 });

@@ -42,6 +42,7 @@ export const config = {
 
   googleMaps: {
     addressValidationApiKey: optional('GOOGLE_ADDRESS_VALIDATION_API_KEY', ''),
+    distanceMatrixApiKey: optional('GOOGLE_DISTANCE_MATRIX_API_KEY', ''),
   },
 
   email: {

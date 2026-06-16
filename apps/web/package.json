@@ -81,7 +81,8 @@
       "!src/components/Header.jsx",
       "!src/components/MembershipModal.jsx",
       "!src/components/NotificationPrefsSection.jsx",
-      "!src/components/TimeSlotPanel.jsx"
+      "!src/components/TimeSlotPanel.jsx",
+      "!src/components/ServiceAreaMap.jsx"
     ],
     "coverageThreshold": {
       "global": {

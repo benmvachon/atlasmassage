@@ -34,4 +34,14 @@ router.get('/contact-info', async (req, res, next) => {
   }
 });
 
+router.get('/travel-settings', async (req, res, next) => {
+  try {
+    const repo = new BusinessRepository(getPool());
+    const settings = await repo.getTravelSettings();
+    res.json({ success: true, data: settings ?? { travel_mode_enabled: false } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

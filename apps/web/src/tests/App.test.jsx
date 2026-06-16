@@ -8,7 +8,13 @@ jest.mock('../services/businessService', () => ({
   businessService: {
     getHours: jest.fn().mockResolvedValue({ data: [] }),
     getContactInfo: jest.fn().mockResolvedValue({ data: null }),
+    getTravelSettings: jest.fn().mockResolvedValue({ data: { travel_mode_enabled: false } }),
   },
+}));
+
+jest.mock('../components/ServiceAreaMap', () => ({
+  __esModule: true,
+  default: () => <div data-testid="service-area-map" />,
 }));
 
 describe('HomePage', () => {
@@ -76,6 +82,25 @@ describe('HomePage', () => {
       );
     });
     expect(screen.getByText(/contact info is not available/i)).toBeInTheDocument();
+  });
+
+  it('hides the address and shows the service area map when travel mode is enabled', async () => {
+    businessService.getContactInfo.mockResolvedValueOnce({
+      data: {
+        address_line1: '101 Bellevue Street', address_line2: '', city: 'Newton',
+        state: 'MA', zip: '02458', phone: '(617) 555-9999', email: 'contact@atlasmassage.com',
+      },
+    });
+    businessService.getTravelSettings.mockResolvedValueOnce({ data: { travel_mode_enabled: true } });
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <HomePage />
+        </MemoryRouter>
+      );
+    });
+    expect(screen.queryByText('Address')).not.toBeInTheDocument();
+    expect(screen.getByTestId('service-area-map')).toBeInTheDocument();
   });
 });
 

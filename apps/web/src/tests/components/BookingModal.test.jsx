@@ -281,6 +281,17 @@ describe('BookingModal — contact step address verification', () => {
     });
     expect(screen.getByRole('alert')).toHaveTextContent(/unavailable/i);
   });
+
+  it('blocks navigation and shows a service-area error when the address is out of travel range', async () => {
+    bookingService.validateAddress.mockResolvedValue({ valid: false, outOfServiceArea: true, driveMinutes: 35 });
+    renderModal();
+    fillContactFields();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(/outside our 20-minute travel service area/i);
+    expect(screen.getByLabelText(/street address/i)).toBeInTheDocument();
+  });
 });
 
 // ── Wizard navigation ─────────────────────────────────────────────────────────

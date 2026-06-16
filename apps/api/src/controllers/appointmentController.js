@@ -14,6 +14,7 @@ import { GiftCardService } from '../services/giftCardService.js';
 import { NotificationService } from '../services/notificationService.js';
 import { generateSlots } from '../services/slotService.js';
 import { validateAddress } from '../services/addressValidationService.js';
+import { isWithinServiceArea } from '../services/travelDistanceService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { config } from '../config/index.js';
 import { logger } from '../logging/logger.js';
@@ -312,6 +313,20 @@ export async function validateGuestAddress(req, res, next) {
   try {
     const { addressLine1, addressLine2, city, state, zip } = req.body;
     const result = await validateAddress({ addressLine1, addressLine2, city, state, zip });
+
+    if (result.valid) {
+      const travelSettings = await repos().business.getTravelSettings();
+      if (travelSettings?.travel_mode_enabled) {
+        const contact = await repos().business.getBusinessContactInfo();
+        const originAddress = `${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`;
+        const destinationAddress = [addressLine1, addressLine2, city, state, zip].filter(Boolean).join(', ');
+        const { withinRange, driveMinutes } = await isWithinServiceArea({ originAddress, destinationAddress });
+        if (!withinRange) {
+          return res.json({ success: true, data: { valid: false, outOfServiceArea: true, driveMinutes } });
+        }
+      }
+    }
+
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);

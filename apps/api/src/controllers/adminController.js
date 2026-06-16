@@ -122,6 +122,27 @@ export async function updateBusinessContactInfo(req, res, next) {
   }
 }
 
+// ── Travel settings ───────────────────────────────────────────────────────────
+
+export async function getTravelSettings(req, res, next) {
+  try {
+    const settings = await repos().business.getTravelSettings();
+    res.json({ success: true, data: settings ?? { travel_mode_enabled: false } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateTravelSettings(req, res, next) {
+  try {
+    const { travelModeEnabled } = req.body;
+    const updated = await repos().business.updateTravelSettings({ travelModeEnabled });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Massage beds ──────────────────────────────────────────────────────────────
 
 export async function listMassageBeds(req, res, next) {

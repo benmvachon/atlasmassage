@@ -110,6 +110,8 @@ beforeEach(() => {
       state: 'MA', zip: '02116', phone: '(617) 555-0100', email: 'hello@atlasmassage.com',
     }),
     updateBusinessContactInfo: jest.fn(),
+    getTravelSettings: jest.fn().mockResolvedValue({ id: 1, travel_mode_enabled: true }),
+    updateTravelSettings: jest.fn(),
   });
 
   Object.assign(mockTherapistRepo, {
@@ -348,6 +350,58 @@ describe('PUT /api/v1/admin/business/contact-info', () => {
       .put('/api/v1/admin/business/contact-info')
       .set('Authorization', therapistBearer())
       .send(valid);
+
+    expect(res.status).toBe(403);
+  });
+});
+
+// ── Travel settings ──────────────────────────────────────────────────────────
+
+describe('GET /api/v1/admin/business/travel-settings', () => {
+  it('returns the current travel mode setting for an owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/business/travel-settings')
+      .set('Authorization', ownerBearer());
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ id: 1, travel_mode_enabled: true });
+  });
+
+  it('returns 401 without a token', async () => {
+    const res = await request(app).get('/api/v1/admin/business/travel-settings');
+    expect(res.status).toBe(401);
+  });
+});
+
+describe('PUT /api/v1/admin/business/travel-settings', () => {
+  it('updates the travel mode setting and returns the updated row', async () => {
+    mockBusiness.updateTravelSettings.mockResolvedValue({ id: 1, travel_mode_enabled: false });
+
+    const res = await request(app)
+      .put('/api/v1/admin/business/travel-settings')
+      .set('Authorization', ownerBearer())
+      .send({ travelModeEnabled: false });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ travel_mode_enabled: false });
+    expect(mockBusiness.updateTravelSettings).toHaveBeenCalledWith({ travelModeEnabled: false });
+  });
+
+  it('returns 422 when travelModeEnabled is missing', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/travel-settings')
+      .set('Authorization', ownerBearer())
+      .send({});
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('travelModeEnabled');
+  });
+
+  it('returns 403 for a non-owner', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/travel-settings')
+      .set('Authorization', therapistBearer())
+      .send({ travelModeEnabled: false });
 
     expect(res.status).toBe(403);
   });

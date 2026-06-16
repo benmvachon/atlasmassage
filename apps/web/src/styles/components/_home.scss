@@ -95,6 +95,14 @@
     }
   }
 
+  &__map-caption {
+    margin-top: $space-2;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    padding: 0 $space-2;
+    text-align: center;
+  }
+
   &__details {
     display: flex;
     flex-direction: column;

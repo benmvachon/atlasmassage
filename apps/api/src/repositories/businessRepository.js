@@ -152,4 +152,21 @@ export class BusinessRepository {
     );
     return rows[0];
   }
+
+  async getTravelSettings() {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM travel_settings LIMIT 1'
+    );
+    return rows[0] ?? null;
+  }
+
+  async updateTravelSettings({ travelModeEnabled }) {
+    const { rows } = await this.pool.query(
+      `UPDATE travel_settings
+       SET travel_mode_enabled = $1, updated_at = NOW()
+       RETURNING *`,
+      [travelModeEnabled]
+    );
+    return rows[0];
+  }
 }

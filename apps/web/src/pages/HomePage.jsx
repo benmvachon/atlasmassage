@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAsync } from '../hooks/useAsync';
 import { businessService } from '../services/businessService';
+import ServiceAreaMap from '../components/ServiceAreaMap';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -49,6 +50,9 @@ export default function HomePage() {
   const { data: contactData, loading: loadingContact } = useAsync(() => businessService.getContactInfo());
   const contact = contactData?.data ?? null;
 
+  const { data: travelData } = useAsync(() => businessService.getTravelSettings());
+  const travelModeEnabled = travelData?.data?.travel_mode_enabled ?? false;
+
   const mapQuery = contact
     ? encodeURIComponent(`${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`)
     : encodeURIComponent('Boston, Massachusetts');
@@ -71,16 +75,20 @@ export default function HomePage() {
       <div className="page">
         <section className="location-section">
           <div className="location-section__map">
-            <iframe
-              title="Atlas Bodywork location"
-              src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-              width="100%"
-              height="420"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            {travelModeEnabled && contact ? (
+              <ServiceAreaMap contact={contact} />
+            ) : (
+              <iframe
+                title="Atlas Bodywork location"
+                src={`https://maps.google.com/maps?q=${mapQuery}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                width="100%"
+                height="420"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
           </div>
 
           <div className="location-section__details">
@@ -114,15 +122,17 @@ export default function HomePage() {
                 <p className="biz-info__muted">Contact info is not available right now.</p>
               ) : (
                 <ul className="biz-contact">
-                  <li className="biz-contact__item">
-                    <span className="biz-contact__label">Address</span>
-                    <span>
-                      {contact.address_line1}
-                      {contact.address_line2 && <><br />{contact.address_line2}</>}
-                      <br />
-                      {contact.city}, {contact.state} {contact.zip}
-                    </span>
-                  </li>
+                  {!travelModeEnabled && (
+                    <li className="biz-contact__item">
+                      <span className="biz-contact__label">Address</span>
+                      <span>
+                        {contact.address_line1}
+                        {contact.address_line2 && <><br />{contact.address_line2}</>}
+                        <br />
+                        {contact.city}, {contact.state} {contact.zip}
+                      </span>
+                    </li>
+                  )}
                   <li className="biz-contact__item">
                     <span className="biz-contact__label">Phone</span>
                     <a href={telHref(contact.phone)} className="biz-contact__link">{contact.phone}</a>

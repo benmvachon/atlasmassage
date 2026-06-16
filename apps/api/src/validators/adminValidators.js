@@ -24,6 +24,11 @@ export const schedulingSettingsRules = [
     .isInt({ min: 0, max: 120 }).withMessage('bufferMinutes must be an integer between 0 and 120'),
 ];
 
+export const travelSettingsRules = [
+  body('travelModeEnabled')
+    .isBoolean().withMessage('travelModeEnabled must be a boolean'),
+];
+
 export const businessContactInfoRules = [
   body('addressLine1')
     .trim().notEmpty().withMessage('Address is required')

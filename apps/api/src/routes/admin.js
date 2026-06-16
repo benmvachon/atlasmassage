@@ -20,6 +20,7 @@ import {
   therapistUpdateRules,
   testimonialCreateRules,
   testimonialUpdateRules,
+  travelSettingsRules,
   validate,
 } from '../validators/adminValidators.js';
 
@@ -76,6 +77,8 @@ router.get('/business/scheduling-settings', adminController.getSchedulingSetting
 router.put('/business/scheduling-settings', schedulingSettingsRules, validate, adminController.updateSchedulingSettings);
 router.get('/business/contact-info', adminController.getBusinessContactInfo);
 router.put('/business/contact-info', businessContactInfoRules, validate, adminController.updateBusinessContactInfo);
+router.get('/business/travel-settings', adminController.getTravelSettings);
+router.put('/business/travel-settings', travelSettingsRules, validate, adminController.updateTravelSettings);
 
 // ── Massage tables ────────────────────────────────────────────────────────────
 router.get('/business/beds', adminController.listMassageBeds);
