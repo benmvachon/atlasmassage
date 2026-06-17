@@ -62,7 +62,7 @@ export default function Header() {
           <NavLink to="/services" onClick={close}>Services</NavLink>
           <NavLink to="/team" onClick={close}>Team</NavLink>
           <NavLink to="/testimonials" onClick={close}>Testimonials</NavLink>
-          <NavLink to="/memberships" onClick={close}>Memberships</NavLink>
+          {/* <NavLink to="/memberships" onClick={close}>Memberships</NavLink> */}
           <NavLink to="/gift-cards" onClick={close}>Gift Cards</NavLink>
           <NavLink to="/booking" className="btn btn--primary" onClick={close}>Book Now</NavLink>
           {isTherapist && !isOwner && (
