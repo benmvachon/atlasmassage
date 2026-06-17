@@ -1472,6 +1472,24 @@
   }
 }
 
+.payment-success {
+  padding: $space-2 0 $space-1;
+
+  &__msg {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text;
+    margin-bottom: $space-3;
+  }
+
+  &__prompt {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-4;
+  }
+}
+
 .soap-field {
   margin-bottom: $space-5;
 

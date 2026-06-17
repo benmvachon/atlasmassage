@@ -2,6 +2,8 @@ import { jest } from '@jest/globals';
 
 // Stripe key must be absent so payment block is skipped in the controller
 delete process.env.STRIPE_SECRET_KEY;
+// Raise the rate-limit ceiling so the full test suite doesn't trip it
+process.env.RATE_LIMIT_MAX = '500';
 
 await jest.unstable_mockModule('../database/pool.js', () => ({
   getPool: jest.fn(() => ({})),
@@ -66,7 +68,9 @@ await jest.unstable_mockModule('../services/membershipService.js', () => ({
 
 const mockPaymentSvc = {
   payments: { findPaymentMethodById: jest.fn().mockResolvedValue(null) },
-  createBookingSetupIntent: jest.fn().mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null }),
+  createBookingSetupIntent:  jest.fn().mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null }),
+  recordInPersonPayment:     jest.fn(),
+  chargeNoShow:              jest.fn(),
 };
 await jest.unstable_mockModule('../services/paymentService.js', () => ({
   PaymentService: jest.fn(() => mockPaymentSvc),
@@ -129,6 +133,8 @@ beforeEach(() => {
   mockMembershipSvc.consumeCredit.mockResolvedValue(0);
   mockPaymentSvc.payments.findPaymentMethodById.mockResolvedValue(null);
   mockPaymentSvc.createBookingSetupIntent.mockResolvedValue({ clientSecret: 'seti_mock_secret', stripeCustomerId: null });
+  mockPaymentSvc.recordInPersonPayment.mockResolvedValue({ id: 'pay-uuid', amount_cents: 9000, source: 'in_person', in_person_method: 'cash' });
+  mockPaymentSvc.chargeNoShow.mockResolvedValue({ payment: { id: 'pay-uuid', amount_cents: 9000, source: 'stripe' } });
   mockValidateAddress.mockResolvedValue({ valid: true, formattedAddress: '123 Main St, Springfield, IL 62704, USA', unconfirmedComponentTypes: [] });
   mockIsWithinServiceArea.mockResolvedValue({ withinRange: true, driveMinutes: 12 });
 
@@ -1020,5 +1026,188 @@ describe('POST /api/v1/appointments/validate-address', () => {
       .send(VALID_BODY);
     expect(res.status).toBe(200);
     expect(res.body.data).toMatchObject({ valid: false, outOfServiceArea: true, driveMinutes: 35 });
+  });
+});
+
+// ── POST /appointments/:id/record-payment ─────────────────────────────────────
+
+describe('POST /api/v1/appointments/:id/record-payment', () => {
+  const COMPLETED_APPT = { ...APPT, status: 'completed', therapist_id: THERAPIST_ID };
+  const body = { amountCents: 9000, method: 'cash' };
+
+  it('records payment for the assigned therapist', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send(body);
+    expect(res.status).toBe(201);
+    expect(res.body.data.payment.id).toBe('pay-uuid');
+    expect(mockPaymentSvc.recordInPersonPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: APPT_ID, amountCents: 9000, method: 'cash' })
+    );
+  });
+
+  it('owner can record payment for any appointment', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(OWNER_ID, ['owner']))
+      .send(body);
+    expect(res.status).toBe(201);
+  });
+
+  it('defaults method to cash when omitted', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ amountCents: 9000 });
+    expect(res.status).toBe(201);
+    expect(mockPaymentSvc.recordInPersonPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ method: 'cash' })
+    );
+  });
+
+  it('returns 400 when amountCents is missing', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ method: 'cash' });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when amountCents is zero', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ amountCents: 0, method: 'cash' });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when method is not a recognised value', async () => {
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ amountCents: 9000, method: 'bitcoin' });
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 403 when a different therapist tries to record payment', async () => {
+    const OTHER_THERAPIST = 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380b77';
+    mockApptRepo.findById.mockResolvedValue(COMPLETED_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(OTHER_THERAPIST, ['therapist']))
+      .send(body);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when a plain client tries', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .send(body);
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/record-payment`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send(body);
+    expect(res.status).toBe(404);
+  });
+});
+
+// ── POST /appointments/:id/charge-no-show ─────────────────────────────────────
+
+describe('POST /api/v1/appointments/:id/charge-no-show', () => {
+  const NO_SHOW_APPT = { ...APPT, status: 'no_show', therapist_id: THERAPIST_ID, stripe_payment_method_id: 'pm_mock' };
+
+  it('charges no-show fee for the assigned therapist', async () => {
+    mockApptRepo.findById.mockResolvedValue(NO_SHOW_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(200);
+    expect(res.body.data.payment.id).toBe('pay-uuid');
+    expect(mockPaymentSvc.chargeNoShow).toHaveBeenCalledWith(APPT_ID, 5000);
+  });
+
+  it('owner can charge no-show for any appointment', async () => {
+    mockApptRepo.findById.mockResolvedValue(NO_SHOW_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(OWNER_ID, ['owner']))
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(200);
+  });
+
+  it('falls back to the service price when amountCents is omitted', async () => {
+    mockApptRepo.findById.mockResolvedValue(NO_SHOW_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({});
+    expect(res.status).toBe(200);
+    expect(mockApptRepo.findServiceById).toHaveBeenCalledWith(SERVICE_ID);
+    expect(mockPaymentSvc.chargeNoShow).toHaveBeenCalledWith(APPT_ID, 9000);
+  });
+
+  it('returns 400 when amountCents is omitted and the service has no price', async () => {
+    mockApptRepo.findById.mockResolvedValue(NO_SHOW_APPT);
+    mockApptRepo.findServiceById.mockResolvedValue({ id: SERVICE_ID, price_cents: 0 });
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 403 when a different therapist tries', async () => {
+    const OTHER_THERAPIST = 'f0eebc99-9c0b-4ef8-bb6d-6bb9bd380b77';
+    mockApptRepo.findById.mockResolvedValue(NO_SHOW_APPT);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(OTHER_THERAPIST, ['therapist']))
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when a plain client tries', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(CLIENT_ID))
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/charge-no-show`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ amountCents: 5000 });
+    expect(res.status).toBe(404);
   });
 });

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const IN_PERSON_METHOD_LABELS = { cash: 'Cash', card: 'Card terminal', check: 'Check' };
 const PAYMENT_SOURCE_LABELS   = { stripe: 'Charged to card', in_person: 'Paid in-person', membership_credit: 'Membership credit' };
@@ -406,11 +407,12 @@ function ClientHistoryModal({ appt, onClose }) {
 
 // ── In-person payment modal ────────────────────────────────────────────────────
 
-function InPersonPaymentModal({ appt, onClose, onDone }) {
+function InPersonPaymentModal({ appt, onClose, onDone, onRebook }) {
   const [amount, setAmount] = useState(((appt.price_cents ?? 0) / 100).toFixed(2));
   const [method, setMethod] = useState('cash');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [succeeded, setSucceeded] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -421,6 +423,7 @@ function InPersonPaymentModal({ appt, onClose, onDone }) {
     try {
       await api.post(`/appointments/${appt.id}/record-payment`, { amountCents: cents, method });
       onDone();
+      setSucceeded(true);
     } catch (err) {
       setError(err.message || 'Failed to record payment.');
       setSaving(false);
@@ -431,50 +434,72 @@ function InPersonPaymentModal({ appt, onClose, onDone }) {
     <div className="cal-detail-overlay" onClick={onClose}>
       <div className="cal-detail" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div className="cal-detail__header">
-          <h3 className="cal-detail__title">Record In-Person Payment</h3>
+          <h3 className="cal-detail__title">
+            {succeeded ? 'Payment Recorded' : 'Record In-Person Payment'}
+          </h3>
           <button className="cal-detail__close" onClick={onClose}>&#x2715;</button>
         </div>
-        <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.875rem', marginBottom: '1.5rem', color: '#374151' }}>
-          <strong>{appt.client_name}</strong> &mdash; {appt.service_name}
-        </p>
-        <form onSubmit={handleSubmit} noValidate>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <label className="owner-label" style={{ flex: 1 }}>
-              Amount ($)
-              <input
-                className="owner-input"
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                disabled={saving}
-              />
-            </label>
-            <label className="owner-label" style={{ flex: 1 }}>
-              Method
-              <select
-                className="owner-input"
-                value={method}
-                onChange={e => setMethod(e.target.value)}
-                disabled={saving}
-              >
-                <option value="cash">Cash</option>
-                <option value="card">Card terminal</option>
-                <option value="check">Check</option>
-              </select>
-            </label>
+
+        {succeeded ? (
+          <div className="payment-success">
+            <p className="payment-success__msg">
+              Payment recorded for <strong>{appt.client_name}</strong>.
+            </p>
+            <p className="payment-success__prompt">Would you like to book their next appointment?</p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button className="btn btn--primary btn--sm" type="button" onClick={onRebook}>
+                Book Next Appointment
+              </button>
+              <button className="btn btn--ghost btn--sm" type="button" onClick={onClose}>
+                Done
+              </button>
+            </div>
           </div>
-          {error && <p className="owner-form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button className="btn btn--primary btn--sm" type="submit" disabled={saving}>
-              {saving ? 'Recording…' : 'Record Payment'}
-            </button>
-            <button className="btn btn--ghost btn--sm" type="button" onClick={onClose} disabled={saving}>
-              Cancel
-            </button>
-          </div>
-        </form>
+        ) : (
+          <>
+            <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '0.875rem', marginBottom: '1.5rem', color: '#374151' }}>
+              <strong>{appt.client_name}</strong> &mdash; {appt.service_name}
+            </p>
+            <form onSubmit={handleSubmit} noValidate>
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <label className="owner-label" style={{ flex: 1 }}>
+                  Amount ($)
+                  <input
+                    className="owner-input"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={amount}
+                    onChange={e => setAmount(e.target.value)}
+                    disabled={saving}
+                  />
+                </label>
+                <label className="owner-label" style={{ flex: 1 }}>
+                  Method
+                  <select
+                    className="owner-input"
+                    value={method}
+                    onChange={e => setMethod(e.target.value)}
+                    disabled={saving}
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="card">Card terminal</option>
+                    <option value="check">Check</option>
+                  </select>
+                </label>
+              </div>
+              {error && <p className="owner-form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button className="btn btn--primary btn--sm" type="submit" disabled={saving}>
+                  {saving ? 'Recording…' : 'Record Payment'}
+                </button>
+                <button className="btn btn--ghost btn--sm" type="button" onClick={onClose} disabled={saving}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );
@@ -566,6 +591,8 @@ const MONTH_OPTIONS = generateMonthOptions();
 
 export default function TherapistBookingsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -872,7 +899,12 @@ export default function TherapistBookingsPage() {
           onClose={() => setPaymentAppt(null)}
           onDone={() => {
             setPaidIds(prev => new Set([...prev, paymentAppt.id]));
+          }}
+          onRebook={() => {
             setPaymentAppt(null);
+            const params = new URLSearchParams();
+            if (user?.id) params.set('therapistId', user.id);
+            navigate(`/booking?${params}`);
           }}
         />
       )}
