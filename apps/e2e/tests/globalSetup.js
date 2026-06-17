@@ -33,6 +33,14 @@ export default async function globalSetup(config) {
     login('client1@example.com',     'atlas-client-2024'),
   ]);
 
+  // Disable booking restrictions so authenticated return clients skip the health
+  // step and reach the payment step directly (the pre-restriction default). Tests
+  // that specifically verify restriction enforcement should re-enable them locally.
+  await context.put('/api/v1/admin/business/restrictions', {
+    data: { restrictPregnancy: false, restrictMinors: false },
+    headers: { Authorization: `Bearer ${owner.token}` },
+  });
+
   writeFileSync(
     resolve(__dirname, '.auth-state.json'),
     JSON.stringify({ owner, sarah, marcus, client }, null, 2)

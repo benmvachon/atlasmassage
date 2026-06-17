@@ -19,7 +19,7 @@
  *   - cvc         : input[name="cvc"]
  */
 import { test, expect } from '@playwright/test';
-import { ACCOUNTS, DATES, getAuthState, loginInBrowser, setAvailability, deleteAvailability, cancelAppointment, drawSignature, debugHeaders } from './helpers.js';
+import { ACCOUNTS, DATES, getAuthState, loginInBrowser, setAvailability, deleteAvailability, cancelAppointment, drawSignature, mockValidateAddress, debugHeaders } from './helpers.js';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -215,6 +215,7 @@ test('booking modal: selecting "Enter a new card" shows the Stripe CardElement',
 });
 
 test('booking modal: guest booking with a new test card completes successfully', async ({ page, request }) => {
+  await mockValidateAddress(page);
   await page.goto(`/booking?year=${PAY_YEAR}&month=${PAY_MONTH}&therapistId=${SARAH_ID}`);
   await page.waitForSelector('.avail-calendar');
 

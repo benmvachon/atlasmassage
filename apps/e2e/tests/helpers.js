@@ -173,6 +173,22 @@ export async function cancelAppointment(request, appointmentId, ownerToken) {
 // ── Stripe ────────────────────────────────────────────────────────────────────
 
 /**
+ * Stub the address-validation API so guest contact forms always pass. Call
+ * BEFORE navigating in any test that uses a fake/test address in the contact
+ * step. Without this, the real Google Maps API rejects addresses like
+ * "Test City, CA 90210" and the contact step never advances.
+ */
+export async function mockValidateAddress(page) {
+  await page.route('**/api/v1/appointments/validate-address', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { valid: true, formattedAddress: null, unconfirmedComponentTypes: [] } }),
+    })
+  );
+}
+
+/**
  * Abort the Stripe CDN so useStripe() returns null and the payment block in
  * handleContinue is skipped. Call BEFORE page.goto().
  *

@@ -22,7 +22,7 @@ const SARAH_ID    = sarah.userId;
 const SARAH_TOKEN = sarah.token;
 const OWNER_TOKEN = owner.token;
 
-const GC_DATE    = '2030-12-01'; // Monday in December 2030
+const GC_DATE    = '2030-12-02'; // Monday in December 2030 (Dec 1 is Sunday)
 const GC_YEAR    = 2030;
 const GC_MONTH   = 12;
 
@@ -413,6 +413,6 @@ test('success page: renders correctly with booking and buy-another links', async
   await page.waitForSelector('.gift-card-success');
 
   await expect(page.locator('.gift-card-success__title')).toContainText('Purchased');
-  await expect(page.locator('a[href="/booking"]')).toBeVisible();
-  await expect(page.locator('a[href="/gift-cards"]')).toBeVisible();
+  await expect(page.locator('.gift-card-success a[href="/booking"]')).toBeVisible();
+  await expect(page.locator('.gift-card-success a[href="/gift-cards"]')).toBeVisible();
 });

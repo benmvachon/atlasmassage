@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
 import {
   DATES, getAuthState,
   setAvailability, deleteAvailability, getServiceId,
-  cancelAppointment, mockStripeDisabled, drawSignature,
+  cancelAppointment, mockStripeDisabled, mockValidateAddress, drawSignature,
 } from './helpers.js';
 
 test.describe.configure({ mode: 'serial' });
@@ -36,6 +36,12 @@ test.beforeAll(async ({ request }) => {
 
 test.afterAll(async ({ request }) => {
   await deleteAvailability(request, sarahUserId, sarahToken, [TEST_DATE]);
+});
+
+// Stub address validation for every test — the contact step calls the real
+// Google Maps API which rejects test addresses like "Test City, CA 90210".
+test.beforeEach(async ({ page }) => {
+  await mockValidateAddress(page);
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -260,4 +266,114 @@ test('filtering to a specific therapist updates the calendar request', async ({ 
     page.selectOption('#bf-therapist', sarahUserId),
   ]);
   expect(calendarRequest.url()).toContain(`therapistId=${sarahUserId}`);
+});
+
+// ── Address validation error paths (added with travel mode / address validation) ──
+
+test('contact step: shows error when address cannot be verified', async ({ page }) => {
+  // Override the beforeEach stub to return an invalid response
+  await page.route('**/api/v1/appointments/validate-address', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { valid: false } }),
+    })
+  );
+  await openModal(page);
+  await fillContactStep(page);
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+  await expect(page.locator('.avail-modal__error')).toContainText("couldn't verify this address");
+  await expect(page.locator('#bm-name')).toBeVisible(); // still on contact step
+});
+
+test('contact step: shows out-of-service-area error when address is outside travel range', async ({ page }) => {
+  await page.route('**/api/v1/appointments/validate-address', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { valid: false, outOfServiceArea: true } }),
+    })
+  );
+  await openModal(page);
+  await fillContactStep(page);
+  await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+  await expect(page.locator('.avail-modal__error')).toContainText('outside our 20-minute travel service area');
+  await expect(page.locator('#bm-name')).toBeVisible(); // still on contact step
+});
+
+// ── Consent step — services section (added to consent step) ──────────────────
+
+test('consent step: Services We Offer section is visible', async ({ page }) => {
+  await mockStripeDisabled(page);
+  await openModal(page);
+  await fillContactStep(page);
+  await advancePastContact(page);
+  await advancePastHealth(page);
+
+  await expect(page.locator('.waiver-services')).toBeVisible();
+  await expect(page.locator('.waiver-services__heading')).toContainText('Services We Offer');
+  await expect(page.locator('.waiver-services__item')).not.toHaveCount(0);
+});
+
+// ── Booking restrictions (pregnancy / minors) ─────────────────────────────────
+
+test.describe('Booking restrictions', () => {
+  const { owner } = getAuthState();
+
+  async function setRestrictions(request, { pregnancy, minors }) {
+    return request.put('/api/v1/admin/business/restrictions', {
+      data: { restrictPregnancy: pregnancy, restrictMinors: minors },
+      headers: { Authorization: `Bearer ${owner.token}` },
+    });
+  }
+
+  test.beforeAll(async ({ request }) => {
+    await setRestrictions(request, { pregnancy: true, minors: true });
+  });
+
+  test.afterAll(async ({ request }) => {
+    await setRestrictions(request, { pregnancy: false, minors: false });
+  });
+
+  test('health step: DOB is required when restrict_minors is enabled', async ({ page }) => {
+    await openModal(page);
+    await fillContactStep(page);
+    await advancePastContact(page);
+
+    // Submit without filling the required DOB
+    await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+    await expect(page.locator('.avail-modal__error')).toContainText('Date of birth is required');
+    await expect(page.locator('#bm-dob')).toBeVisible(); // still on health step
+  });
+
+  test('health step: blocks under-18 bookings when restrict_minors is enabled', async ({ page }) => {
+    await openModal(page);
+    await fillContactStep(page);
+    await advancePastContact(page);
+
+    const underageDob = new Date();
+    underageDob.setFullYear(underageDob.getFullYear() - 15);
+    await page.fill('#bm-dob', underageDob.toISOString().slice(0, 10));
+    await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+    await expect(page.locator('.avail-modal__error')).toContainText('not currently certified for pediatric massage');
+    await expect(page.locator('#bm-dob')).toBeVisible(); // still on health step
+  });
+
+  test('health step: blocks pregnant clients when restrict_pregnancy is enabled', async ({ page }) => {
+    await openModal(page);
+    await fillContactStep(page);
+    await advancePastContact(page);
+
+    // Fill valid adult DOB (required by restrict_minors which is also enabled)
+    await page.fill('#bm-dob', '1990-01-01');
+    await page.locator('input[name="pregnancyStatus"][value="pregnant"]').click();
+    await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+    await expect(page.locator('.avail-modal__error')).toContainText('not currently certified for prenatal');
+    await expect(page.locator('#bm-dob')).toBeVisible(); // still on health step
+  });
 });
