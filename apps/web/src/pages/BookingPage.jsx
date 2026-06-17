@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import BookingCalendar from '../components/BookingCalendar.jsx';
 import TimeSlotPanel from '../components/TimeSlotPanel.jsx';
@@ -35,6 +35,13 @@ export default function BookingPage() {
   }, [setSearchParams]);
 
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const timeSlotsRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedDate && timeSlotsRef.current) {
+      timeSlotsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedDate]);
 
   const {
     data: calendarData = DEFAULT_CALENDAR,
@@ -122,15 +129,17 @@ export default function BookingPage() {
         loading={calendarLoading}
       />
 
-      {selectedDate && (
-        <TimeSlotPanel
-          date={selectedDate}
-          slots={slots ?? []}
-          loading={slotsLoading}
-          error={slotsError}
-          onSelectSlot={setSelectedSlot}
-        />
-      )}
+      <div ref={timeSlotsRef}>
+        {selectedDate && (
+          <TimeSlotPanel
+            date={selectedDate}
+            slots={slots ?? []}
+            loading={slotsLoading}
+            error={slotsError}
+            onSelectSlot={setSelectedSlot}
+          />
+        )}
+      </div>
 
       {selectedSlot && (
         <BookingModal
