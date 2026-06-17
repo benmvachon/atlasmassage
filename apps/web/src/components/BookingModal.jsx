@@ -7,6 +7,7 @@ import { paymentService } from '../services/paymentService.js';
 import { membershipService } from '../services/membershipService.js';
 import { giftCardService } from '../services/giftCardService.js';
 import { getStripePromise, stripePublishableKey } from '../services/stripe.js';
+import { ALL_SERVICES } from '../data/services.js';
 
 function formatDate(dateStr) {
   return new Date(`${dateStr}T12:00:00`).toLocaleDateString('en-US', {
@@ -49,6 +50,8 @@ const WAIVER_ITEMS = [
 ];
 
 const WAIVER_CLOSING = 'I further understand that massage therapy is not a substitute for a medical examination or treatment, and that I should see a physician or other qualified health specialist for any mental or physical ailment of which I am aware. I understand that massage therapists do not diagnose illness or disease, and nothing said during the massage should be construed as such. My consent is informed and voluntary and I understand that I may withdraw my consent at any time except for actions already taken.';
+
+const TRAVEL_WAIVER_ITEM = 'Because this is a travel massage appointment, I will provide a clean, private, and suitable space — with enough room to set up a portable massage table — for my therapist to perform the massage.';
 
 const STEP_LABELS = {
   contact: 'Contact',
@@ -173,6 +176,7 @@ function BookingWizard({
   consentStatus, loadingConsent,
   healthStatus, loadingHealth,
   restrictions,
+  travelModeEnabled,
   onClose, onComplete,
 }) {
   const { user } = useAuth();
@@ -785,11 +789,23 @@ function BookingWizard({
             <div className="booking-modal__body">
               <div className="waiver-scroll" role="region" aria-label="Consent form text">
                 <ol className="waiver-list">
-                  {WAIVER_ITEMS.map((item, i) => (
+                  {(travelModeEnabled ? [...WAIVER_ITEMS, TRAVEL_WAIVER_ITEM] : WAIVER_ITEMS).map((item, i) => (
                     <li key={i} className="waiver-list__item">{item}</li>
                   ))}
                 </ol>
                 <p className="waiver-closing">{WAIVER_CLOSING}</p>
+
+                <div className="waiver-services">
+                  <h3 className="waiver-services__heading">Services We Offer</h3>
+                  <ul className="waiver-services__list">
+                    {ALL_SERVICES.map(s => (
+                      <li key={s.name} className="waiver-services__item">
+                        <span className="waiver-services__name">{s.name}</span>
+                        <span className="waiver-services__description"> — {s.description}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               <SignatureCanvas onChange={setSignature} />
@@ -1055,6 +1071,7 @@ export default function BookingModal({
   const [healthStatus, setHealthStatus] = useState(null);
   const [loadingHealth, setLoadingHealth] = useState(!!user);
   const [restrictions, setRestrictions] = useState(null);
+  const [travelModeEnabled, setTravelModeEnabled] = useState(false);
 
   const therapistOptions = useMemo(() => {
     if (lockedTherapist) return [lockedTherapist];
@@ -1065,6 +1082,12 @@ export default function BookingModal({
     bookingService.getBookingRestrictions()
       .then(data => setRestrictions(data))
       .catch(() => setRestrictions({ restrict_pregnancy: true, restrict_minors: true }));
+  }, []);
+
+  useEffect(() => {
+    bookingService.getTravelSettings()
+      .then(data => setTravelModeEnabled(!!data?.travel_mode_enabled))
+      .catch(() => setTravelModeEnabled(false));
   }, []);
 
   useEffect(() => {
@@ -1124,6 +1147,7 @@ export default function BookingModal({
         healthStatus={healthStatus}
         loadingHealth={loadingHealth}
         restrictions={restrictions}
+        travelModeEnabled={travelModeEnabled}
         onClose={onClose}
         onComplete={onComplete}
       />

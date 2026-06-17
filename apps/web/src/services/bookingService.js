@@ -22,6 +22,11 @@ export const bookingService = {
     return res.data;
   },
 
+  async getTravelSettings() {
+    const res = await api.get('/business/travel-settings');
+    return res.data;
+  },
+
   async getConsentStatus() {
     const res = await api.get('/appointments/consent/status');
     return res.data;

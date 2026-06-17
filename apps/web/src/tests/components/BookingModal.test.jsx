@@ -2,6 +2,7 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import BookingModal from '../../components/BookingModal.jsx';
 import { bookingService } from '../../services/bookingService.js';
+import { ALL_SERVICES } from '../../data/services.js';
 
 // ── Stripe mocks ──────────────────────────────────────────────────────────────
 
@@ -31,6 +32,7 @@ jest.mock('../../services/bookingService.js', () => ({
     getConsentStatus:       jest.fn().mockResolvedValue({ data: { hasSigned: false, signedAt: null } }),
     getHealthStatus:        jest.fn().mockResolvedValue({ data: { hasRecord: false } }),
     getBookingRestrictions: jest.fn().mockResolvedValue({ restrict_pregnancy: false, restrict_minors: false }),
+    getTravelSettings:      jest.fn().mockResolvedValue({ travel_mode_enabled: false }),
     validateAddress:        jest.fn(),
   },
 }));
@@ -343,6 +345,35 @@ describe('BookingModal — wizard navigation', () => {
     });
     expect(screen.getByLabelText(/full name/i)).toHaveValue('Jane Doe');
     expect(screen.getByLabelText(/email/i)).toHaveValue('jane@example.com');
+  });
+});
+
+// ── Consent step — services explanation & travel acknowledgement ──────────────
+
+describe('BookingModal — consent step content', () => {
+  it('lists the explanations of all services offered, matching the Services page', async () => {
+    renderModal();
+    await advanceToConsent();
+    expect(screen.getByText('Services We Offer')).toBeInTheDocument();
+    const servicesText = document.querySelector('.waiver-services').textContent;
+    for (const service of ALL_SERVICES) {
+      expect(servicesText).toContain(service.name);
+      expect(servicesText).toContain(service.description);
+    }
+  });
+
+  it('does not include the travel acknowledgement when travel mode is disabled', async () => {
+    bookingService.getTravelSettings.mockResolvedValueOnce({ travel_mode_enabled: false });
+    renderModal();
+    await advanceToConsent();
+    expect(screen.queryByText(/i will provide a clean, private, and suitable space/i)).not.toBeInTheDocument();
+  });
+
+  it('includes the travel acknowledgement when travel mode is enabled', async () => {
+    bookingService.getTravelSettings.mockResolvedValueOnce({ travel_mode_enabled: true });
+    renderModal();
+    await advanceToConsent();
+    expect(screen.getByText(/i will provide a clean, private, and suitable space/i)).toBeInTheDocument();
   });
 });
 
