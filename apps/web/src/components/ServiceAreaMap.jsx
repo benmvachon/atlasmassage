@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 // Rough approximation of a 20-minute peak-traffic drive radius. This is a
 // visual stand-in only — the booking modal's actual range check calls the
 // Distance Matrix API for a real drive-time answer.
-const SERVICE_RADIUS_METERS = 14500; // ~9 miles
+const SERVICE_RADIUS_METERS = 10000; // ~9 miles
 
 // Mirrors $color-secondary in styles/abstracts/_variables.scss — Maps JS can't
 // read SCSS variables, so this is kept in sync by hand.
