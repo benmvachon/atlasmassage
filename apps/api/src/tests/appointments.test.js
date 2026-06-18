@@ -50,6 +50,11 @@ await jest.unstable_mockModule('../repositories/transferRequestRepository.js', (
   TransferRequestRepository: jest.fn(() => mockTransferRepo),
 }));
 
+const mockUserRepo = {};
+await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
+  UserRepository: jest.fn(() => mockUserRepo),
+}));
+
 await jest.unstable_mockModule('../services/notificationService.js', () => ({
   NotificationService: jest.fn(() => ({
     sendBookingConfirmation: jest.fn().mockResolvedValue(),
@@ -198,6 +203,12 @@ beforeEach(() => {
   Object.assign(mockTransferRepo, {
     findPendingByAppointment: jest.fn().mockResolvedValue(null),
     create:                   jest.fn().mockResolvedValue({ id: 'tr-uuid' }),
+  });
+  Object.assign(mockUserRepo, {
+    findById: jest.fn().mockResolvedValue({
+      id: CLIENT_ID, address_line1: '123 Client St', address_line2: null,
+      city: 'Newton', state: 'MA', zip: '02458',
+    }),
   });
 });
 
@@ -500,6 +511,75 @@ describe('GET /api/v1/appointments/health/status', () => {
   it('returns 401 when unauthenticated', async () => {
     const res = await request(app).get('/api/v1/appointments/health/status');
     expect(res.status).toBe(401);
+  });
+});
+
+// ── POST /appointments — travel mode + authenticated client ───────────────────
+
+describe('POST /api/v1/appointments — travel mode enforcement for authenticated clients', () => {
+  const body = {
+    therapistId: THERAPIST_ID,
+    serviceId:   SERVICE_ID,
+    scheduledAt: FUTURE_AT,
+    waiverSignature: 'data:image/png;base64,iVBORw0KGgo=',
+  };
+
+  it('returns 400 ADDRESS_REQUIRED when client has no address and travel mode is on', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    mockUserRepo.findById.mockResolvedValue({
+      id: CLIENT_ID, address_line1: null, city: null, state: null, zip: null,
+    });
+
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('ADDRESS_REQUIRED');
+  });
+
+  it('creates appointment when client has address within service area and travel mode is on', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    mockIsWithinServiceArea.mockResolvedValue({ withinRange: true, driveMinutes: 14 });
+
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+
+    expect(res.status).toBe(201);
+    expect(mockIsWithinServiceArea).toHaveBeenCalledWith(
+      expect.objectContaining({ destinationAddress: expect.stringContaining('123 Client St') })
+    );
+  });
+
+  it('returns 400 OUT_OF_SERVICE_AREA when client address is outside travel range', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    mockIsWithinServiceArea.mockResolvedValue({ withinRange: false, driveMinutes: 45 });
+
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('OUT_OF_SERVICE_AREA');
+  });
+
+  it('does not check address when travel mode is off', async () => {
+    mockBusinessRepo.getTravelSettings.mockResolvedValue({ travel_mode_enabled: false });
+    mockUserRepo.findById.mockResolvedValue({
+      id: CLIENT_ID, address_line1: null, city: null, state: null, zip: null,
+    });
+
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+
+    expect(res.status).toBe(201);
+    expect(mockIsWithinServiceArea).not.toHaveBeenCalled();
   });
 });
 

@@ -6,6 +6,7 @@ import { bookingService } from '../services/bookingService.js';
 import { paymentService } from '../services/paymentService.js';
 import { membershipService } from '../services/membershipService.js';
 import { giftCardService } from '../services/giftCardService.js';
+import { userService } from '../services/userService.js';
 import { getStripePromise, stripePublishableKey } from '../services/stripe.js';
 import { ALL_SERVICES } from '../data/services.js';
 
@@ -87,6 +88,7 @@ const CANCELLATION_POLICY = {
 
 const STEP_LABELS = {
   contact: 'Contact',
+  address: 'Address',
   health: 'Medical History',
   consent: 'Consent',
   payment: 'Payment',
@@ -98,9 +100,13 @@ const PREGNANCY_OPTIONS = [
   { value: 'recently_pregnant', label: 'Recently pregnant (within 3 months)' },
 ];
 
-function computeSteps(user, hasHealthRecord, hasConsent, restrictions) {
+function computeSteps(user, hasHealthRecord, hasConsent, restrictions, travelModeEnabled) {
   const steps = [];
-  if (!user) steps.push('contact');
+  if (!user) {
+    steps.push('contact');
+  } else if (travelModeEnabled && !user.address_line1) {
+    steps.push('address');
+  }
   const anyRestriction = restrictions?.restrict_pregnancy || restrictions?.restrict_minors;
   if (!user || !hasHealthRecord || anyRestriction) steps.push('health');
   if (!user || !hasConsent) steps.push('consent');
@@ -270,8 +276,8 @@ function BookingWizard({
   const isReturnClient = hasHealthRecord && hasConsent;
 
   const steps = useMemo(
-    () => computeSteps(user, hasHealthRecord, hasConsent, restrictions),
-    [user, hasHealthRecord, hasConsent, restrictions]
+    () => computeSteps(user, hasHealthRecord, hasConsent, restrictions, travelModeEnabled),
+    [user, hasHealthRecord, hasConsent, restrictions, travelModeEnabled]
   );
 
   // Initialize first step once status data has loaded; also re-initialize if
@@ -290,6 +296,17 @@ function BookingWizard({
       setCancellationAgreed(false);
     }
   }, [currentStep]);
+
+  // Pre-fill address fields from the logged-in user's profile
+  useEffect(() => {
+    if (user) {
+      setAddressLine1(user.address_line1 ?? '');
+      setAddressLine2(user.address_line2 ?? '');
+      setCity(user.city ?? '');
+      setAddressState(user.state ?? '');
+      setZip(user.zip ?? '');
+    }
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stepIndex = steps.indexOf(currentStep ?? steps[0]);
   const selectedService = services.find(s => s.id === serviceId);
@@ -350,6 +367,55 @@ function BookingWizard({
         );
         return;
       }
+    } catch (err) {
+      setError(err.message || 'Could not verify this address. Please try again.');
+      return;
+    } finally {
+      setVerifyingAddress(false);
+    }
+
+    goNext();
+  }
+
+  const isAddressReady = !!(
+    addressLine1.trim() &&
+    city.trim() &&
+    addressState.trim() &&
+    zip.trim()
+  );
+
+  async function handleAddressNext(e) {
+    e.preventDefault();
+    if (!addressLine1.trim()) { setError('Street address is required.'); return; }
+    if (!city.trim()) { setError('City is required.'); return; }
+    if (!addressState.trim()) { setError('State is required.'); return; }
+    if (!zip.trim()) { setError('ZIP code is required.'); return; }
+    setError('');
+
+    setVerifyingAddress(true);
+    try {
+      const result = await bookingService.validateAddress({
+        addressLine1: addressLine1.trim(),
+        addressLine2: addressLine2.trim() || undefined,
+        city: city.trim(),
+        state: addressState.trim(),
+        zip: zip.trim(),
+      });
+      if (!result.valid) {
+        setError(
+          result.outOfServiceArea
+            ? "We're sorry — this address is outside our 20-minute travel service area."
+            : "We couldn't verify this address. Please check it for typos and try again."
+        );
+        return;
+      }
+      await userService.updateMe({
+        addressLine1: addressLine1.trim(),
+        addressLine2: addressLine2.trim() || null,
+        city: city.trim(),
+        state: addressState.trim(),
+        zip: zip.trim(),
+      });
     } catch (err) {
       setError(err.message || 'Could not verify this address. Please try again.');
       return;
@@ -696,6 +762,106 @@ function BookingWizard({
                   className="btn btn--primary"
                   type="submit"
                   disabled={submitting || verifyingAddress || !isContactReady}
+                >
+                  {verifyingAddress ? 'Verifying address…' : 'Continue →'}
+                </button>
+                <button className="btn btn--ghost" type="button" onClick={onClose} disabled={submitting || verifyingAddress}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
+
+        {/* ── Step: Address (logged-in user, travel mode, no address on file) ── */}
+        {currentStep === 'address' && (
+          <form className="booking-modal__step" onSubmit={handleAddressNext} noValidate>
+            <div className="booking-modal__body">
+              <p className="booking-step-desc">
+                Because this is a travel massage, we need your service address to confirm you&apos;re within our coverage area.
+              </p>
+
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-addr1">Street address</label>
+                <input
+                  id="bm-addr1"
+                  className="booking-field__input"
+                  type="text"
+                  value={addressLine1}
+                  onChange={e => setAddressLine1(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="address-line1"
+                  required
+                />
+              </div>
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-addr2">
+                  Apt, suite, etc. <span className="booking-field__optional">(optional)</span>
+                </label>
+                <input
+                  id="bm-addr2"
+                  className="booking-field__input"
+                  type="text"
+                  value={addressLine2}
+                  onChange={e => setAddressLine2(e.target.value)}
+                  disabled={submitting}
+                  autoComplete="address-line2"
+                />
+              </div>
+              <div className="booking-field-row">
+                <div className="booking-field booking-field--grow">
+                  <label className="booking-field__label" htmlFor="bm-city">City</label>
+                  <input
+                    id="bm-city"
+                    className="booking-field__input"
+                    type="text"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="address-level2"
+                    required
+                  />
+                </div>
+                <div className="booking-field booking-field--state">
+                  <label className="booking-field__label" htmlFor="bm-state">State</label>
+                  <input
+                    id="bm-state"
+                    className="booking-field__input"
+                    type="text"
+                    value={addressState}
+                    onChange={e => setAddressState(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="address-level1"
+                    maxLength={2}
+                    placeholder="MA"
+                    required
+                  />
+                </div>
+                <div className="booking-field booking-field--zip">
+                  <label className="booking-field__label" htmlFor="bm-zip">ZIP code</label>
+                  <input
+                    id="bm-zip"
+                    className="booking-field__input"
+                    type="text"
+                    value={zip}
+                    onChange={e => setZip(e.target.value)}
+                    disabled={submitting}
+                    autoComplete="postal-code"
+                    inputMode="numeric"
+                    maxLength={10}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="booking-modal__footer">
+              {error && <p className="avail-modal__error" role="alert">{error}</p>}
+              <div className="avail-modal__actions">
+                <button
+                  className="btn btn--primary"
+                  type="submit"
+                  disabled={submitting || verifyingAddress || !isAddressReady}
                 >
                   {verifyingAddress ? 'Verifying address…' : 'Continue →'}
                 </button>

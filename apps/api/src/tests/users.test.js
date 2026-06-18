@@ -82,11 +82,33 @@ describe('PUT /api/v1/users/me', () => {
       .send({ firstName: 'Jay' });
 
     expect(res.status).toBe(200);
-    expect(mockUserRepoInstance.update).toHaveBeenCalledWith(CLIENT_ID, {
+    expect(mockUserRepoInstance.update).toHaveBeenCalledWith(CLIENT_ID, expect.objectContaining({
       firstName: 'Jay',
       lastName: undefined,
       phone: undefined,
-    });
+    }));
+  });
+
+  it('saves address fields when provided', async () => {
+    const res = await request(app)
+      .put('/api/v1/users/me')
+      .set('Authorization', clientBearer())
+      .send({
+        addressLine1: '42 Elm St',
+        addressLine2: 'Apt 3',
+        city: 'Newton',
+        state: 'MA',
+        zip: '02458',
+      });
+
+    expect(res.status).toBe(200);
+    expect(mockUserRepoInstance.update).toHaveBeenCalledWith(CLIENT_ID, expect.objectContaining({
+      addressLine1: '42 Elm St',
+      addressLine2: 'Apt 3',
+      city: 'Newton',
+      state: 'MA',
+      zip: '02458',
+    }));
   });
 
   it('returns 422 when firstName is blank', async () => {
@@ -96,6 +118,20 @@ describe('PUT /api/v1/users/me', () => {
       .send({ firstName: '' });
 
     expect(res.status).toBe(422);
+  });
+
+  it('returns 422 when state is longer than 2 characters', async () => {
+    const res = await request(app)
+      .put('/api/v1/users/me')
+      .set('Authorization', clientBearer())
+      .send({ state: 'Massachusetts' });
+
+    expect(res.status).toBe(422);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).put('/api/v1/users/me').send({ firstName: 'Jay' });
+    expect(res.status).toBe(401);
   });
 });
 

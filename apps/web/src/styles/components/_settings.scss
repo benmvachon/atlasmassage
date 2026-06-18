@@ -136,6 +136,37 @@
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  &--three-col {
+    @include respond-to(md) {
+      display: grid;
+      grid-template-columns: 1fr 80px 110px;
+      gap: $space-3;
+    }
+  }
+}
+
+.settings-divider {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-top: 1px solid $color-border;
+  padding-top: $space-4;
+  margin-top: $space-2;
+}
+
+.settings-label {
+  &--grow { flex: 1 1 auto; }
+  &--state { flex: 0 0 80px; }
+  &--zip { flex: 0 0 110px; }
+}
+
+.settings-muted--sm {
+  margin-top: -#{$space-2};
+  margin-bottom: $space-2;
 }
 
 .settings-input {

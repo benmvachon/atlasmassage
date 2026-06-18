@@ -82,9 +82,14 @@ function AddCardForm({ onSuccess, onCancel }) {
 
 function ProfileSection({ user, onSaved }) {
   const [form, setForm] = useState({
-    firstName: user?.first_name ?? '',
-    lastName:  user?.last_name  ?? '',
-    phone:     user?.phone      ?? '',
+    firstName:    user?.first_name    ?? '',
+    lastName:     user?.last_name     ?? '',
+    phone:        user?.phone         ?? '',
+    addressLine1: user?.address_line1 ?? '',
+    addressLine2: user?.address_line2 ?? '',
+    city:         user?.city          ?? '',
+    state:        user?.state         ?? '',
+    zip:          user?.zip           ?? '',
   });
   const [saving, setSaving]   = useState(false);
   const [success, setSuccess] = useState(false);
@@ -131,6 +136,45 @@ function ProfileSection({ user, onSaved }) {
           <input className="settings-input" type="tel" value={form.phone} placeholder="Optional"
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
         </label>
+
+        <div className="settings-divider">Service Address</div>
+        <p className="settings-muted settings-muted--sm">
+          Required for travel massage appointments. Must be within our service area.
+        </p>
+
+        <label className="settings-label">
+          Street address
+          <input className="settings-input" value={form.addressLine1} placeholder="123 Main St"
+            autoComplete="address-line1"
+            onChange={e => setForm(f => ({ ...f, addressLine1: e.target.value }))} />
+        </label>
+        <label className="settings-label">
+          Apt, suite, etc. <span className="settings-muted">(optional)</span>
+          <input className="settings-input" value={form.addressLine2} placeholder="Apt 4B"
+            autoComplete="address-line2"
+            onChange={e => setForm(f => ({ ...f, addressLine2: e.target.value }))} />
+        </label>
+        <div className="settings-fields settings-fields--three-col">
+          <label className="settings-label settings-label--grow">
+            City
+            <input className="settings-input" value={form.city}
+              autoComplete="address-level2"
+              onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+          </label>
+          <label className="settings-label settings-label--state">
+            State
+            <input className="settings-input" value={form.state} maxLength={2} placeholder="MA"
+              autoComplete="address-level1"
+              onChange={e => setForm(f => ({ ...f, state: e.target.value.toUpperCase() }))} />
+          </label>
+          <label className="settings-label settings-label--zip">
+            ZIP
+            <input className="settings-input" value={form.zip} maxLength={10} inputMode="numeric"
+              autoComplete="postal-code"
+              onChange={e => setForm(f => ({ ...f, zip: e.target.value }))} />
+          </label>
+        </div>
+
         {error   && <p className="settings-error" role="alert">{error}</p>}
         {success && <p className="settings-success" role="status">Profile updated.</p>}
         <div>

@@ -26,8 +26,8 @@ export async function getMe(req, res, next) {
 
 export async function updateMe(req, res, next) {
   try {
-    const { firstName, lastName, phone } = req.body;
-    const user = await repo().update(req.user.sub, { firstName, lastName, phone });
+    const { firstName, lastName, phone, addressLine1, addressLine2, city, state, zip } = req.body;
+    const user = await repo().update(req.user.sub, { firstName, lastName, phone, addressLine1, addressLine2, city, state, zip });
     res.json({ success: true, data: { user: sanitize(user) } });
   } catch (err) {
     next(err);

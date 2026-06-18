@@ -2,6 +2,8 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { useStripe, useElements } from '@stripe/react-stripe-js';
 import BookingModal from '../../components/BookingModal.jsx';
 import { bookingService } from '../../services/bookingService.js';
+import { userService } from '../../services/userService.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { ALL_SERVICES } from '../../data/services.js';
 
 // ── Stripe mocks ──────────────────────────────────────────────────────────────
@@ -49,8 +51,14 @@ jest.mock('../../services/membershipService.js', () => ({
   },
 }));
 
-jest.mock('../../context/AuthContext.jsx', () => ({
-  useAuth: () => ({ user: null }),
+jest.mock('../../context/AuthContext.jsx', () => ({ useAuth: jest.fn() }));
+
+jest.mock('../../services/userService.js', () => ({
+  userService: { updateMe: jest.fn() },
+}));
+
+jest.mock('../../services/giftCardService.js', () => ({
+  giftCardService: { validate: jest.fn() },
 }));
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -91,8 +99,10 @@ const mockCtx = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  useAuth.mockReturnValue({ user: null });
   useStripe.mockReturnValue(mockStripe);
   useElements.mockReturnValue(mockElements);
+  userService.updateMe.mockResolvedValue({ data: { user: {} } });
   HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCtx);
   HTMLCanvasElement.prototype.toDataURL  = jest.fn(() => 'data:image/png;base64,sig');
 
@@ -530,5 +540,113 @@ describe('BookingModal — service selection', () => {
     expect(bookingService.createAppointment).toHaveBeenCalledWith(
       expect.objectContaining({ serviceId: 'sid-90' })
     );
+  });
+});
+
+// ── Address step (logged-in client, travel mode) ──────────────────────────────
+
+const LOGGED_IN_USER_NO_ADDR = {
+  id: 'uid-1', email: 'jane@example.com',
+  first_name: 'Jane', last_name: 'Doe', roles: ['client'],
+  address_line1: null, city: null, state: null, zip: null,
+};
+
+const LOGGED_IN_USER_WITH_ADDR = {
+  ...LOGGED_IN_USER_NO_ADDR,
+  address_line1: '10 Elm St', city: 'Newton', state: 'MA', zip: '02458',
+};
+
+function renderModalAsLoggedInUser(user = LOGGED_IN_USER_NO_ADDR) {
+  useAuth.mockReturnValue({ user });
+  return renderModal();
+}
+
+describe('BookingModal — address step (logged-in client, travel mode on)', () => {
+  beforeEach(() => {
+    bookingService.getTravelSettings.mockResolvedValue({ travel_mode_enabled: true });
+    // Consent and health not on file → steps: address → health → consent → payment
+    bookingService.getConsentStatus.mockResolvedValue({ data: { hasSigned: false, signedAt: null } });
+    bookingService.getHealthStatus.mockResolvedValue({ data: { hasRecord: false } });
+  });
+
+  it('shows the address step first when client has no address on file', async () => {
+    renderModalAsLoggedInUser(LOGGED_IN_USER_NO_ADDR);
+    await act(async () => {});
+    expect(await screen.findByLabelText(/street address/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/full name/i)).not.toBeInTheDocument(); // not contact step
+  });
+
+  it('Continue is disabled until all required address fields are filled', async () => {
+    renderModalAsLoggedInUser(LOGGED_IN_USER_NO_ADDR);
+    await act(async () => {});
+    await screen.findByLabelText(/street address/i);
+    expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
+
+    fill(/street address/i, '10 Elm St');
+    fill(/city/i, 'Newton');
+    fill(/state/i, 'MA');
+    fill(/zip code/i, '02458');
+    expect(screen.getByRole('button', { name: /continue/i })).not.toBeDisabled();
+  });
+
+  it('validates address and saves to profile before advancing to health step', async () => {
+    renderModalAsLoggedInUser(LOGGED_IN_USER_NO_ADDR);
+    await act(async () => {});
+    await screen.findByLabelText(/street address/i);
+
+    fill(/street address/i, '10 Elm St');
+    fill(/city/i, 'Newton');
+    fill(/state/i, 'MA');
+    fill(/zip code/i, '02458');
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+
+    expect(bookingService.validateAddress).toHaveBeenCalledWith(
+      expect.objectContaining({ addressLine1: '10 Elm St', city: 'Newton', state: 'MA', zip: '02458' })
+    );
+    expect(userService.updateMe).toHaveBeenCalledWith(
+      expect.objectContaining({ addressLine1: '10 Elm St', city: 'Newton', state: 'MA', zip: '02458' })
+    );
+    // Advanced to health step
+    expect(await screen.findByLabelText(/current medications/i)).toBeInTheDocument();
+  });
+
+  it('blocks advance and shows error when address is out of service area', async () => {
+    bookingService.validateAddress.mockResolvedValue({ valid: false, outOfServiceArea: true, driveMinutes: 45 });
+    renderModalAsLoggedInUser(LOGGED_IN_USER_NO_ADDR);
+    await act(async () => {});
+    await screen.findByLabelText(/street address/i);
+
+    fill(/street address/i, '999 Far Away Rd');
+    fill(/city/i, 'Distant City');
+    fill(/state/i, 'CA');
+    fill(/zip code/i, '90210');
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/outside our 20-minute travel service area/i);
+    expect(screen.getByLabelText(/street address/i)).toBeInTheDocument();
+    expect(userService.updateMe).not.toHaveBeenCalled();
+  });
+
+  it('skips address step when client already has address on file', async () => {
+    renderModalAsLoggedInUser(LOGGED_IN_USER_WITH_ADDR);
+    await act(async () => {});
+    // Should land on health step, not address step
+    expect(await screen.findByLabelText(/current medications/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/street address/i)).not.toBeInTheDocument();
+  });
+
+  it('skips address step when travel mode is disabled', async () => {
+    bookingService.getTravelSettings.mockResolvedValue({ travel_mode_enabled: false });
+    renderModalAsLoggedInUser(LOGGED_IN_USER_NO_ADDR);
+    await act(async () => {});
+    // With no consent/health on file, first step for logged-in user is health
+    expect(await screen.findByLabelText(/current medications/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/street address/i)).not.toBeInTheDocument();
   });
 });

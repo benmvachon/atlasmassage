@@ -8,6 +8,7 @@ import { SoapNoteRepository } from '../repositories/soapNoteRepository.js';
 import { ClientFeedbackRepository } from '../repositories/clientFeedbackRepository.js';
 import { ClientHistoryRepository } from '../repositories/clientHistoryRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
+import { UserRepository } from '../repositories/userRepository.js';
 import { PaymentService } from '../services/paymentService.js';
 import { MembershipService } from '../services/membershipService.js';
 import { GiftCardService } from '../services/giftCardService.js';
@@ -143,6 +144,34 @@ export async function createAppointment(req, res, next) {
             'We are not currently certified for pediatric massage. Please contact us for more information.',
             400,
             'RESTRICTION_MINORS'
+          );
+        }
+      }
+    }
+
+    // For travel mode, verify the authenticated client has a valid address on file
+    // and that it falls within the service area. Guests are validated earlier via
+    // POST /appointments/validate-address (the contact step always fires for them).
+    if (clientId) {
+      const travelSettings = await businessRepo.getTravelSettings();
+      if (travelSettings?.travel_mode_enabled) {
+        const clientUser = await new UserRepository(getPool()).findById(clientId);
+        if (!clientUser?.address_line1 || !clientUser?.city || !clientUser?.state || !clientUser?.zip) {
+          throw new AppError(
+            'A service address is required to book a travel massage. Please add your address in Account Settings.',
+            400,
+            'ADDRESS_REQUIRED'
+          );
+        }
+        const contact = await businessRepo.getBusinessContactInfo();
+        const originAddress = `${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`;
+        const destinationAddress = [clientUser.address_line1, clientUser.address_line2, clientUser.city, clientUser.state, clientUser.zip].filter(Boolean).join(', ');
+        const { withinRange } = await isWithinServiceArea({ originAddress, destinationAddress });
+        if (!withinRange) {
+          throw new AppError(
+            "Your address is outside our 20-minute travel service area. Please contact us or update your address in Account Settings.",
+            400,
+            'OUT_OF_SERVICE_AREA'
           );
         }
       }

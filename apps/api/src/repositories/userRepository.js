@@ -113,13 +113,18 @@ export class UserRepository {
     );
   }
 
-  async update(id, { firstName, lastName, phone }) {
+  async update(id, { firstName, lastName, phone, addressLine1, addressLine2, city, state, zip }) {
     const sets = ['updated_at = NOW()'];
     const vals = [];
     let i = 1;
-    if (firstName !== undefined) { sets.push(`first_name = $${i++}`); vals.push(firstName); }
-    if (lastName !== undefined)  { sets.push(`last_name = $${i++}`);  vals.push(lastName); }
-    if (phone !== undefined)     { sets.push(`phone = $${i++}`);      vals.push(phone || null); }
+    if (firstName    !== undefined) { sets.push(`first_name    = $${i++}`); vals.push(firstName); }
+    if (lastName     !== undefined) { sets.push(`last_name     = $${i++}`); vals.push(lastName); }
+    if (phone        !== undefined) { sets.push(`phone         = $${i++}`); vals.push(phone || null); }
+    if (addressLine1 !== undefined) { sets.push(`address_line1 = $${i++}`); vals.push(addressLine1 || null); }
+    if (addressLine2 !== undefined) { sets.push(`address_line2 = $${i++}`); vals.push(addressLine2 || null); }
+    if (city         !== undefined) { sets.push(`city          = $${i++}`); vals.push(city || null); }
+    if (state        !== undefined) { sets.push(`state         = $${i++}`); vals.push(state || null); }
+    if (zip          !== undefined) { sets.push(`zip           = $${i++}`); vals.push(zip || null); }
     vals.push(id);
     await this.pool.query(
       `UPDATE users SET ${sets.join(', ')} WHERE id = $${i}`,
