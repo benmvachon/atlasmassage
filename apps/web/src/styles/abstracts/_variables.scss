@@ -37,6 +37,16 @@ $color-primary-border-md:   rgba($color-primary, 0.30);  // available-day border
 
 $color-error-border-alpha:  rgba($color-error, 0.30);    // error card outline
 
+// ── Secondary color tints ───────────────────────────────────────────────────────
+// Used for hover states, selection backgrounds, and overlays.
+// Defined here so changing $color-secondary cascades through all tints.
+
+$color-secondary-tint-xs:     rgba($color-secondary, 0.04);  // subtle hover / default bg
+$color-secondary-tint-sm:     rgba($color-secondary, 0.08);  // action-bar bg, appt card bg
+$color-secondary-tint-md:     rgba($color-secondary, 0.12);  // selected cell, badge bg
+$color-secondary-tint-lg:     rgba($color-secondary, 0.20);  // strong tint, legend swatch
+$color-secondary-tint-active: rgba($color-secondary, 0.10);  // active nav link bg
+
 // ── Focus / interaction shadows ───────────────────────────────────────────────
 // Components consume these tokens — no inline rgba in component files.
 

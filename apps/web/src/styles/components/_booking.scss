@@ -90,6 +90,7 @@
 
 .slot-panel {
   @include card;
+  border-top: 3px solid $color-secondary;
   padding: $space-6;
   margin-top: $space-6;
 
@@ -201,7 +202,7 @@
   &__footer {
     flex-shrink: 0;
     padding: $space-4 $space-8 $space-6;
-    border-top: 1px solid $color-bg-alt;
+    border-top: 1px solid rgba($color-secondary, 0.25);
   }
 
   &__loading {
@@ -281,7 +282,7 @@
   text-transform: uppercase;
   color: $color-text-muted;
   padding: $space-4 0 $space-3;
-  border-top: 1px solid $color-bg-alt;
+  border-top: 1px solid rgba($color-secondary, 0.35);
   margin-top: $space-2;
 
   display: flex;
@@ -512,7 +513,7 @@
   }
 
   &--done:not(:last-child)::after {
-    background: $color-primary;
+    background: $color-secondary;
   }
 
   &__dot {
