@@ -22,12 +22,6 @@ function formatTime(t) {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 
-function addMinutes(timeStr, mins) {
-  const [h, m] = timeStr.split(':').map(Number);
-  const total = h * 60 + m + mins;
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
-}
-
 function brandLabel(brand) {
   return { visa: 'Visa', mastercard: 'Mastercard', amex: 'Amex', discover: 'Discover' }[brand] ?? 'Card';
 }
@@ -314,9 +308,6 @@ function BookingWizard({
 
   const stepIndex = steps.indexOf(currentStep ?? steps[0]);
   const selectedService = services.find(s => s.id === serviceId);
-  const displayEndTime = selectedService
-    ? addMinutes(slot.startTime, selectedService.durationMinutes)
-    : slot.endTime;
   const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
   const needsPayment = !!stripePublishableKey && !membershipCoversBooking;
   const isNewCard = selectedMethodId === 'new';
@@ -613,7 +604,7 @@ function BookingWizard({
             <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
             <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
             <p className="booking-modal__slot-summary">
-              {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(displayEndTime)}
+              {formatDate(date)} · {formatTime(slot.startTime)}
             </p>
           </div>
           <div className="booking-modal__body booking-gate">
@@ -668,7 +659,7 @@ function BookingWizard({
           <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
           <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
           <p className="booking-modal__slot-summary">
-            {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(displayEndTime)}
+            {formatDate(date)} · {formatTime(slot.startTime)}
           </p>
 
           {showProgress && (

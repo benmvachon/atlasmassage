@@ -569,19 +569,19 @@ describe('BookingModal — service selection', () => {
     expect(options).toHaveLength(3);
   });
 
-  it('updates slot summary end time when a longer service is selected', async () => {
+  it('slot summary shows only start time regardless of selected service', async () => {
     renderModal({ services: MULTI_SERVICES, slot: SLOT_ALL });
     await advanceToPayment();
 
-    // Default (60 min): 10:00 AM – 11:00 AM
     const summary = document.querySelector('.booking-modal__slot-summary');
-    expect(summary).toHaveTextContent('11:00 AM');
+    expect(summary).toHaveTextContent('10:00 AM');
+    expect(summary).not.toHaveTextContent('11:00 AM');
 
-    // Switch to 90-min service → end time becomes 11:30 AM
     await act(async () => {
       fireEvent.change(screen.getByLabelText(/service/i), { target: { value: 'sid-90' } });
     });
-    expect(summary).toHaveTextContent('11:30 AM');
+    expect(summary).toHaveTextContent('10:00 AM');
+    expect(summary).not.toHaveTextContent('11:30 AM');
   });
 
   it('sends the selected serviceId in the createAppointment call', async () => {
