@@ -15,8 +15,8 @@ export function notFound(req, _res, next) {
 }
 
 export function errorHandler(err, req, res, _next) {
-  const statusCode = err.statusCode || 500;
   const isOperational = err.isOperational === true;
+  const statusCode = isOperational ? (err.statusCode || 500) : 500;
 
   if (!isOperational) {
     logger.error('unhandled_error', {
