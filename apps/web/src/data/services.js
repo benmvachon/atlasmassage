@@ -9,6 +9,11 @@ export const LEFT_SERVICES = [
     description:
       'Slow, sustained pressure reaches the deeper layers of muscle and connective tissue, releasing chronic tension and restrictions.',
   },
+  {
+    name: 'Kinesiotaping',
+    description:
+      'Flexible elastic tape gently elevates skin layers to stimulate circulatory flow, easing tension and reinforcing fatigued muscles.',
+  },
 ];
 
 export const RIGHT_SERVICES = [
