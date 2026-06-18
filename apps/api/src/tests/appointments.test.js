@@ -317,6 +317,62 @@ describe('POST /api/v1/appointments', () => {
     expect(res.status).toBe(422);
   });
 
+  describe('consent signature handling', () => {
+    it('creates a consent signature for a new authenticated client', async () => {
+      mockConsentRepo.findByClientId.mockResolvedValue(null);
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(body);
+      expect(res.status).toBe(201);
+      expect(mockConsentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ clientId: CLIENT_ID, signature: body.waiverSignature })
+      );
+    });
+
+    it('reuses the existing consent signature for a returning authenticated client', async () => {
+      const EXISTING_SIGNED_AT = '2030-01-01T00:00:00.000Z';
+      mockConsentRepo.findByClientId.mockResolvedValue({ id: 'cs-existing', signed_at: EXISTING_SIGNED_AT });
+      const { waiverSignature: _omit, ...bodyWithoutWaiver } = body;
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(bodyWithoutWaiver);
+      expect(res.status).toBe(201);
+      expect(mockConsentRepo.create).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 WAIVER_REQUIRED when a new authenticated client omits waiverSignature', async () => {
+      mockConsentRepo.findByClientId.mockResolvedValue(null);
+      const { waiverSignature: _omit, ...bodyWithoutWaiver } = body;
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .set('Authorization', bearer(CLIENT_ID))
+        .send(bodyWithoutWaiver);
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('WAIVER_REQUIRED');
+    });
+
+    it('creates a consent signature for a guest booking', async () => {
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .send({ ...body, guestName: 'Guest User', guestEmail: 'guest@example.com' });
+      expect(res.status).toBe(201);
+      expect(mockConsentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ guestEmail: 'guest@example.com', signature: body.waiverSignature })
+      );
+    });
+
+    it('returns 400 WAIVER_REQUIRED when a guest omits waiverSignature', async () => {
+      const { waiverSignature: _omit, ...bodyWithoutWaiver } = body;
+      const res = await request(app)
+        .post('/api/v1/appointments')
+        .send({ ...bodyWithoutWaiver, guestName: 'Guest User', guestEmail: 'guest@example.com' });
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('WAIVER_REQUIRED');
+    });
+  });
+
   describe('configurable buffer time for bed assignment', () => {
     // Existing appointment on the only active bed ends at 09:40 — 20 minutes
     // before the new 10:00 booking starts.
@@ -362,6 +418,36 @@ describe('POST /api/v1/appointments', () => {
 
       expect(res.status).toBe(201);
     });
+  });
+});
+
+// ── GET /appointments/consent/status ─────────────────────────────────────────
+
+describe('GET /api/v1/appointments/consent/status', () => {
+  it('returns hasSigned: false when no consent signature is on file', async () => {
+    mockConsentRepo.findByClientId.mockResolvedValue(null);
+    const res = await request(app)
+      .get('/api/v1/appointments/consent/status')
+      .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(200);
+    expect(res.body.data.hasSigned).toBe(false);
+    expect(res.body.data.signedAt).toBeNull();
+  });
+
+  it('returns hasSigned: true with signedAt when a consent signature exists', async () => {
+    const SIGNED_AT = '2030-03-15T14:00:00.000Z';
+    mockConsentRepo.findByClientId.mockResolvedValue({ id: 'cs-uuid', signed_at: SIGNED_AT });
+    const res = await request(app)
+      .get('/api/v1/appointments/consent/status')
+      .set('Authorization', bearer(CLIENT_ID));
+    expect(res.status).toBe(200);
+    expect(res.body.data.hasSigned).toBe(true);
+    expect(res.body.data.signedAt).toBe(SIGNED_AT);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get('/api/v1/appointments/consent/status');
+    expect(res.status).toBe(401);
   });
 });
 

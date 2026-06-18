@@ -53,6 +53,32 @@ const WAIVER_CLOSING = 'I further understand that massage therapy is not a subst
 
 const TRAVEL_WAIVER_ITEM = 'Because this is a travel massage appointment, I will provide a clean, private, and suitable space — with enough room to set up a portable massage table — for my therapist to perform the massage.';
 
+const CANCELLATION_POLICY = {
+  commitment: 'To provide the highest level of service and ensure appointment availability for all clients, reserved appointment times are held exclusively for you.',
+  notice: 'Clients are required to provide at least 24 hours\' notice to cancel or reschedule an appointment.',
+  charge: 'Appointments cancelled, rescheduled, or missed with less than 24 hours\' notice will result in an automatic charge of 100% of the scheduled service fee to the credit or debit card on file.',
+  applies: [
+    'Cancellations made less than 24 hours before the scheduled appointment time',
+    'Missed appointments ("no-shows")',
+    'Appointments where the client arrives too late to reasonably complete the scheduled service and chooses not to proceed',
+  ],
+  exceptions: [
+    'Serious illness',
+    'Medical emergencies',
+    'Family emergencies',
+    'Severe weather or natural disasters',
+    'Other unforeseen circumstances deemed reasonable by management',
+  ],
+  exceptionsNote: 'Exceptions may be considered at the sole discretion of the practice. Approval of any exception is not guaranteed and will be reviewed on a case-by-case basis.',
+  cardOnFile: [
+    'A valid credit or debit card may be securely maintained on file.',
+    'Appointments cancelled or rescheduled within 24 hours of the scheduled appointment time will be charged the full service fee.',
+    'Missed appointments will be charged the full service fee.',
+    'I authorize the practice to process such charges automatically using the payment method on file.',
+    'This authorization remains in effect until revoked in writing and all outstanding balances have been paid.',
+  ],
+};
+
 const STEP_LABELS = {
   contact: 'Contact',
   health: 'Medical History',
@@ -209,6 +235,7 @@ function BookingWizard({
   // Consent
   const [signature, setSignature] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [cancellationAgreed, setCancellationAgreed] = useState(false);
 
   // Payment
   const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
@@ -245,6 +272,7 @@ function BookingWizard({
     if (currentStep === 'consent') {
       setSignature('');
       setAgreed(false);
+      setCancellationAgreed(false);
     }
   }, [currentStep]);
 
@@ -350,6 +378,7 @@ function BookingWizard({
   function handleConsentNext() {
     if (!signature) { setError('Please draw your signature.'); return; }
     if (!agreed) { setError('Please check the agreement box.'); return; }
+    if (!cancellationAgreed) { setError('Please acknowledge the cancellation policy.'); return; }
     setError('');
     goNext();
   }
@@ -806,6 +835,32 @@ function BookingWizard({
                     ))}
                   </ul>
                 </div>
+
+                <div className="waiver-cancellation">
+                  <h3 className="waiver-cancellation__heading">Cancellation &amp; Appointment Policy</h3>
+                  <p className="waiver-cancellation__text">{CANCELLATION_POLICY.commitment}</p>
+                  <p className="waiver-cancellation__text">{CANCELLATION_POLICY.notice}</p>
+                  <p className="waiver-cancellation__text">{CANCELLATION_POLICY.charge}</p>
+                  <p className="waiver-cancellation__subheading">This policy applies to:</p>
+                  <ul className="waiver-cancellation__list">
+                    {CANCELLATION_POLICY.applies.map((item, i) => (
+                      <li key={i} className="waiver-cancellation__item">{item}</li>
+                    ))}
+                  </ul>
+                  <p className="waiver-cancellation__subheading">Exceptions</p>
+                  <p className="waiver-cancellation__text">{CANCELLATION_POLICY.exceptionsNote}</p>
+                  <ul className="waiver-cancellation__list">
+                    {CANCELLATION_POLICY.exceptions.map((item, i) => (
+                      <li key={i} className="waiver-cancellation__item">{item}</li>
+                    ))}
+                  </ul>
+                  <p className="waiver-cancellation__subheading">Card-on-File Authorization</p>
+                  <ul className="waiver-cancellation__list">
+                    {CANCELLATION_POLICY.cardOnFile.map((item, i) => (
+                      <li key={i} className="waiver-cancellation__item">{item}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               <SignatureCanvas onChange={setSignature} />
@@ -822,6 +877,19 @@ function BookingWizard({
                   I have read and agree to the above consent form
                 </span>
               </label>
+
+              <label className="waiver-agree">
+                <input
+                  type="checkbox"
+                  className="waiver-agree__checkbox"
+                  checked={cancellationAgreed}
+                  onChange={e => setCancellationAgreed(e.target.checked)}
+                  disabled={submitting}
+                />
+                <span className="waiver-agree__text">
+                  I have read and agree to the Cancellation &amp; Appointment Policy, and I authorize the practice to charge my card on file for late cancellations, reschedules, and no-shows
+                </span>
+              </label>
             </div>
 
             <div className="booking-modal__footer">
@@ -831,7 +899,7 @@ function BookingWizard({
                   className="btn btn--primary"
                   type="button"
                   onClick={handleConsentNext}
-                  disabled={!signature || !agreed || submitting}
+                  disabled={!signature || !agreed || !cancellationAgreed || submitting}
                 >
                   Continue →
                 </button>
