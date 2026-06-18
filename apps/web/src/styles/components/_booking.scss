@@ -1036,3 +1036,81 @@
     }
   }
 }
+
+// ── Guest gate ───────────────────────────────────────────────────────────────
+
+.booking-gate {
+  padding: $space-6 $space-5 $space-5;
+
+  &__heading {
+    font-family: $font-family-base;
+    font-size: 1.15rem;
+    color: $color-text;
+    margin: 0 0 $space-2;
+    text-align: center;
+  }
+
+  &__sub {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    text-align: center;
+    margin: 0 0 $space-5;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+    padding: $space-4 $space-4;
+    background: #fff;
+    border: 1.5px solid $color-primary;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover, &:focus-visible {
+      background: $color-primary-tint-xs;
+      outline: none;
+    }
+
+    &:focus-visible {
+      box-shadow: $focus-shadow-md;
+    }
+
+    &--ghost {
+      border-color: $color-border;
+
+      .booking-gate__option-title {
+        color: $color-text-muted;
+      }
+
+      &:hover, &:focus-visible {
+        background: #f9f9f9;
+        border-color: darken($color-border, 10%);
+      }
+    }
+  }
+
+  &__option-title {
+    font-family: $font-family-ui;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $color-primary-dark;
+  }
+
+  &__option-desc {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}

@@ -373,6 +373,10 @@ test.describe('Service duration constraints', () => {
     }
     await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
+    // Pass the guest gate.
+    await page.click('button:has-text("Continue as guest")');
+    await page.waitForSelector('#bm-name');
+
     // Contact step
     await page.fill('#bm-name', 'E2E Tester');
     await page.fill('#bm-email', guestEmail);

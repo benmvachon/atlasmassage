@@ -51,6 +51,11 @@ jest.mock('../../services/membershipService.js', () => ({
   },
 }));
 
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => jest.fn(),
+  useLocation: () => ({ pathname: '/booking', search: '' }),
+}));
+
 jest.mock('../../context/AuthContext.jsx', () => ({ useAuth: jest.fn() }));
 
 jest.mock('../../services/userService.js', () => ({
@@ -129,8 +134,18 @@ function fillContactFields() {
   fill(/zip code/i,      '12345');
 }
 
+/** Click "Continue as guest" if the guest gate is showing. */
+async function passGate() {
+  const btn = screen.queryByRole('button', { name: /continue as guest/i });
+  if (btn) {
+    await act(async () => { fireEvent.click(btn); });
+    await waitFor(() => screen.getByLabelText(/full name/i));
+  }
+}
+
 /** Advance from the contact step to the health step. */
 async function advanceToHealth() {
+  await passGate();
   fillContactFields();
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /continue/i }));
@@ -181,8 +196,9 @@ describe('BookingModal — sticky layout structure', () => {
     expect(document.querySelector('.booking-modal__body')).not.toBeNull();
   });
 
-  it('renders the action buttons inside booking-modal__footer', () => {
+  it('renders the action buttons inside booking-modal__footer', async () => {
     renderModal();
+    await passGate();
     const footer = document.querySelector('.booking-modal__footer');
     expect(footer).not.toBeNull();
     expect(footer.querySelector('button')).not.toBeNull();
@@ -212,43 +228,81 @@ describe('BookingModal — sticky layout structure', () => {
     expect(footer).toHaveTextContent(/book appointment/i);
   });
 
-  it('renders the wizard progress nav inside booking-modal__header', () => {
+  it('renders the wizard progress nav inside booking-modal__header', async () => {
     renderModal();
+    await passGate();
     const header = document.querySelector('.booking-modal__header');
     expect(header.querySelector('.booking-wizard-progress')).not.toBeNull();
+  });
+});
+
+// ── Guest gate ────────────────────────────────────────────────────────────────
+
+describe('BookingModal — guest gate', () => {
+  it('shows the gate when no user is logged in', () => {
+    renderModal();
+    expect(screen.getByText(/how would you like to book/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /continue as guest/i })).toBeInTheDocument();
+  });
+
+  it('does not show the gate for a logged-in user', async () => {
+    renderModalAsLoggedInUser();
+    await act(async () => {});
+    expect(screen.queryByText(/how would you like to book/i)).not.toBeInTheDocument();
+  });
+
+  it('advances to the contact step when "Continue as guest" is clicked', async () => {
+    renderModal();
+    await passGate();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.queryByText(/how would you like to book/i)).not.toBeInTheDocument();
+  });
+
+  it('still shows the slot summary and title on the gate screen', () => {
+    renderModal();
+    const header = document.querySelector('.booking-modal__header');
+    expect(header).toHaveTextContent(/book appointment/i);
+    expect(header).toHaveTextContent(/10:00/);
   });
 });
 
 // ── Contact step — disabled state ─────────────────────────────────────────────
 
 describe('BookingModal — contact step disabled state', () => {
-  it('Continue is disabled before any fields are filled', () => {
+  it('Continue is disabled before any fields are filled', async () => {
     renderModal();
+    await passGate();
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('remains disabled with only a name filled', () => {
+  it('remains disabled with only a name filled', async () => {
     renderModal();
+    await passGate();
     fill(/full name/i, 'Jane Doe');
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('remains disabled with an invalid email', () => {
+  it('remains disabled with an invalid email', async () => {
     renderModal();
+    await passGate();
     fill(/full name/i, 'Jane Doe');
     fill(/email/i, 'notanemail');
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('remains disabled with name and email but no address', () => {
+  it('remains disabled with name and email but no address', async () => {
     renderModal();
+    await passGate();
     fill(/full name/i, 'Jane Doe');
     fill(/email/i, 'jane@example.com');
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('becomes enabled once name, email, and all address fields are provided', () => {
+  it('becomes enabled once name, email, and all address fields are provided', async () => {
     renderModal();
+    await passGate();
     fillContactFields();
     expect(screen.getByRole('button', { name: /continue/i })).not.toBeDisabled();
   });
@@ -259,6 +313,7 @@ describe('BookingModal — contact step disabled state', () => {
 describe('BookingModal — contact step address verification', () => {
   it('calls validateAddress with the entered address before advancing', async () => {
     renderModal();
+    await passGate();
     fillContactFields();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /continue/i }));
@@ -276,6 +331,7 @@ describe('BookingModal — contact step address verification', () => {
   it('blocks navigation and shows an error when the address cannot be verified', async () => {
     bookingService.validateAddress.mockResolvedValue({ valid: false, formattedAddress: null, unconfirmedComponentTypes: ['locality'] });
     renderModal();
+    await passGate();
     fillContactFields();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /continue/i }));
@@ -288,6 +344,7 @@ describe('BookingModal — contact step address verification', () => {
   it('shows an error when the verification request fails', async () => {
     bookingService.validateAddress.mockRejectedValue(new Error('Address verification service is unavailable. Please try again.'));
     renderModal();
+    await passGate();
     fillContactFields();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /continue/i }));
@@ -298,6 +355,7 @@ describe('BookingModal — contact step address verification', () => {
   it('blocks navigation and shows a service-area error when the address is out of travel range', async () => {
     bookingService.validateAddress.mockResolvedValue({ valid: false, outOfServiceArea: true, driveMinutes: 35 });
     renderModal();
+    await passGate();
     fillContactFields();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /continue/i }));

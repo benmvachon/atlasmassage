@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useFocusTrap } from '../hooks/useFocusTrap.js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -217,10 +218,13 @@ function BookingWizard({
   travelModeEnabled,
   onClose, onComplete,
 }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const stripe = useStripe();
   const elements = useElements();
 
+  const [guestMode, setGuestMode] = useState(false);
   const [currentStep, setCurrentStep] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [verifyingAddress, setVerifyingAddress] = useState(false);
@@ -587,6 +591,60 @@ function BookingWizard({
             {!user && email && ` A confirmation will be sent to ${email}.`}
           </p>
           <button className="btn btn--primary" onClick={() => { onComplete(); onClose(); }}>Done</button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Guest gate ────────────────────────────────────────────────────────────────
+
+  if (!authLoading && !user && !guestMode) {
+    return (
+      <div className="avail-modal-overlay" onClick={onClose} role="presentation">
+        <div
+          ref={dialogRef}
+          className="avail-modal booking-modal booking-modal--gate"
+          onClick={e => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-modal-title"
+        >
+          <div className="booking-modal__header">
+            <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
+            <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
+            <p className="booking-modal__slot-summary">
+              {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(displayEndTime)}
+            </p>
+          </div>
+          <div className="booking-modal__body booking-gate">
+            <p className="booking-gate__heading">How would you like to book?</p>
+            <p className="booking-gate__sub">
+              Members enjoy faster checkout and can view their booking history.
+            </p>
+            <div className="booking-gate__options">
+              <button
+                className="booking-gate__option"
+                onClick={() => navigate('/login', { state: { from: location.pathname + location.search } })}
+              >
+                <span className="booking-gate__option-title">Sign in</span>
+                <span className="booking-gate__option-desc">Use your existing account</span>
+              </button>
+              <button
+                className="booking-gate__option"
+                onClick={() => navigate('/signup', { state: { from: location.pathname + location.search } })}
+              >
+                <span className="booking-gate__option-title">Create account</span>
+                <span className="booking-gate__option-desc">Save your info for next time</span>
+              </button>
+              <button
+                className="booking-gate__option booking-gate__option--ghost"
+                onClick={() => setGuestMode(true)}
+              >
+                <span className="booking-gate__option-title">Continue as guest</span>
+                <span className="booking-gate__option-desc">No account needed</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

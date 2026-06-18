@@ -53,6 +53,9 @@ async function openModal(page) {
   await page.click(`button[aria-label*="${TEST_DATE}"][aria-label*="available"]`);
   await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
+  // Pass the guest gate that appears for unauthenticated users.
+  await page.click('button:has-text("Continue as guest")');
+  await page.waitForSelector('#bm-name');
 }
 
 /** Fill every required contact field (name, email, address). */
