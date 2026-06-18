@@ -62,15 +62,15 @@ export default function GiftCardsPage() {
   }
 
   return (
-    <div className="gift-cards-page container">
-      <div className="gift-cards-page__hero">
-        <h1 className="gift-cards-page__title">Give the Gift of Wellness</h1>
-        <p className="gift-cards-page__subtitle">
+    <div className="page page--gift-cards container">
+      <div className="page--gift-cards__hero">
+        <h1 className="page--gift-cards__title">Give the Gift of Wellness</h1>
+        <p className="page--gift-cards__subtitle">
           Atlas Bodywork gift cards are the kindest way to tell somebody they need a massage.
         </p>
       </div>
 
-      <div className="gift-cards-page__layout">
+      <div className="page--gift-cards__layout">
         <form className="gift-card-form" onSubmit={handleSubmit} noValidate>
           <section className="gift-card-form__section">
             <h2 className="gift-card-form__section-title">Choose an amount</h2>
@@ -210,7 +210,7 @@ export default function GiftCardsPage() {
           </p>
         </form>
 
-        <aside className="gift-cards-page__info">
+        <aside className="page--gift-cards__info">
           <div className="gift-card-info-card">
             <h3>How it works</h3>
             <ol className="gift-card-info-steps">
