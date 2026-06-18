@@ -4,6 +4,9 @@ import TherapistBookingsPage from '../../pages/therapist/TherapistBookingsPage.j
 import { api } from '../../services/api.js';
 
 jest.mock('../../services/api.js', () => ({ api: { get: jest.fn(), post: jest.fn() } }));
+jest.mock('../../context/AuthContext.jsx', () => ({
+  useAuth: () => ({ user: { id: 'therapist-1', roles: ['therapist'] } }),
+}));
 
 function makeAppt(overrides = {}) {
   return {

@@ -143,7 +143,7 @@ async function advanceToPayment() {
     fireEvent.mouseDown(canvas);
     fireEvent.mouseUp(canvas);
   });
-  fireEvent.click(screen.getByRole('checkbox'));
+  screen.getAllByRole('checkbox').forEach(cb => fireEvent.click(cb));
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /continue/i }));
   });
@@ -311,14 +311,14 @@ describe('BookingModal — wizard navigation', () => {
     expect(screen.getByText(/i have read and agree to the above consent form/i)).toBeInTheDocument();
   });
 
-  it('consent Continue is disabled until canvas is signed and checkbox is checked', async () => {
+  it('consent Continue is disabled until canvas is signed and both checkboxes are checked', async () => {
     renderModal();
     await advanceToConsent();
 
     const consentBtn = screen.getByRole('button', { name: /continue/i });
     expect(consentBtn).toBeDisabled();
 
-    // Sign — still disabled without checkbox
+    // Sign — still disabled without checkboxes
     const canvas = document.querySelector('canvas');
     await act(async () => {
       fireEvent.mouseDown(canvas);
@@ -326,8 +326,13 @@ describe('BookingModal — wizard navigation', () => {
     });
     expect(consentBtn).toBeDisabled();
 
-    // Check checkbox → now enabled
-    fireEvent.click(screen.getByRole('checkbox'));
+    // Check first checkbox only — still disabled
+    const [waiverBox, cancellationBox] = screen.getAllByRole('checkbox');
+    fireEvent.click(waiverBox);
+    expect(consentBtn).toBeDisabled();
+
+    // Check second checkbox → now enabled
+    fireEvent.click(cancellationBox);
     expect(consentBtn).not.toBeDisabled();
   });
 
