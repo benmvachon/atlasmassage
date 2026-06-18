@@ -43,7 +43,7 @@ export class AppointmentRepository {
 
   async findServiceById(id) {
     const { rows } = await this.pool.query(
-      'SELECT id, name, price_cents, duration_minutes FROM services WHERE id = $1',
+      'SELECT id, name, price_cents, duration_minutes, is_active FROM services WHERE id = $1',
       [id]
     );
     return rows[0] ?? null;

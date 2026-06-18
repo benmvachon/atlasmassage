@@ -149,7 +149,7 @@ beforeEach(() => {
     create:                       jest.fn().mockResolvedValue(APPT),
     findById:                     jest.fn().mockResolvedValue(APPT),
     findGuestAppointment:         jest.fn().mockResolvedValue(GUEST_APPT_DETAIL),
-    findServiceById:              jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 9000, duration_minutes: 60 }),
+    findServiceById:              jest.fn().mockResolvedValue({ id: SERVICE_ID, name: 'Deep Tissue', price_cents: 9000, duration_minutes: 60, is_active: true }),
     updateStatus:                 jest.fn().mockResolvedValue({ ...APPT, status: 'confirmed' }),
     updateStripePaymentMethodId:  jest.fn().mockResolvedValue({ ...APPT }),
     updateStripeCustomerId:       jest.fn().mockResolvedValue({ ...APPT }),
@@ -1295,5 +1295,98 @@ describe('POST /api/v1/appointments/:id/charge-no-show', () => {
       .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
       .send({ amountCents: 5000 });
     expect(res.status).toBe(404);
+  });
+});
+
+// ── Service duration validation for POST /api/v1/appointments ────────────────
+
+describe('POST /api/v1/appointments — service duration validation', () => {
+  const SERVICE_90_ID = 'f1eebc99-9c0b-4ef8-bb6d-6bb9bd380a77';
+  const body90 = {
+    therapistId: THERAPIST_ID,
+    serviceId: SERVICE_90_ID,
+    scheduledAt: FUTURE_AT,
+    waiverSignature: 'data:image/png;base64,iVBORw0KGgo=',
+  };
+
+  beforeEach(() => {
+    mockApptRepo.findServiceById.mockResolvedValue({
+      id: SERVICE_90_ID, name: 'Massage 90 min', price_cents: 19500, duration_minutes: 90, is_active: true,
+    });
+  });
+
+  it('calls generateSlots with slotDuration equal to the service duration_minutes', async () => {
+    mockGenerateSlots.mockReturnValue([
+      { startTime: '10:00', endTime: '11:30', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
+    ]);
+    await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(mockGenerateSlots).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ slotDuration: 90 })
+    );
+  });
+
+  it('returns 201 when a valid 90-min slot exists at the requested time', async () => {
+    mockGenerateSlots.mockReturnValue([
+      { startTime: '10:00', endTime: '11:30', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
+    ]);
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(res.status).toBe(201);
+  });
+
+  it('stores durationMinutes from the service (90) not a hardcoded 60', async () => {
+    mockGenerateSlots.mockReturnValue([
+      { startTime: '10:00', endTime: '11:30', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
+    ]);
+    await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(mockApptRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ durationMinutes: 90 })
+    );
+  });
+
+  it('returns 409 when the 90-min slot does not exist at the requested time', async () => {
+    // generateSlots returns no slot at 10:00 — simulate the case where the
+    // 90-min service does not fit at that start time
+    mockGenerateSlots.mockReturnValue([
+      { startTime: '11:00', endTime: '12:30', availableTherapists: [{ id: THERAPIST_ID, firstName: 'Alice', lastName: 'B' }] },
+    ]);
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
+  });
+
+  it('returns 400 when the service is inactive', async () => {
+    mockApptRepo.findServiceById.mockResolvedValue({
+      id: SERVICE_90_ID, name: 'Old Service', price_cents: 0, duration_minutes: 90, is_active: false,
+    });
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('BAD_REQUEST');
+  });
+
+  it('returns 400 when the service does not exist', async () => {
+    mockApptRepo.findServiceById.mockResolvedValue(null);
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body90);
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('BAD_REQUEST');
   });
 });

@@ -20,6 +20,12 @@ function formatTime(t) {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 
+function addMinutes(timeStr, mins) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const total = h * 60 + m + mins;
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
 function brandLabel(brand) {
   return { visa: 'Visa', mastercard: 'Mastercard', amex: 'Amex', discover: 'Discover' }[brand] ?? 'Card';
 }
@@ -237,9 +243,18 @@ function BookingWizard({
   const [agreed, setAgreed] = useState(false);
   const [cancellationAgreed, setCancellationAgreed] = useState(false);
 
+  const compatibleServices = useMemo(
+    () => {
+      const available = slot.availableDurations;
+      if (!available) return services;
+      return services.filter(s => available.includes(s.durationMinutes));
+    },
+    [services, slot.availableDurations]
+  );
+
   // Payment
   const [therapistId, setTherapistId] = useState(lockedTherapist?.id ?? '');
-  const [serviceId] = useState(services[0]?.id ?? '');
+  const [serviceId, setServiceId] = useState(() => compatibleServices[0]?.id ?? '');
 
   // Gift card
   const [giftCardInput, setGiftCardInput] = useState('');
@@ -278,6 +293,9 @@ function BookingWizard({
 
   const stepIndex = steps.indexOf(currentStep ?? steps[0]);
   const selectedService = services.find(s => s.id === serviceId);
+  const displayEndTime = selectedService
+    ? addMinutes(slot.startTime, selectedService.durationMinutes)
+    : slot.endTime;
   const membershipCoversBooking = !!(membershipStatus?.active && membershipStatus.creditsRemaining > 0);
   const needsPayment = !!stripePublishableKey && !membershipCoversBooking;
   const isNewCard = selectedMethodId === 'new';
@@ -526,7 +544,7 @@ function BookingWizard({
           <button className="avail-modal__close" onClick={onClose} aria-label="Close">×</button>
           <h3 id="booking-modal-title" className="avail-modal__title">Book Appointment</h3>
           <p className="booking-modal__slot-summary">
-            {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+            {formatDate(date)} · {formatTime(slot.startTime)} – {formatTime(displayEndTime)}
           </p>
 
           {showProgress && (
@@ -930,6 +948,23 @@ function BookingWizard({
                   </div>
                 </div>
               )}
+
+              <div className="booking-field">
+                <label className="booking-field__label" htmlFor="bm-service">Service</label>
+                <select
+                  id="bm-service"
+                  className="booking-field__input"
+                  value={serviceId}
+                  onChange={e => setServiceId(e.target.value)}
+                  disabled={submitting}
+                >
+                  {compatibleServices.map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} — {s.durationMinutes} min — ${(s.priceCents / 100).toFixed(0)}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div className="booking-field">
                 <label className="booking-field__label" htmlFor="bm-therapist">Therapist preference</label>

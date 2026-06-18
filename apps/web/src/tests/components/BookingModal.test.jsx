@@ -58,9 +58,10 @@ jest.mock('../../context/AuthContext.jsx', () => ({
 const SLOT = {
   startTime: '10:00',
   endTime:   '11:00',
+  availableDurations: [60],
   availableTherapists: [{ id: 'tid-1', firstName: 'Alice', lastName: 'Smith' }],
 };
-const SERVICES = [{ id: 'sid-1', name: 'Massage', priceCents: 10000 }];
+const SERVICES = [{ id: 'sid-1', name: 'Massage', priceCents: 10000, durationMinutes: 60 }];
 const APPT     = { id: 'appt-1', client_id: null };
 
 function renderModal(overrides = {}) {
@@ -444,5 +445,90 @@ describe('BookingModal — new-card guest booking', () => {
 
     expect(screen.getByText(/your card number is incomplete/i)).toBeInTheDocument();
     expect(screen.queryByText(/booking confirmed/i)).not.toBeInTheDocument();
+  });
+});
+
+// ── Service selection on payment step ─────────────────────────────────────────
+
+describe('BookingModal — service selection', () => {
+  const MULTI_SERVICES = [
+    { id: 'sid-60',  name: 'Massage',         priceCents: 15000, durationMinutes: 60  },
+    { id: 'sid-90',  name: 'Massage (90 min)', priceCents: 19500, durationMinutes: 90  },
+    { id: 'sid-120', name: 'Massage (2 hr)',   priceCents: 24000, durationMinutes: 120 },
+  ];
+  const SLOT_60_ONLY = { ...SLOT, availableDurations: [60] };
+  const SLOT_60_90   = { ...SLOT, availableDurations: [60, 90] };
+  const SLOT_ALL     = { ...SLOT, availableDurations: [60, 90, 120] };
+
+  it('renders a service dropdown on the payment step', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_ALL });
+    await advanceToPayment();
+    expect(screen.getByLabelText(/service/i)).toBeInTheDocument();
+  });
+
+  it('shows only services whose durationMinutes is in slot.availableDurations', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_60_90 });
+    await advanceToPayment();
+    const select = screen.getByLabelText(/service/i);
+    const values = Array.from(select.querySelectorAll('option')).map(o => o.value);
+    expect(values).toContain('sid-60');
+    expect(values).toContain('sid-90');
+    expect(values).not.toContain('sid-120');
+  });
+
+  it('hides longer services when slot only supports 60-min duration', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_60_ONLY });
+    await advanceToPayment();
+    const select = screen.getByLabelText(/service/i);
+    const values = Array.from(select.querySelectorAll('option')).map(o => o.value);
+    expect(values).toContain('sid-60');
+    expect(values).not.toContain('sid-90');
+    expect(values).not.toContain('sid-120');
+  });
+
+  it('shows all services when slot supports all durations', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_ALL });
+    await advanceToPayment();
+    const options = screen.getByLabelText(/service/i).querySelectorAll('option');
+    expect(options).toHaveLength(3);
+  });
+
+  it('shows all services when slot has no availableDurations', async () => {
+    const slotNoMeta = { startTime: '10:00', endTime: '11:00', availableTherapists: SLOT.availableTherapists };
+    renderModal({ services: MULTI_SERVICES, slot: slotNoMeta });
+    await advanceToPayment();
+    const options = screen.getByLabelText(/service/i).querySelectorAll('option');
+    expect(options).toHaveLength(3);
+  });
+
+  it('updates slot summary end time when a longer service is selected', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_ALL });
+    await advanceToPayment();
+
+    // Default (60 min): 10:00 AM – 11:00 AM
+    const summary = document.querySelector('.booking-modal__slot-summary');
+    expect(summary).toHaveTextContent('11:00 AM');
+
+    // Switch to 90-min service → end time becomes 11:30 AM
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/service/i), { target: { value: 'sid-90' } });
+    });
+    expect(summary).toHaveTextContent('11:30 AM');
+  });
+
+  it('sends the selected serviceId in the createAppointment call', async () => {
+    renderModal({ services: MULTI_SERVICES, slot: SLOT_ALL });
+    await advanceToPayment();
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/service/i), { target: { value: 'sid-90' } });
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /book appointment/i }));
+    });
+
+    expect(bookingService.createAppointment).toHaveBeenCalledWith(
+      expect.objectContaining({ serviceId: 'sid-90' })
+    );
   });
 });

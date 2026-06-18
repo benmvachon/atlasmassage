@@ -68,6 +68,8 @@ export const DATES = {
   schedMon: '2030-10-07', // Monday in Oct 2030
   // bed-assignment.spec.js uses Sep 2030 week 4
   bedMon: '2030-09-23',   // Monday — therapist/owner table visibility + bed capacity
+  // booking-constraints.spec.js service-duration tests use Sep 2030 week 3
+  mon3: '2030-09-16',  // Monday — service duration constraint tests
 };
 
 // ── Authentication ────────────────────────────────────────────────────────────
@@ -134,6 +136,16 @@ export async function getServiceId(request) {
   const body = await res.json();
   _cachedServiceId = body.data.services[0]?.id ?? null;
   return _cachedServiceId;
+}
+
+/**
+ * Fetch the first active service with a given durationMinutes.
+ * Returns null if no matching service is found.
+ */
+export async function getServiceByDuration(request, durationMinutes) {
+  const res = await request.get('/api/v1/availability/booking/calendar');
+  const body = await res.json();
+  return body.data.services.find(s => s.durationMinutes === durationMinutes)?.id ?? null;
 }
 
 /**

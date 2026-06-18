@@ -223,8 +223,8 @@ export async function getBookingCalendar(req, res, next) {
           .filter(t => t.is_accepting_clients)
           .map(t => ({ id: t.id, firstName: t.first_name, lastName: t.last_name, specialties: t.specialties })),
         services: services
-          .filter(s => s.is_active && s.duration_minutes === 60)
-          .map(s => ({ id: s.id, name: s.name, priceCents: s.price_cents })),
+          .filter(s => s.is_active)
+          .map(s => ({ id: s.id, name: s.name, priceCents: s.price_cents, durationMinutes: s.duration_minutes })),
       },
     });
   } catch (err) {
@@ -242,13 +242,14 @@ export async function getBookingSlots(req, res, next) {
     const { availability: availRepo, appointment: apptRepo, therapist: therapistRepo, business: businessRepo } = repos();
     const [weekStart, weekEnd] = weekBoundsFor(date);
 
-    const [availRows, apptRows, weekApptRows, therapists, allBeds, schedulingSettings] = await Promise.all([
+    const [availRows, apptRows, weekApptRows, therapists, allBeds, schedulingSettings, services] = await Promise.all([
       availRepo.getForDateRange(date, date, therapistId || null),
       apptRepo.getByDateRange(date, date),
       apptRepo.getByDateRange(weekStart, weekEnd),
       therapistRepo.findAll(),
       businessRepo.getMassageBeds(),
       businessRepo.getSchedulingSettings(),
+      businessRepo.getServices(),
     ]);
 
     const therapistMap = Object.fromEntries(therapists.map(t => [t.id, t]));
@@ -259,7 +260,29 @@ export async function getBookingSlots(req, res, next) {
     const activeBedCount = allBeds.filter(b => b.is_active).length;
     const bufferMinutes = schedulingSettings?.buffer_minutes ?? 15;
     const notBefore = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const slots = generateSlots(filteredAvailRows, apptRows, { timeOfDay, notBefore, activeBedCount, bufferMinutes });
+
+    const activeDurations = [...new Set(
+      services.filter(s => s.is_active).map(s => s.duration_minutes)
+    )].sort((a, b) => a - b);
+    const minDuration = activeDurations[0] ?? 60;
+
+    const baseSlots = generateSlots(filteredAvailRows, apptRows, { slotDuration: minDuration, timeOfDay, notBefore, activeBedCount, bufferMinutes });
+
+    const longerDurations = activeDurations.filter(d => d > minDuration);
+    const longerSets = {};
+    for (const dur of longerDurations) {
+      const durSlots = generateSlots(filteredAvailRows, apptRows, { slotDuration: dur, timeOfDay, notBefore, activeBedCount, bufferMinutes });
+      longerSets[dur] = new Set(durSlots.map(s => s.startTime));
+    }
+
+    const slots = baseSlots.map(s => ({
+      ...s,
+      availableDurations: [
+        minDuration,
+        ...longerDurations.filter(d => longerSets[d].has(s.startTime)),
+      ],
+    }));
+
     res.json({ success: true, data: { slots } });
   } catch (err) {
     next(err);

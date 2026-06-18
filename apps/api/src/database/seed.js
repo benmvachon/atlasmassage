@@ -82,6 +82,8 @@ const MEMBERSHIP_PLANS = [
 
 const SERVICES = [
   { name: 'Massage', description: 'A comprehensive massage inclusive of all services offered by the therapist and individualized to your needs.', durationMinutes: 60, priceCents: 15000 },
+  { name: 'Massage (90 min)', description: 'An extended session with additional time for deeper work, broader coverage, or a more leisurely pace — tailored to your needs.', durationMinutes: 90, priceCents: 21000 },
+  { name: 'Massage (2 hr)', description: 'Our most comprehensive session. Ideal for clients seeking full-body attention, intensive therapeutic work, or simply an indulgent experience.', durationMinutes: 120, priceCents: 26000 },
 ];
 
 const MASSAGE_BEDS = [

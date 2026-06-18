@@ -19,8 +19,6 @@ import { AppError } from '../middleware/errorHandler.js';
 import { config } from '../config/index.js';
 import { logger } from '../logging/logger.js';
 
-const SLOT_DURATION = 60;
-
 const DEFAULT_BUFFER_MINUTES = 15;
 
 function repos() {
@@ -85,20 +83,26 @@ export async function createAppointment(req, res, next) {
     }
     const dateStr = apptDate.toISOString().slice(0, 10);
 
-    const [availRows, existingAppts, allBeds, schedulingSettings] = await Promise.all([
+    const [availRows, existingAppts, allBeds, schedulingSettings, service] = await Promise.all([
       availRepo.getForDateRange(dateStr, dateStr, therapistId || null),
       apptRepo.getByDateRange(dateStr, dateStr),
       businessRepo.getMassageBeds(),
       businessRepo.getSchedulingSettings(),
+      apptRepo.findServiceById(serviceId),
     ]);
     const bufferMinutes = schedulingSettings?.buffer_minutes ?? DEFAULT_BUFFER_MINUTES;
+
+    if (!service || !service.is_active) {
+      throw new AppError('Service not found or unavailable', 400, 'BAD_REQUEST');
+    }
+    const durationMinutes = service.duration_minutes;
 
     const activeBeds = allBeds.filter(b => b.is_active);
     if (activeBeds.length === 0) {
       throw new AppError('No massage tables are currently available', 503, 'NO_BEDS_AVAILABLE');
     }
 
-    const slots = generateSlots(availRows, existingAppts, { activeBedCount: activeBeds.length, bufferMinutes });
+    const slots = generateSlots(availRows, existingAppts, { slotDuration: durationMinutes, activeBedCount: activeBeds.length, bufferMinutes });
     const slotTime = `${String(apptDate.getUTCHours()).padStart(2, '0')}:${String(apptDate.getUTCMinutes()).padStart(2, '0')}`;
     const matchingSlot = slots.find(s => s.startTime === slotTime);
 
@@ -116,7 +120,7 @@ export async function createAppointment(req, res, next) {
       }
     }
 
-    const bed = pickAvailableBed(activeBeds, existingAppts, apptDate.getTime(), SLOT_DURATION * 60_000, bufferMinutes * 60_000);
+    const bed = pickAvailableBed(activeBeds, existingAppts, apptDate.getTime(), durationMinutes * 60_000, bufferMinutes * 60_000);
     if (!bed) {
       throw new AppError('This time slot is no longer available', 409, 'SLOT_UNAVAILABLE');
     }
@@ -202,7 +206,7 @@ export async function createAppointment(req, res, next) {
       serviceId,
       bedId: resolvedBedId,
       scheduledAt,
-      durationMinutes: SLOT_DURATION,
+      durationMinutes,
       notes,
       guestName: clientId ? null : guestName,
       guestEmail: clientId ? null : guestEmail,
@@ -479,13 +483,13 @@ export async function rescheduleAppointment(req, res, next) {
     const bufferMinutes = schedulingSettings?.buffer_minutes ?? DEFAULT_BUFFER_MINUTES;
 
     const activeBeds = allBeds.filter(b => b.is_active);
-    const slots = generateSlots(availRows, existingAppts, { activeBedCount: activeBeds.length, bufferMinutes });
+    const slots = generateSlots(availRows, existingAppts, { slotDuration: appt.duration_minutes, activeBedCount: activeBeds.length, bufferMinutes });
     const slotTime = `${String(newDate.getUTCHours()).padStart(2, '0')}:${String(newDate.getUTCMinutes()).padStart(2, '0')}`;
     if (!slots.some(s => s.startTime === slotTime && s.availableTherapists.some(t => t.id === targetTherapistId))) {
       throw new AppError('The requested time slot is not available', 409, 'SLOT_UNAVAILABLE');
     }
 
-    const bed = pickAvailableBed(activeBeds, existingAppts, newDate.getTime(), SLOT_DURATION * 60_000, bufferMinutes * 60_000);
+    const bed = pickAvailableBed(activeBeds, existingAppts, newDate.getTime(), appt.duration_minutes * 60_000, bufferMinutes * 60_000);
     const updated = await apptRepo.reschedule(appt.id, {
       scheduledAt,
       therapistId: targetTherapistId,

@@ -112,7 +112,7 @@ describe('GET /api/v1/availability/booking/calendar', () => {
     expect(res.body.data.therapists[0].id).toBe(THERAPIST_ID);
   });
 
-  it('filters services to active 60-minute ones', async () => {
+  it('filters services to active ones and includes durationMinutes', async () => {
     mockBizRepo.getServices.mockResolvedValue([
       ...SERVICES,
       { ...SERVICES[0], id: 'svc-2', is_active: false },
@@ -122,7 +122,8 @@ describe('GET /api/v1/availability/booking/calendar', () => {
     const ids = res.body.data.services.map(s => s.id);
     expect(ids).toContain('svc-1');
     expect(ids).not.toContain('svc-2');
-    expect(ids).not.toContain('svc-3');
+    expect(ids).toContain('svc-3');
+    expect(res.body.data.services.find(s => s.id === 'svc-3').durationMinutes).toBe(90);
   });
 
   it('filters by therapistId query param', async () => {
@@ -585,5 +586,110 @@ describe('GET /api/v1/availability/booking/calendar — availability-driven day 
     // but with no business hours constraint on slot generation this may appear.
     // Primarily tests that the controller doesn't crash and returns 200.
     expect(res.status).toBe(200);
+  });
+});
+
+// ── GET /availability/booking/slots — availableDurations ─────────────────────
+
+describe('GET /api/v1/availability/booking/slots — availableDurations', () => {
+  // 2030-06-16 is a Monday (within Mon–Fri business hours)
+  const DATE = '2030-06-16';
+  const makeAvail = (startTime, endTime) => ({
+    therapist_id: THERAPIST_ID,
+    specific_date: DATE,
+    start_time: `${startTime}:00`,
+    end_time: `${endTime}:00`,
+    first_name: 'Alice',
+    last_name: 'B',
+  });
+
+  const MULTI_SERVICES = [
+    { id: 'svc-60',  name: 'Massage',       price_cents: 15000, duration_minutes: 60,  is_active: true },
+    { id: 'svc-90',  name: 'Massage 90 min', price_cents: 19500, duration_minutes: 90,  is_active: true },
+    { id: 'svc-120', name: 'Massage 2 hr',   price_cents: 24000, duration_minutes: 120, is_active: true },
+  ];
+
+  beforeEach(() => {
+    // 120-min availability window (09:00–11:00)
+    mockAvailRepo.getForDateRange.mockResolvedValue([makeAvail('09:00', '11:00')]);
+    mockBizRepo.getServices.mockResolvedValue(MULTI_SERVICES);
+  });
+
+  it('includes availableDurations on every returned slot', async () => {
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    expect(res.status).toBe(200);
+    for (const slot of res.body.data.slots) {
+      expect(slot).toHaveProperty('availableDurations');
+      expect(Array.isArray(slot.availableDurations)).toBe(true);
+      expect(slot.availableDurations.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('09:00 slot with 120-min window supports all three durations', async () => {
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    const slot = res.body.data.slots.find(s => s.startTime === '09:00');
+    expect(slot).toBeDefined();
+    expect(slot.availableDurations).toContain(60);
+    expect(slot.availableDurations).toContain(90);
+    expect(slot.availableDurations).toContain(120);
+  });
+
+  it('09:15 slot supports 60 and 90 min but not 120 (lastStart for 120 is 09:00)', async () => {
+    // availEnd=11:00, lastStart(120)=09:00 → 09:15 > 09:00 → 120 min blocked
+    // lastStart(90)=09:30 → 09:15 ≤ 09:30 → 90 min allowed
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    const slot = res.body.data.slots.find(s => s.startTime === '09:15');
+    expect(slot).toBeDefined();
+    expect(slot.availableDurations).toContain(60);
+    expect(slot.availableDurations).toContain(90);
+    expect(slot.availableDurations).not.toContain(120);
+  });
+
+  it('10:00 slot only supports 60-min (last start for 90-min would be 09:30)', async () => {
+    // lastStart(90)=09:30 → 10:00 > 09:30 → 90 min blocked
+    // lastStart(60)=10:00 → 10:00 ≤ 10:00 → 60 min allowed
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    const slot = res.body.data.slots.find(s => s.startTime === '10:00');
+    expect(slot).toBeDefined();
+    expect(slot.availableDurations).toContain(60);
+    expect(slot.availableDurations).not.toContain(90);
+    expect(slot.availableDurations).not.toContain(120);
+  });
+
+  it('excludes 90-min when an existing appointment blocks a 90-min window but not a 60-min one', async () => {
+    // Appointment at 10:30 (60 min, startMin=630, endMin=690).
+    // 90-min slot at 09:00 (t=540, slotEnd=630): slotEnd(630) > startMin-15(615) → BLOCKED
+    // 60-min slot at 09:00 (t=540, slotEnd=600): slotEnd(600) > startMin-15(615)? 600 > 615 → FALSE → safe
+    mockApptRepo.getByDateRange.mockResolvedValue([
+      { therapist_id: THERAPIST_ID, bed_id: null, scheduled_at: `${DATE}T10:30:00Z`, duration_minutes: 60 },
+    ]);
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    const slot = res.body.data.slots.find(s => s.startTime === '09:00');
+    expect(slot).toBeDefined();
+    expect(slot.availableDurations).toContain(60);
+    expect(slot.availableDurations).not.toContain(90);
+    expect(slot.availableDurations).not.toContain(120);
+  });
+
+  it('omits a duration when the corresponding service is inactive', async () => {
+    mockBizRepo.getServices.mockResolvedValue([
+      { id: 'svc-60',  name: 'Massage',    price_cents: 15000, duration_minutes: 60,  is_active: true  },
+      { id: 'svc-120', name: 'Massage 2h', price_cents: 24000, duration_minutes: 120, is_active: false },
+    ]);
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    const slot = res.body.data.slots.find(s => s.startTime === '09:00');
+    expect(slot).toBeDefined();
+    expect(slot.availableDurations).toContain(60);
+    expect(slot.availableDurations).not.toContain(120);
+  });
+
+  it('returns availableDurations: [60] when only a 60-min service is active', async () => {
+    mockBizRepo.getServices.mockResolvedValue([
+      { id: 'svc-60', name: 'Massage', price_cents: 15000, duration_minutes: 60, is_active: true },
+    ]);
+    const res = await request(app).get(`/api/v1/availability/booking/slots?date=${DATE}`);
+    for (const slot of res.body.data.slots) {
+      expect(slot.availableDurations).toEqual([60]);
+    }
   });
 });

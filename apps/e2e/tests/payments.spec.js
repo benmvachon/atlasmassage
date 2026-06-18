@@ -240,7 +240,9 @@ test('booking modal: guest booking with a new test card completes successfully',
   // Step 3: Consent
   await page.waitForSelector('.waiver-sig__canvas');
   await drawSignature(page);
-  await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
+  for (const cb of await page.locator('.waiver-agree__checkbox').all()) {
+    await cb.evaluate(el => el.click());
+  }
   await page.locator('.avail-modal__actions .btn--primary').click();
 
   // Step 4: Payment — new card is pre-selected for guests

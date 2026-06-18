@@ -199,3 +199,54 @@ describe('availableDaysForMonth', () => {
     expect(availableDaysForMonth({}, {})).toEqual([]);
   });
 });
+
+// ── slotDuration parameter ────────────────────────────────────────────────────
+
+describe('generateSlots — slotDuration parameter', () => {
+  it('uses slotDuration for endTime (90 min → 10:30 not 11:00)', () => {
+    const slots = generateSlots([avail(T1, '09:00', '11:00')], [], { slotDuration: 90 });
+    const first = slots.find(s => s.startTime === '09:00');
+    expect(first).toBeDefined();
+    expect(first.endTime).toBe('10:30');
+  });
+
+  it('shrinks the available window — only one 90-min slot fits in a 90-min window', () => {
+    const slots = generateSlots([avail(T1, '09:00', '10:30')], [], { slotDuration: 90 });
+    expect(slots.map(s => s.startTime)).toEqual(['09:00']);
+  });
+
+  it('returns no slots when the availability window is shorter than slotDuration', () => {
+    const slots = generateSlots([avail(T1, '09:00', '10:00')], [], { slotDuration: 90 });
+    expect(slots).toHaveLength(0);
+  });
+
+  it('produces a 120-minute slot with correct endTime', () => {
+    const slots = generateSlots([avail(T1, '09:00', '13:00')], [], { slotDuration: 120 });
+    const first = slots.find(s => s.startTime === '09:00');
+    expect(first).toBeDefined();
+    expect(first.endTime).toBe('11:00');
+  });
+
+  it('blocks a 90-min slot that would overlap an existing appointment + buffer', () => {
+    // Appointment at 10:30. 90-min slot at 09:00 ends at 10:30 → conflicts (10:30 > 10:30-15=10:15).
+    const appt = { therapist_id: 't1', scheduled_at: '2030-01-10T10:30:00Z', duration_minutes: 60 };
+    const slots = generateSlots([avail(T1, '09:00', '14:00')], [appt], { slotDuration: 90 });
+    const times = slots.map(s => s.startTime);
+    expect(times).not.toContain('09:00');
+    expect(times).toContain('11:45'); // 10:30 + 60 appt + 15 buffer = 11:45
+  });
+
+  it('allows a 90-min slot when it ends at least bufferMinutes before an existing appointment', () => {
+    // Appointment at 11:45. 90-min slot at 09:00 ends at 10:30. 10:30 + 15 buffer = 10:45 < 11:45 → safe.
+    const appt = { therapist_id: 't1', scheduled_at: '2030-01-10T11:45:00Z', duration_minutes: 60 };
+    const slots = generateSlots([avail(T1, '09:00', '14:00')], [appt], { slotDuration: 90 });
+    expect(slots.map(s => s.startTime)).toContain('09:00');
+  });
+
+  it('defaults to 60-min duration when slotDuration is omitted', () => {
+    const slots = generateSlots([avail(T1, '09:00', '10:00')], [], {});
+    const first = slots.find(s => s.startTime === '09:00');
+    expect(first).toBeDefined();
+    expect(first.endTime).toBe('10:00');
+  });
+});

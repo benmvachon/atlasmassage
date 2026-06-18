@@ -80,7 +80,9 @@ async function advancePastHealth(page) {
 /** Complete the consent step (sign + check). */
 async function completeConsentStep(page) {
   await drawSignature(page);
-  await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
+  for (const cb of await page.locator('.waiver-agree__checkbox').all()) {
+    await cb.evaluate(el => el.click());
+  }
   // The "Continue →" button on the consent step
   await page.locator('.avail-modal__actions .btn--primary').click();
   await page.waitForSelector('.booking-divider'); // payment step
@@ -193,8 +195,10 @@ test('consent Continue button is disabled until canvas is signed and checkbox is
   await drawSignature(page);
   await expect(consentBtn).toBeDisabled();
 
-  // Check the checkbox → now enabled
-  await page.locator('.waiver-agree__checkbox').evaluate(cb => cb.click());
+  // Check both consent checkboxes → now enabled
+  for (const cb of await page.locator('.waiver-agree__checkbox').all()) {
+    await cb.evaluate(el => el.click());
+  }
   await expect(consentBtn).toBeEnabled();
 });
 

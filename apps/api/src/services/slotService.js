@@ -1,4 +1,3 @@
-const SLOT_DURATION = 60;      // all appointments are 1 hour
 const DEFAULT_BUFFER = 15;     // fallback minutes required between appointments
 const INCREMENT = 15;          // slot start-time step
 
@@ -31,7 +30,7 @@ function scheduledAtToMinutes(scheduledAt) {
  * bufferMinutes:   minutes required between appointments for the same therapist or bed
  * Returns sorted [{ startTime, endTime, availableTherapists: [{id, firstName, lastName}] }]
  */
-export function generateSlots(availability, appointments, { timeOfDay, notBefore, activeBedCount = 0, bufferMinutes = DEFAULT_BUFFER } = {}) {
+export function generateSlots(availability, appointments, { timeOfDay, notBefore, activeBedCount = 0, bufferMinutes = DEFAULT_BUFFER, slotDuration = 60 } = {}) {
   const todBounds = timeOfDay ? TOD_BOUNDS[timeOfDay] : null;
   const BUFFER = bufferMinutes;
 
@@ -58,7 +57,7 @@ export function generateSlots(availability, appointments, { timeOfDay, notBefore
     const existing = apptsByTherapist[tid] ?? [];
     const availStart = timeToMinutes(avail.start_time);
     const availEnd = timeToMinutes(avail.end_time);
-    const lastStart = availEnd - SLOT_DURATION;
+    const lastStart = availEnd - slotDuration;
 
     for (let t = availStart; t <= lastStart; t += INCREMENT) {
       if (todBounds && (t < todBounds[0] || t >= todBounds[1])) continue;
@@ -68,7 +67,7 @@ export function generateSlots(availability, appointments, { timeOfDay, notBefore
         if (slotDatetime < notBefore) continue;
       }
 
-      const slotEnd = t + SLOT_DURATION;
+      const slotEnd = t + slotDuration;
       // Slot is blocked if [t, slotEnd] and any existing [a.startMin, a.endMin]
       // overlap when each is padded by BUFFER.
       const blocked = existing.some(a => t < a.endMin + BUFFER && slotEnd > a.startMin - BUFFER);

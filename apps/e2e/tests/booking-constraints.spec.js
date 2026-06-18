@@ -12,7 +12,8 @@ import { test, expect } from '@playwright/test';
 import {
   DATES, getAuthState,
   setAvailability, deleteAvailability, setBookingLimits,
-  createGuestAppointment, cancelAppointment, getServiceId,
+  createGuestAppointment, cancelAppointment, getServiceId, getServiceByDuration,
+  mockValidateAddress, mockStripeDisabled, drawSignature,
 } from './helpers.js';
 
 // Multiple describe blocks share Sarah's booking limits and the same therapist
@@ -348,6 +349,176 @@ test.describe('24-hour advance booking window', () => {
       const label = await todayBtn.getAttribute('aria-label');
       expect(label ?? '').not.toContain(', available');
     }
+  });
+});
+
+// ── Service duration constraints ──────────────────────────────────────────────
+
+test.describe('Service duration constraints', () => {
+  const { owner, sarah } = getAuthState();
+  const ownerToken = owner.token;
+  const sarahToken = sarah.token;
+  const sarahUserId = sarah.userId;
+  const testDate = DATES.mon3; // 2030-09-16 (Monday)
+  let serviceId60, serviceId90, serviceId120;
+
+  // Helper: navigate through contact → health → consent wizard steps
+  // and land on the payment step for the given slot (first or last).
+  async function navigateToPaymentStep(page, { slotSelector = 'first', guestEmail }) {
+    await page.waitForSelector('.slot-panel__grid');
+    if (slotSelector === 'last') {
+      await page.locator('button.slot-btn').last().click();
+    } else {
+      await page.locator('button.slot-btn').first().click();
+    }
+    await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
+
+    // Contact step
+    await page.fill('#bm-name', 'E2E Tester');
+    await page.fill('#bm-email', guestEmail);
+    await page.fill('#bm-addr1', '123 Test St');
+    await page.fill('#bm-city', 'Test City');
+    await page.fill('#bm-state', 'CA');
+    await page.fill('#bm-zip', '90210');
+    await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+    // Health step
+    await page.waitForSelector('#bm-medications');
+    await page.locator('.booking-modal form').evaluate(f => f.requestSubmit());
+
+    // Consent step — draw signature + check all boxes
+    await page.waitForSelector('.waiver-sig__canvas');
+    await drawSignature(page);
+    for (const cb of await page.locator('.waiver-agree__checkbox').all()) {
+      await cb.evaluate(el => el.click());
+    }
+    await page.locator('.avail-modal__actions .btn--primary').click();
+
+    // Payment step
+    await page.waitForSelector('#bm-service');
+  }
+
+  test.beforeAll(async ({ request }) => {
+    // 120-min window (09:00–11:00): covers 60, 90, and 120-min services at 09:00
+    await setAvailability(request, sarahUserId, sarahToken, [
+      { date: testDate, startTime: '09:00', endTime: '11:00' },
+    ]);
+    serviceId60  = await getServiceByDuration(request, 60);
+    serviceId90  = await getServiceByDuration(request, 90);
+    serviceId120 = await getServiceByDuration(request, 120);
+  });
+
+  test.afterAll(async ({ request }) => {
+    await deleteAvailability(request, sarahUserId, sarahToken, [testDate]);
+  });
+
+  test('slots API annotates availableDurations reflecting the availability window', async ({ request }) => {
+    const res = await request.get(
+      `/api/v1/availability/booking/slots?date=${testDate}&therapistId=${sarahUserId}`
+    );
+    const body = await res.json();
+    const slots = body.data.slots;
+
+    // 09:00 has a full 120-min window → all three durations
+    const slot900 = slots.find(s => s.startTime === '09:00');
+    expect(slot900).toBeTruthy();
+    expect(slot900.availableDurations).toContain(60);
+    expect(slot900.availableDurations).toContain(90);
+    expect(slot900.availableDurations).toContain(120);
+
+    // 10:00 has only 60 min remaining (10:00 + 90 > 11:00) → only 60 min
+    const slot1000 = slots.find(s => s.startTime === '10:00');
+    expect(slot1000).toBeTruthy();
+    expect(slot1000.availableDurations).toContain(60);
+    expect(slot1000.availableDurations).not.toContain(90);
+    expect(slot1000.availableDurations).not.toContain(120);
+  });
+
+  test('server rejects a 90-min booking at a slot that only has 60-min runway', async ({ request }) => {
+    // Block 09:00 for 90 min by placing a 10:00 appointment (90-min slot at 09:00 ends at 10:30
+    // which conflicts with 10:00 appointment start minus 15-min buffer = 09:45)
+    const existingAppt = await createGuestAppointment(request, {
+      therapistId: sarahUserId,
+      serviceId: serviceId60,
+      scheduledAt: `${testDate}T10:00:00.000Z`,
+    });
+
+    try {
+      const res = await request.post('/api/v1/appointments', {
+        data: {
+          therapistId: sarahUserId,
+          serviceId: serviceId90,
+          scheduledAt: `${testDate}T09:00:00.000Z`,
+          guestName: 'E2E Reject',
+          guestEmail: 'e2e-reject@test.invalid',
+          waiverSignature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        },
+      });
+      const body = await res.json();
+      expect(res.status()).toBe(409);
+      expect(body.error.code).toBe('SLOT_UNAVAILABLE');
+    } finally {
+      if (existingAppt?.id) await cancelAppointment(request, existingAppt.id, ownerToken);
+    }
+  });
+
+  test('service dropdown on payment step shows only services that fit the slot', async ({ page }) => {
+    await mockValidateAddress(page);
+    await mockStripeDisabled(page);
+
+    await page.goto(`/booking?year=2030&month=9&therapistId=${sarahUserId}`);
+    await page.waitForSelector('.avail-calendar');
+    await page.click(`button[aria-label*="${testDate}"][aria-label*="available"]`);
+
+    // Click the LAST slot (most constrained — least runway remaining)
+    await navigateToPaymentStep(page, { slotSelector: 'last', guestEmail: 'e2e-svc-last@test.invalid' });
+
+    const select = page.locator('#bm-service');
+    await expect(select).toBeVisible();
+    const options = select.locator('option');
+    const count = await options.count();
+
+    // The last slot in a 09:00–11:00 window is 10:00 — only 60 min fits
+    expect(count).toBe(1);
+    const text = await options.first().textContent();
+    expect(text).toContain('60 min');
+  });
+
+  test('service dropdown shows all services at the first slot with full runway', async ({ page }) => {
+    await mockValidateAddress(page);
+    await mockStripeDisabled(page);
+
+    await page.goto(`/booking?year=2030&month=9&therapistId=${sarahUserId}`);
+    await page.waitForSelector('.avail-calendar');
+    await page.click(`button[aria-label*="${testDate}"][aria-label*="available"]`);
+
+    // Click the FIRST slot (09:00) — full 120-min runway, all three durations fit
+    await navigateToPaymentStep(page, { slotSelector: 'first', guestEmail: 'e2e-svc-first@test.invalid' });
+
+    const select = page.locator('#bm-service');
+    await expect(select).toBeVisible();
+    await expect(select.locator('option')).toHaveCount(3);
+  });
+
+  test('selecting a 90-min service updates the end time in the slot summary', async ({ page }) => {
+    await mockValidateAddress(page);
+    await mockStripeDisabled(page);
+
+    await page.goto(`/booking?year=2030&month=9&therapistId=${sarahUserId}`);
+    await page.waitForSelector('.avail-calendar');
+    await page.click(`button[aria-label*="${testDate}"][aria-label*="available"]`);
+
+    // First slot (09:00) — all three durations fit
+    await navigateToPaymentStep(page, { slotSelector: 'first', guestEmail: 'e2e-endtime@test.invalid' });
+
+    const summary = page.locator('.booking-modal__slot-summary');
+
+    // Default service (60 min): end time is 10:00 AM
+    await expect(summary).toContainText('10:00 AM');
+
+    // Switch to 90-min service → end time should become 10:30 AM
+    await page.selectOption('#bm-service', { value: serviceId90 });
+    await expect(summary).toContainText('10:30 AM');
   });
 });
 
