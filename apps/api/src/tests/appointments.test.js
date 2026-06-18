@@ -96,6 +96,7 @@ const { default: request }       = await import('supertest');
 const { default: app }           = await import('../app.js');
 const { issueAccessToken }       = await import('../services/tokenService.js');
 const { NotificationService }    = await import('../services/notificationService.js');
+const { AppError }               = await import('../middleware/errorHandler.js');
 
 const CLIENT_ID    = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const THERAPIST_ID = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22';
@@ -1070,7 +1071,7 @@ describe('POST /api/v1/appointments/validate-address', () => {
 
   it('propagates a 502 when the validation provider is unavailable', async () => {
     mockValidateAddress.mockRejectedValue(
-      Object.assign(new Error('Address verification service is unavailable. Please try again.'), { statusCode: 502, code: 'ADDRESS_VALIDATION_UNAVAILABLE' })
+      new AppError('Address verification service is unavailable. Please try again.', 502, 'ADDRESS_VALIDATION_UNAVAILABLE')
     );
     const res = await request(app)
       .post('/api/v1/appointments/validate-address')
