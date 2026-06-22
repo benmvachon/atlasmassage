@@ -37,6 +37,16 @@ function repos() {
   };
 }
 
+// Normalize a UTM value for storage: trim, drop empties, cap length. Source and medium
+// are lowercased so "Google" and "google" group together on the dashboard; campaign is
+// left as-entered to preserve human-readable labels.
+function normalizeUtm(value, { lower = false } = {}) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, 255);
+  if (!trimmed) return null;
+  return lower ? trimmed.toLowerCase() : trimmed;
+}
+
 function computeAge(dobStr) {
   const birth = new Date(dobStr);
   const today = new Date();
@@ -69,6 +79,7 @@ export async function createAppointment(req, res, next) {
       guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
       notes, paymentMethodId, waiverSignature, giftCardCode,
       healthCurrentMedications, healthRecentSurgeries, healthPregnancyStatus, healthInjuries, healthDateOfBirth,
+      firstUtmSource, firstUtmMedium, firstUtmCampaign, lastUtmSource, lastUtmMedium, lastUtmCampaign,
     } = req.body;
 
     const clientId = req.user?.sub ?? null;
@@ -248,6 +259,12 @@ export async function createAppointment(req, res, next) {
       waiverSignature: waiverSignature ?? null,
       consentSignatureId,
       healthRecordId,
+      firstUtmSource: normalizeUtm(firstUtmSource, { lower: true }),
+      firstUtmMedium: normalizeUtm(firstUtmMedium, { lower: true }),
+      firstUtmCampaign: normalizeUtm(firstUtmCampaign),
+      lastUtmSource: normalizeUtm(lastUtmSource, { lower: true }),
+      lastUtmMedium: normalizeUtm(lastUtmMedium, { lower: true }),
+      lastUtmCampaign: normalizeUtm(lastUtmCampaign),
     });
 
     // Check if the booking is covered by a membership credit.

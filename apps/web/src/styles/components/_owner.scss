@@ -1759,3 +1759,70 @@
 //     color: $color-primary;
 //   }
 // }
+
+// ── Marketing Analytics page ────────────────────────────────────────────────────
+.mkt-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $space-4;
+  margin-bottom: $space-2;
+}
+
+.mkt-range__field,
+.mkt-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: $color-text-muted;
+
+  input,
+  select {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    font-weight: 400;
+    color: $color-text;
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    background: $color-white;
+  }
+}
+
+.mkt-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.mkt-filters__field select {
+  min-width: 160px;
+}
+
+.mkt-status {
+  display: inline-block;
+  padding: 2px $space-2;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: $color-bg-alt;
+  color: $color-text-muted;
+
+  &--confirmed { background: rgba($color-success, 0.12); color: $color-success; }
+  &--completed { background: rgba($color-primary, 0.12); color: $color-primary; }
+  &--cancelled { background: $color-error-bg;            color: $color-error-dark; }
+  &--pending   { background: rgba(#d4a373, 0.20);        color: #8a5a2b; }
+}
+
+.mkt-sentinel {
+  height: 1px;
+}
+
+.mkt-end {
+  margin-top: $space-4;
+}

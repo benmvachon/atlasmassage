@@ -471,6 +471,68 @@ export async function getRevenue(req, res, next) {
   }
 }
 
+// ── Marketing attribution ──────────────────────────────────────────────────────
+
+function defaultRange(req) {
+  const end = req.query.end || new Date().toISOString().slice(0, 10);
+  const start = req.query.start || new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+  return { start, end };
+}
+
+// Opaque base64 keyset cursor: { scheduledAt, id }. Malformed cursors are ignored
+// (treated as "start from the beginning") so a stale client can't 500 the endpoint.
+function decodeCursor(raw) {
+  if (!raw) return null;
+  try {
+    const obj = JSON.parse(Buffer.from(raw, 'base64').toString('utf8'));
+    if (obj && obj.scheduledAt && obj.id) return obj;
+  } catch { /* ignore malformed cursor */ }
+  return null;
+}
+
+function encodeCursor(cursor) {
+  return cursor ? Buffer.from(JSON.stringify(cursor), 'utf8').toString('base64') : null;
+}
+
+export async function getMarketingSources(req, res, next) {
+  try {
+    const { start, end } = defaultRange(req);
+    const touch = req.query.touch === 'last' ? 'last' : 'first';
+    const data = await repos().appointment.getSourceAttributionStats({ start, end, touch });
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getAttributionTimeseries(req, res, next) {
+  try {
+    const { start, end } = defaultRange(req);
+    const touch = req.query.touch === 'last' ? 'last' : 'first';
+    const data = await repos().appointment.getAttributionTimeseries({ start, end, touch });
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function listAttributedAppointments(req, res, next) {
+  try {
+    const { start, end } = defaultRange(req);
+    const touch = req.query.touch === 'last' ? 'last' : 'first';
+    const { source, medium, campaign, status } = req.query;
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 25, 1), 100);
+    const cursor = decodeCursor(req.query.cursor);
+
+    const { rows, nextCursor } = await repos().appointment.listAttributedAppointments({
+      start, end, touch, source, medium, campaign, status, limit, cursor,
+    });
+    res.json({ success: true, data: { appointments: rows, nextCursor: encodeCursor(nextCursor) } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Transfer requests ─────────────────────────────────────────────────────────
 
 export async function listTransferRequests(req, res, next) {

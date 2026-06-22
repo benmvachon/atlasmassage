@@ -223,6 +223,10 @@ test('booking modal: guest booking with a new test card completes successfully',
   await page.locator('button.slot-btn').first().click();
   await page.waitForSelector('[role="dialog"][aria-labelledby="booking-modal-title"]');
 
+  // Pass the guest gate shown to unauthenticated users.
+  await page.click('button:has-text("Continue as guest")');
+  await page.waitForSelector('#bm-name');
+
   // Step 1: Contact — fill required fields including address
   await page.fill('#bm-name', 'E2E Guest');
   await page.fill('#bm-email', 'e2e-guest@example.com');

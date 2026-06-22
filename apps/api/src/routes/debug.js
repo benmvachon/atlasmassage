@@ -224,7 +224,11 @@ router.post('/trigger-notifications', async (req, res, next) => {
  */
 router.post('/appointments/backdated', async (req, res, next) => {
   try {
-    const { therapistId, serviceId, clientId, scheduledAt, status = 'confirmed' } = req.body;
+    const {
+      therapistId, serviceId, clientId, scheduledAt, status = 'confirmed',
+      firstUtmSource, firstUtmMedium, firstUtmCampaign,
+      lastUtmSource, lastUtmMedium, lastUtmCampaign,
+    } = req.body;
     if (!therapistId || !serviceId || !scheduledAt) {
       return res.status(400).json({ success: false, error: 'therapistId, serviceId, scheduledAt required' });
     }
@@ -236,11 +240,37 @@ router.post('/appointments/backdated', async (req, res, next) => {
     if (!service) return res.status(404).json({ success: false, error: 'service not found' });
     const { rows: [appt] } = await pool.query(
       `INSERT INTO appointments
-         (therapist_id, service_id, client_id, scheduled_at, status, duration_minutes)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [therapistId, serviceId, clientId ?? null, scheduledAt, status, service.duration_minutes]
+         (therapist_id, service_id, client_id, scheduled_at, status, duration_minutes,
+          first_utm_source, first_utm_medium, first_utm_campaign,
+          last_utm_source, last_utm_medium, last_utm_campaign)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      [therapistId, serviceId, clientId ?? null, scheduledAt, status, service.duration_minutes,
+       firstUtmSource ?? null, firstUtmMedium ?? null, firstUtmCampaign ?? null,
+       lastUtmSource ?? null, lastUtmMedium ?? null, lastUtmCampaign ?? null]
     );
     res.json({ success: true, data: { appointment: appt } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /api/v1/debug/appointments/:appointmentId/attribution
+ * Reads back the stored UTM attribution columns for an appointment so E2E
+ * tests can verify the controller sanitized and persisted them correctly.
+ */
+router.get('/appointments/:appointmentId/attribution', async (req, res, next) => {
+  try {
+    const { appointmentId } = req.params;
+    const pool = getPool();
+    const { rows: [appt] } = await pool.query(
+      `SELECT first_utm_source, first_utm_medium, first_utm_campaign,
+              last_utm_source, last_utm_medium, last_utm_campaign
+         FROM appointments WHERE id = $1`,
+      [appointmentId]
+    );
+    if (!appt) return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    res.json({ success: true, data: { attribution: appt } });
   } catch (err) {
     next(err);
   }

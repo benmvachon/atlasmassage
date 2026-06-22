@@ -336,18 +336,25 @@ async function seed() {
     const nextTuesday = nextWeekday(today, 2);
     const nextWednesday = nextWeekday(today, 3);
 
-    // Sarah has a 10:00 appointment next Tuesday (blocks 09:06–10:59 for her)
+    // Sarah has a 10:00 appointment next Tuesday (blocks 09:06–10:59 for her).
+    // UTM values populate the Marketing Sources dashboard with sample channels.
     await client.query(
       `INSERT INTO appointments
-         (client_id, therapist_id, service_id, scheduled_at, duration_minutes, status)
-       VALUES ($1, $2, $3, $4, 60, 'confirmed')`,
+         (client_id, therapist_id, service_id, scheduled_at, duration_minutes, status,
+          first_utm_source, first_utm_medium, first_utm_campaign,
+          last_utm_source, last_utm_medium, last_utm_campaign)
+       VALUES ($1, $2, $3, $4, 60, 'confirmed',
+               'google', 'cpc', 'spring_promo', 'google', 'cpc', 'spring_promo')`,
       [clientUserId, seededUserIds['sarah@atlasmassage.com'], swedish.id, `${nextTuesday}T10:00:00Z`]
     );
-    // Marcus has a 13:00 appointment next Wednesday
+    // Marcus has a 13:00 appointment next Wednesday (discovered via newsletter, booked via Instagram).
     await client.query(
       `INSERT INTO appointments
-         (client_id, therapist_id, service_id, scheduled_at, duration_minutes, status)
-       VALUES ($1, $2, $3, $4, 60, 'confirmed')`,
+         (client_id, therapist_id, service_id, scheduled_at, duration_minutes, status,
+          first_utm_source, first_utm_medium, first_utm_campaign,
+          last_utm_source, last_utm_medium, last_utm_campaign)
+       VALUES ($1, $2, $3, $4, 60, 'confirmed',
+               'newsletter', 'email', 'june_digest', 'instagram', 'social', 'summer_launch')`,
       [clientUserId, seededUserIds['marcus@atlasmassage.com'], swedish.id, `${nextWednesday}T13:00:00Z`]
     );
     logger.info('seed_appointments', { count: 2 });

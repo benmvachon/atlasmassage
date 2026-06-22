@@ -26,6 +26,8 @@ import BusinessDetailsPage from '../pages/owner/BusinessDetailsPage.jsx';
 import TherapistManagementPage from '../pages/owner/TherapistManagementPage.jsx';
 import AppointmentsCalendarPage from '../pages/owner/AppointmentsCalendarPage.jsx';
 import RevenueDashboardPage from '../pages/owner/RevenueDashboardPage.jsx';
+import MarketingSourcesPage from '../pages/owner/MarketingSourcesPage.jsx';
+import MarketingAnalyticsPage from '../pages/owner/MarketingAnalyticsPage.jsx';
 import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
 import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
 import FeedbackPage from '../pages/FeedbackPage.jsx';
@@ -72,6 +74,8 @@ export default function AppRoutes() {
         <Route path="/owner/appointments" element={<AppointmentsCalendarPage />} />
         <Route path="/owner/transfers" element={<TransferRequestsPage />} />
         <Route path="/owner/revenue" element={<RevenueDashboardPage />} />
+        <Route path="/owner/sources" element={<MarketingSourcesPage />} />
+        <Route path="/owner/analytics" element={<MarketingAnalyticsPage />} />
         <Route path="/owner/business" element={<BusinessDetailsPage />} />
         <Route path="/owner/therapists" element={<TherapistManagementPage />} />
         <Route path="/owner/testimonials" element={<TestimonialsManagementPage />} />
