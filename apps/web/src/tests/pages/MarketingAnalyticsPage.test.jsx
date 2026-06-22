@@ -31,6 +31,7 @@ jest.mock('../../services/adminService.js', () => ({
 // Controllable IntersectionObserver so tests can simulate the sentinel scrolling into view.
 let lastObserverCb = null;
 beforeAll(() => {
+  // eslint-disable-next-line no-undef
   global.IntersectionObserver = class {
     constructor(cb) { lastObserverCb = cb; }
     observe() {}
