@@ -6,6 +6,8 @@ const OWNER_NAV_ITEMS = [
   { to: '/owner/appointments',   label: 'Calendar' },
   { to: '/owner/transfers',      label: 'Transfers' },
   { to: '/owner/revenue',        label: 'Revenue' },
+  { to: '/owner/sources',        label: 'Marketing' },
+  { to: '/owner/analytics',      label: 'Analytics' },
   { to: '/owner/business',       label: 'Business Details' },
   { to: '/owner/therapists',     label: 'Therapists' },
   { to: '/owner/testimonials',   label: 'Testimonials' },

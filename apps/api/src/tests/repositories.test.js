@@ -837,4 +837,103 @@ describe('AppointmentRepository', () => {
     expect(sql).toContain('therapist_id');
     expect(params).toContain('t1');
   });
+
+  it('create writes UTM attribution columns and params', async () => {
+    const pool = makePool([APPT_ROW]);
+    await new AppointmentRepository(pool).create({
+      clientId: 'u1', therapistId: 't1', serviceId: 's1', bedId: 'b1',
+      scheduledAt: '2030-06-15T10:00:00Z', durationMinutes: 60,
+      firstUtmSource: 'google', firstUtmMedium: 'cpc', firstUtmCampaign: 'spring',
+      lastUtmSource: 'instagram', lastUtmMedium: 'social', lastUtmCampaign: 'summer',
+    });
+    const [sql, params] = pool.query.mock.calls[0];
+    expect(sql).toContain('first_utm_source');
+    expect(sql).toContain('last_utm_campaign');
+    expect(params).toEqual(expect.arrayContaining(['google', 'cpc', 'spring', 'instagram', 'social', 'summer']));
+  });
+
+  it('getSourceAttributionStats groups by first-touch source by default', async () => {
+    const pool = {
+      query: jest.fn()
+        .mockResolvedValueOnce({ rows: [{ source: 'google', appointment_count: 3, total_cents: 27000 }] })
+        .mockResolvedValueOnce({ rows: [{ source: 'google', medium: 'cpc', campaign: 'spring', appointment_count: 3, total_cents: 27000 }] })
+        .mockResolvedValueOnce({ rows: [{ appointment_count: 3, total_cents: 27000 }] }),
+    };
+    const result = await new AppointmentRepository(pool).getSourceAttributionStats({ start: '2030-06-01', end: '2030-06-30' });
+    expect(result.touch).toBe('first');
+    expect(pool.query.mock.calls[0][0]).toContain('first_utm_source');
+    expect(result.bySource[0].source).toBe('google');
+    expect(result.summary.appointment_count).toBe(3);
+  });
+
+  it('getSourceAttributionStats uses last-touch columns when requested', async () => {
+    const pool = { query: jest.fn().mockResolvedValue({ rows: [] }) };
+    await new AppointmentRepository(pool).getSourceAttributionStats({ start: '2030-06-01', end: '2030-06-30', touch: 'last' });
+    expect(pool.query.mock.calls[0][0]).toContain('last_utm_source');
+  });
+
+  it('getAttributionTimeseries groups by date and the selected touch source', async () => {
+    const pool = makePool([{ date: '2030-06-15', source: 'google', appointment_count: 2, total_cents: 18000 }]);
+    const result = await new AppointmentRepository(pool).getAttributionTimeseries({ start: '2030-06-01', end: '2030-06-30', touch: 'last' });
+    const [sql] = pool.query.mock.calls[0];
+    expect(sql).toContain('scheduled_at::date');
+    expect(sql).toContain('last_utm_source');
+    expect(sql).toContain('GROUP BY 1, 2');
+    expect(result.touch).toBe('last');
+    expect(result.series[0].date).toBe('2030-06-15');
+  });
+
+  it('listAttributedAppointments paginates with keyset and reports nextCursor when more rows exist', async () => {
+    // Repo fetches limit+1 rows to detect a further page; request limit 2 → return 3.
+    const rows = [
+      { id: 'a1', scheduled_at: '2030-06-17T10:00:00.000Z' },
+      { id: 'a2', scheduled_at: '2030-06-16T10:00:00.000Z' },
+      { id: 'a3', scheduled_at: '2030-06-15T10:00:00.000Z' },
+    ];
+    const pool = makePool(rows);
+    const result = await new AppointmentRepository(pool).listAttributedAppointments({
+      start: '2030-06-01', end: '2030-06-30', limit: 2,
+    });
+    // Only `limit` rows are returned to the caller…
+    expect(result.rows).toHaveLength(2);
+    // …and the cursor points at the last returned row, not the peeked extra.
+    expect(result.nextCursor).toEqual({ scheduledAt: '2030-06-16T10:00:00.000Z', id: 'a2' });
+    const [, params] = pool.query.mock.calls[0];
+    expect(params).toContain(3); // limit + 1
+  });
+
+  it('listAttributedAppointments returns no cursor on the final page', async () => {
+    const pool = makePool([{ id: 'a1', scheduled_at: '2030-06-17T10:00:00.000Z' }]);
+    const result = await new AppointmentRepository(pool).listAttributedAppointments({
+      start: '2030-06-01', end: '2030-06-30', limit: 25,
+    });
+    expect(result.rows).toHaveLength(1);
+    expect(result.nextCursor).toBeNull();
+  });
+
+  it('listAttributedAppointments applies source/medium/campaign and keyset cursor filters', async () => {
+    const pool = makePool([]);
+    await new AppointmentRepository(pool).listAttributedAppointments({
+      start: '2030-06-01', end: '2030-06-30', touch: 'last',
+      source: 'google', medium: 'cpc', campaign: 'spring', status: 'completed',
+      cursor: { scheduledAt: '2030-06-16T10:00:00.000Z', id: 'a2' },
+    });
+    const [sql, params] = pool.query.mock.calls[0];
+    expect(sql).toContain('last_utm_source = $');
+    expect(sql).toContain('last_utm_medium = $');
+    expect(sql).toContain('last_utm_campaign = $');
+    expect(sql).toContain('a.status = $');
+    expect(sql).toContain('(a.scheduled_at, a.id) <');
+    expect(params).toEqual(expect.arrayContaining(['google', 'cpc', 'spring', 'completed', 'a2']));
+  });
+
+  it('listAttributedAppointments treats the Direct / Organic source as NULL', async () => {
+    const pool = makePool([]);
+    await new AppointmentRepository(pool).listAttributedAppointments({
+      start: '2030-06-01', end: '2030-06-30', source: 'Direct / Organic',
+    });
+    const [sql, params] = pool.query.mock.calls[0];
+    expect(sql).toContain('first_utm_source IS NULL');
+    expect(params).not.toContain('Direct / Organic');
+  });
 });

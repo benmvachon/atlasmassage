@@ -60,6 +60,35 @@ export const adminService = {
     return api.get(`/admin/revenue?${params}`);
   },
 
+  // Marketing attribution
+  getMarketingSources: (start, end, touch) => {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    if (touch) params.set('touch', touch);
+    return api.get(`/admin/marketing-sources?${params}`);
+  },
+  getAttributionTimeseries: (start, end, touch) => {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    if (touch) params.set('touch', touch);
+    return api.get(`/admin/attribution/timeseries?${params}`);
+  },
+  listAttributedAppointments: ({ start, end, touch, source, medium, campaign, status, cursor, limit } = {}) => {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    if (touch) params.set('touch', touch);
+    if (source) params.set('source', source);
+    if (medium) params.set('medium', medium);
+    if (campaign) params.set('campaign', campaign);
+    if (status) params.set('status', status);
+    if (cursor) params.set('cursor', cursor);
+    if (limit) params.set('limit', String(limit));
+    return api.get(`/admin/attribution/appointments?${params}`);
+  },
+
   // Testimonials
   listTestimonials: () => api.get('/admin/testimonials'),
   createTestimonial: (data) => api.post('/admin/testimonials', data),

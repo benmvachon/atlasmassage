@@ -272,6 +272,164 @@ export class AppointmentRepository {
     };
   }
 
+  async getSourceAttributionStats({ start, end, touch = 'first' }) {
+    // Choose first-touch (origin) vs last-touch (converting visit) columns.
+    const prefix = touch === 'last' ? 'last' : 'first';
+    const sourceCol = `${prefix}_utm_source`;
+    const mediumCol = `${prefix}_utm_medium`;
+    const campaignCol = `${prefix}_utm_campaign`;
+
+    const [bySourceRows, byCampaignRows, summaryRows] = await Promise.all([
+      this.pool.query(
+        `SELECT
+           COALESCE(a.${sourceCol}, 'Direct / Organic') AS source,
+           COUNT(a.id)::int           AS appointment_count,
+           SUM(s.price_cents)::bigint AS total_cents
+         FROM appointments a
+         JOIN services s ON s.id = a.service_id
+         WHERE a.status IN ('confirmed','completed')
+           AND a.scheduled_at::date >= $1::date
+           AND a.scheduled_at::date <= $2::date
+         GROUP BY 1
+         ORDER BY total_cents DESC NULLS LAST`,
+        [start, end]
+      ),
+      this.pool.query(
+        `SELECT
+           COALESCE(a.${sourceCol}, 'Direct / Organic') AS source,
+           a.${mediumCol}             AS medium,
+           a.${campaignCol}           AS campaign,
+           COUNT(a.id)::int           AS appointment_count,
+           SUM(s.price_cents)::bigint AS total_cents
+         FROM appointments a
+         JOIN services s ON s.id = a.service_id
+         WHERE a.status IN ('confirmed','completed')
+           AND a.scheduled_at::date >= $1::date
+           AND a.scheduled_at::date <= $2::date
+         GROUP BY 1, 2, 3
+         ORDER BY total_cents DESC NULLS LAST`,
+        [start, end]
+      ),
+      this.pool.query(
+        `SELECT
+           COUNT(a.id)::int           AS appointment_count,
+           SUM(s.price_cents)::bigint AS total_cents
+         FROM appointments a
+         JOIN services s ON s.id = a.service_id
+         WHERE a.status IN ('confirmed','completed')
+           AND a.scheduled_at::date >= $1::date
+           AND a.scheduled_at::date <= $2::date`,
+        [start, end]
+      ),
+    ]);
+
+    return {
+      touch: prefix,
+      bySource:   bySourceRows.rows,
+      byCampaign: byCampaignRows.rows,
+      summary:    summaryRows.rows[0],
+    };
+  }
+
+  // Daily buckets of attributed bookings, split by the selected touch's source, for the
+  // time-series visualization. The frontend pivots {date, source} into a stacked series.
+  async getAttributionTimeseries({ start, end, touch = 'first' }) {
+    const prefix = touch === 'last' ? 'last' : 'first';
+    const sourceCol = `${prefix}_utm_source`;
+
+    const { rows } = await this.pool.query(
+      `SELECT
+         a.scheduled_at::date::text AS date,
+         COALESCE(a.${sourceCol}, 'Direct / Organic') AS source,
+         COUNT(a.id)::int               AS appointment_count,
+         COALESCE(SUM(s.price_cents), 0)::bigint AS total_cents
+       FROM appointments a
+       JOIN services s ON s.id = a.service_id
+       WHERE a.status IN ('confirmed','completed')
+         AND a.scheduled_at::date >= $1::date
+         AND a.scheduled_at::date <= $2::date
+       GROUP BY 1, 2
+       ORDER BY 1 ASC`,
+      [start, end]
+    );
+    return { touch: prefix, series: rows };
+  }
+
+  // Keyset-paginated list of individual attributed appointments for the infinite-scroll
+  // table. Ordered newest-first by (scheduled_at, id); the cursor is the last row seen.
+  async listAttributedAppointments({
+    start, end, touch = 'first', source, medium, campaign, status, limit = 25, cursor = null,
+  }) {
+    const prefix = touch === 'last' ? 'last' : 'first';
+    const sourceCol = `${prefix}_utm_source`;
+    const mediumCol = `${prefix}_utm_medium`;
+    const campaignCol = `${prefix}_utm_campaign`;
+
+    const params = [start, end];
+    const where = [
+      `a.scheduled_at::date >= $1::date`,
+      `a.scheduled_at::date <= $2::date`,
+    ];
+
+    if (['confirmed', 'completed', 'cancelled', 'pending'].includes(status)) {
+      where.push(`a.status = $${params.push(status)}`);
+    } else {
+      where.push(`a.status IN ('confirmed','completed')`);
+    }
+
+    // 'Direct / Organic' is the synthetic label for NULL source used across the dashboard.
+    if (source) {
+      where.push(source === 'Direct / Organic'
+        ? `a.${sourceCol} IS NULL`
+        : `a.${sourceCol} = $${params.push(source)}`);
+    }
+    if (medium) where.push(`a.${mediumCol} = $${params.push(medium)}`);
+    if (campaign) where.push(`a.${campaignCol} = $${params.push(campaign)}`);
+
+    if (cursor?.scheduledAt && cursor?.id) {
+      const tsParam = params.push(cursor.scheduledAt);
+      const idParam = params.push(cursor.id);
+      where.push(`(a.scheduled_at, a.id) < ($${tsParam}::timestamptz, $${idParam}::uuid)`);
+    }
+
+    const lim = Math.min(Math.max(parseInt(limit, 10) || 25, 1), 100);
+    const limParam = params.push(lim + 1); // fetch one extra row to detect a further page
+
+    const { rows } = await this.pool.query(
+      `SELECT
+         a.id, a.scheduled_at, a.status, a.duration_minutes,
+         s.name AS service_name, s.price_cents,
+         COALESCE(cl.first_name || ' ' || cl.last_name, a.guest_name) AS client_name,
+         COALESCE(cl.email, a.guest_email) AS client_email,
+         th.first_name AS therapist_first_name,
+         th.last_name  AS therapist_last_name,
+         a.first_utm_source, a.first_utm_medium, a.first_utm_campaign,
+         a.last_utm_source, a.last_utm_medium, a.last_utm_campaign
+       FROM appointments a
+       JOIN services s   ON s.id = a.service_id
+       JOIN users th     ON th.id = a.therapist_id
+       LEFT JOIN users cl ON cl.id = a.client_id
+       WHERE ${where.join(' AND ')}
+       ORDER BY a.scheduled_at DESC, a.id DESC
+       LIMIT $${limParam}`,
+      params
+    );
+
+    const hasMore = rows.length > lim;
+    const page = hasMore ? rows.slice(0, lim) : rows;
+    const last = page[page.length - 1];
+    const nextCursor = hasMore && last
+      ? {
+          scheduledAt: last.scheduled_at instanceof Date
+            ? last.scheduled_at.toISOString()
+            : last.scheduled_at,
+          id: last.id,
+        }
+      : null;
+
+    return { rows: page, nextCursor };
+  }
+
   async getDashboardStats() {
     const today = new Date().toISOString().slice(0, 10);
     const weekStart = new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
@@ -344,19 +502,25 @@ export class AppointmentRepository {
     notes, guestName, guestEmail, guestPhone,
     guestAddressLine1, guestAddressLine2, guestCity, guestState, guestZip,
     waiverSignature, consentSignatureId, healthRecordId,
+    firstUtmSource, firstUtmMedium, firstUtmCampaign, lastUtmSource, lastUtmMedium, lastUtmCampaign,
   }) {
     const { rows } = await this.pool.query(
       `INSERT INTO appointments
          (client_id, therapist_id, service_id, bed_id, scheduled_at, duration_minutes,
           notes, guest_name, guest_email, guest_phone,
           guest_address_line1, guest_address_line2, guest_city, guest_state, guest_zip,
-          waiver_signature, waiver_signed_at, consent_signature_id, health_record_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+          waiver_signature, waiver_signed_at, consent_signature_id, health_record_id,
+          first_utm_source, first_utm_medium, first_utm_campaign,
+          last_utm_source, last_utm_medium, last_utm_campaign)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
+               $20, $21, $22, $23, $24, $25)
        RETURNING *`,
       [clientId ?? null, therapistId, serviceId, bedId ?? null, scheduledAt, durationMinutes,
        notes ?? null, guestName ?? null, guestEmail ?? null, guestPhone ?? null,
        guestAddressLine1 ?? null, guestAddressLine2 ?? null, guestCity ?? null, guestState ?? null, guestZip ?? null,
-       waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null, healthRecordId ?? null]
+       waiverSignature ?? null, waiverSignature ? new Date() : null, consentSignatureId ?? null, healthRecordId ?? null,
+       firstUtmSource ?? null, firstUtmMedium ?? null, firstUtmCampaign ?? null,
+       lastUtmSource ?? null, lastUtmMedium ?? null, lastUtmCampaign ?? null]
     );
     return rows[0];
   }

@@ -58,6 +58,11 @@ router.post('/appointments/:id/record-payment', adminController.recordInPersonPa
 // ── Revenue ───────────────────────────────────────────────────────────────────
 router.get('/revenue', adminController.getRevenue);
 
+// ── Marketing attribution ──────────────────────────────────────────────────────
+router.get('/marketing-sources', adminController.getMarketingSources);
+router.get('/attribution/timeseries', adminController.getAttributionTimeseries);
+router.get('/attribution/appointments', adminController.listAttributedAppointments);
+
 // ── Transfer requests ─────────────────────────────────────────────────────────
 router.get('/transfer-requests', adminController.listTransferRequests);
 router.post('/transfer-requests/:id/approve', adminController.approveTransferRequest);

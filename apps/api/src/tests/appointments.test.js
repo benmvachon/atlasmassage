@@ -282,6 +282,37 @@ describe('POST /api/v1/appointments', () => {
     );
   });
 
+  it('persists sanitized UTM attribution on the appointment', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send({
+        ...body,
+        firstUtmSource: '  Google  ', firstUtmMedium: 'CPC', firstUtmCampaign: 'Spring_Promo',
+        lastUtmSource: 'Instagram', lastUtmMedium: 'Social', lastUtmCampaign: 'Summer_Launch',
+      });
+    expect(res.status).toBe(201);
+    expect(mockApptRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstUtmSource: 'google', firstUtmMedium: 'cpc', firstUtmCampaign: 'Spring_Promo',
+        lastUtmSource: 'instagram', lastUtmMedium: 'social', lastUtmCampaign: 'Summer_Launch',
+      })
+    );
+  });
+
+  it('leaves attribution null when no UTM params are provided', async () => {
+    const res = await request(app)
+      .post('/api/v1/appointments')
+      .set('Authorization', bearer(CLIENT_ID))
+      .send(body);
+    expect(res.status).toBe(201);
+    expect(mockApptRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstUtmSource: null, lastUtmSource: null,
+      })
+    );
+  });
+
   it('returns 409 when no therapist is available for any-therapist booking', async () => {
     mockGenerateSlots.mockReturnValue([
       { startTime: '10:00', endTime: '11:00', availableTherapists: [] },

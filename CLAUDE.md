@@ -96,7 +96,7 @@ import { jest } from '@jest/globals';
 
 ## ADRs
 
-`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0012**. Never reuse or renumber; supersede with a new ADR instead.
+`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0013**. Never reuse or renumber; supersede with a new ADR instead.
 
 ## Scaffolding origin
 

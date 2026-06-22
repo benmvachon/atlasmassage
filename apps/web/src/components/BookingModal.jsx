@@ -4,6 +4,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap.js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { bookingService } from '../services/bookingService.js';
+import { getAttribution } from '../services/attribution.js';
 import { paymentService } from '../services/paymentService.js';
 import { membershipService } from '../services/membershipService.js';
 import { giftCardService } from '../services/giftCardService.js';
@@ -518,6 +519,8 @@ function BookingWizard({
           healthPregnancyStatus: pregnancyStatus || undefined,
           healthInjuries: injuries.trim() || undefined,
         }),
+        // Marketing attribution captured from the UTM params that brought them here.
+        ...getAttribution(),
       });
 
       const { appointment, clientSecret } = result;

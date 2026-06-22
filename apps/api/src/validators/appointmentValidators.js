@@ -51,6 +51,12 @@ export const createAppointmentRules = [
   body('healthDateOfBirth')
     .optional({ values: 'falsy' })
     .isDate({ format: 'YYYY-MM-DD' }).withMessage('healthDateOfBirth must be a valid date (YYYY-MM-DD)'),
+  body('firstUtmSource').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('firstUtmSource must be 255 characters or fewer'),
+  body('firstUtmMedium').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('firstUtmMedium must be 255 characters or fewer'),
+  body('firstUtmCampaign').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('firstUtmCampaign must be 255 characters or fewer'),
+  body('lastUtmSource').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('lastUtmSource must be 255 characters or fewer'),
+  body('lastUtmMedium').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('lastUtmMedium must be 255 characters or fewer'),
+  body('lastUtmCampaign').optional({ values: 'falsy' }).isString().isLength({ max: 255 }).withMessage('lastUtmCampaign must be 255 characters or fewer'),
 ];
 
 export const soapNotesRules = [

@@ -504,7 +504,7 @@ test.describe('Service duration constraints', () => {
     await expect(select.locator('option')).toHaveCount(3);
   });
 
-  test('selecting a 90-min service updates the end time in the slot summary', async ({ page }) => {
+  test('slot summary shows the start time only and the service dropdown carries duration', async ({ page }) => {
     await mockValidateAddress(page);
     await mockStripeDisabled(page);
 
@@ -515,14 +515,19 @@ test.describe('Service duration constraints', () => {
     // First slot (09:00) — all three durations fit
     await navigateToPaymentStep(page, { slotSelector: 'first', guestEmail: 'e2e-endtime@test.invalid' });
 
+    // The slot summary intentionally shows only the start time — the end time
+    // varies by service and is misleading before a service is chosen.
     const summary = page.locator('.booking-modal__slot-summary');
+    await expect(summary).toContainText('9:00 AM');
+    await expect(summary).not.toContainText('–');
 
-    // Default service (60 min): end time is 10:00 AM
-    await expect(summary).toContainText('10:00 AM');
+    // Duration is conveyed through the service options instead.
+    await expect(page.locator(`#bm-service option[value="${serviceId90}"]`)).toContainText('90 min');
 
-    // Switch to 90-min service → end time should become 10:30 AM
+    // Selecting the 90-min service keeps the start-time-only summary.
     await page.selectOption('#bm-service', { value: serviceId90 });
-    await expect(summary).toContainText('10:30 AM');
+    await expect(summary).toContainText('9:00 AM');
+    await expect(summary).not.toContainText('–');
   });
 });
 
