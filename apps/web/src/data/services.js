@@ -1,9 +1,9 @@
 export const LEFT_SERVICES = [
-  {
-    name: 'Hot Stone Application',
-    description:
-      'Heated basalt stones are placed and worked across the body, driving warmth into deep muscle tissue and settling the nervous system.',
-  },
+  // {
+  //   name: 'Hot Stone Application',
+  //   description:
+  //     'Heated basalt stones are placed and worked across the body, driving warmth into deep muscle tissue and settling the nervous system.',
+  // },
   {
     name: 'Deep Tissue & Myofascial Work',
     description:
@@ -17,11 +17,11 @@ export const LEFT_SERVICES = [
 ];
 
 export const RIGHT_SERVICES = [
-  {
-    name: 'Cupping',
-    description:
-      'Suction cups lift soft tissue to encourage fluid movement, relieving adhesions and decompressing overworked muscles.',
-  },
+  // {
+  //   name: 'Cupping',
+  //   description:
+  //     'Suction cups lift soft tissue to encourage fluid movement, relieving adhesions and decompressing overworked muscles.',
+  // },
   {
     name: 'Assisted Stretching',
     description:

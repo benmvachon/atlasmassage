@@ -21,3 +21,4 @@ test-results/
 .agents/
 .windsurf/
 skills-lock.json
+.kvenv/

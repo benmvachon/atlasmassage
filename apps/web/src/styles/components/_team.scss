@@ -165,6 +165,14 @@
   padding-top: $space-4;
 }
 
+.team__mission-statement {
+  padding: $space-10;
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.75;
+  color: $color-text-muted;
+}
+
 // ── Owner dashboard: headshot upload ─────────────────────────────────────────
 
 .owner-headshot-upload {
