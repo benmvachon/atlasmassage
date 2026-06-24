@@ -10,6 +10,7 @@ import OwnerRoute from '../components/OwnerRoute.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import ServicesPage from '../pages/ServicesPage.jsx';
 import TestimonialsPage from '../pages/TestimonialsPage.jsx';
+import AnatomyPage from '../pages/AnatomyPage.jsx';
 import TeamPage from '../pages/TeamPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import SignupPage from '../pages/SignupPage.jsx';
@@ -43,6 +44,7 @@ export default function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/anatomy" element={<AnatomyPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/memberships" element={<MembershipsPage />} />

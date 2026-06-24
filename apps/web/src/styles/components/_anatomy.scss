@@ -1,0 +1,350 @@
+@use '../abstracts/variables' as *;
+
+// ── Anatomy / kinesiology reference page ──────────────────────────────────────
+
+.page--anatomy {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding-bottom: $space-16;
+}
+
+.anatomy__intro {
+  max-width: 720px;
+  margin: 0 auto $space-10;
+  text-align: center;
+}
+
+.anatomy__heading {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  letter-spacing: 0.04em;
+  margin-bottom: $space-4;
+}
+
+.anatomy__tagline {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.7;
+  color: $color-text-muted;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+
+.anatomy__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-6;
+  justify-content: center;
+  margin-bottom: $space-6;
+}
+
+.anatomy__filter {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 240px;
+}
+
+.anatomy__filter-label {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-text-muted;
+  font-weight: 600;
+}
+
+.anatomy__select {
+  font-family: $font-family-ui;
+  font-size: $font-size-md;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-white;
+  color: $color-text;
+  cursor: pointer;
+
+  &:focus { outline: 2px solid $color-primary; outline-offset: 1px; }
+  &:disabled { background: $color-bg-alt; color: $color-text-muted; cursor: not-allowed; }
+}
+
+// ── Breadcrumbs ───────────────────────────────────────────────────────────────
+
+.anatomy__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+
+  .crumb {
+    border: none;
+    background: none;
+    color: $color-primary;
+    cursor: pointer;
+    padding: $space-1 $space-2;
+    border-radius: $border-radius-sm;
+
+    &:hover { background: $color-primary-tint-sm; }
+    &:not(:last-child)::after { content: '›'; margin-left: $space-2; color: $color-text-muted; }
+  }
+  .crumb--reset { color: $color-text-muted; }
+  .crumb--current { color: $color-text; font-weight: 600; cursor: default; }
+}
+
+// ── Landing: joint picker ─────────────────────────────────────────────────────
+
+.anatomy-landing__lead {
+  max-width: 640px;
+  margin: 0 auto $space-8;
+  text-align: center;
+  font-family: $font-family-base;
+  line-height: 1.7;
+  color: $color-text-muted;
+}
+
+.joint-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $space-4;
+}
+
+.joint-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  text-align: left;
+  padding: $space-5;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  background: $color-white;
+  cursor: pointer;
+  transition: transform $transition-fast, box-shadow $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+    border-color: $color-primary-border-md;
+  }
+  &__name { font-family: $font-family-base; font-size: $font-size-lg; color: $color-primary-dark; font-weight: 700; }
+  &__region { font-family: $font-family-ui; font-size: $font-size-sm; color: $color-text; }
+  &__type { font-family: $font-family-ui; font-size: $font-size-xs; color: $color-text-muted; }
+}
+
+// ── View shell ────────────────────────────────────────────────────────────────
+
+.anatomy-view__header { margin-bottom: $space-8; }
+
+.anatomy-view__title {
+  font-family: $font-family-base;
+  font-size: $font-size-xl;
+  color: $color-primary-dark;
+  margin-bottom: $space-2;
+}
+
+.anatomy-view__meta {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-secondary-dark;
+  margin-bottom: $space-3;
+}
+
+.anatomy-view__desc {
+  font-family: $font-family-base;
+  line-height: 1.7;
+  color: $color-text;
+  max-width: 760px;
+  margin-bottom: $space-3;
+}
+
+.anatomy-view__hint {
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+// ── Muscle table (joint overview) ─────────────────────────────────────────────
+
+.muscle-table { list-style: none; display: flex; flex-direction: column; gap: $space-2; }
+
+.muscle-table__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-white;
+}
+
+.muscle-table__actions { display: flex; flex-wrap: wrap; gap: $space-2; margin-left: auto; }
+
+.action-tag {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  padding: $space-1 $space-3;
+  border: 1px solid $color-secondary;
+  border-radius: $border-radius-full;
+  background: $color-secondary-light;
+  color: $color-secondary-dark;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover { background: $color-secondary; color: $color-white; }
+  &--prime { border-color: $color-primary; background: $color-primary-tint-md; color: $color-primary-dark; font-weight: 600; }
+}
+
+// ── Muscle chip (selectable muscle button) ────────────────────────────────────
+
+.muscle-chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
+  text-align: left;
+  padding: $space-2 $space-3;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background: $color-white;
+  cursor: pointer;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:hover { border-color: $color-primary; box-shadow: $shadow-sm; }
+  &__name { font-family: $font-family-base; color: $color-text; font-weight: 600; }
+  &__group { font-family: $font-family-ui; font-size: $font-size-xs; color: $color-text-muted; }
+  &__note { font-family: $font-family-ui; font-size: $font-size-xs; color: $color-text-muted; font-style: italic; flex-basis: 100%; }
+  &__depth {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    padding: 0 $space-2;
+    border-radius: $border-radius-full;
+    background: $color-bg-alt;
+    color: $color-text-muted;
+
+    &--superficial { background: #e8f0e8; color: #2f6b3a; }
+    &--intermediate { background: #eef0e0; color: #6b6b2f; }
+    &--middle { background: #f0ece0; color: #8a6a33; }
+    &--deep { background: #e9e4ef; color: #5a3f7a; }
+  }
+}
+
+// ── Role grid (agonist / synergist / antagonist / fixator) ────────────────────
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $space-6;
+}
+
+.role-list {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-5;
+  background: $color-white;
+  border-top: 4px solid $color-border;
+
+  &--agonist { border-top-color: $color-primary; }
+  &--synergist { border-top-color: $color-primary-light; }
+  &--antagonist { border-top-color: $color-secondary-dark; }
+  &--fixator { border-top-color: $lilac-ash; }
+
+  &__title {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $color-text;
+    margin-bottom: $space-4;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+  &__count {
+    font-size: $font-size-xs;
+    background: $color-bg-alt;
+    color: $color-text-muted;
+    border-radius: $border-radius-full;
+    padding: 0 $space-2;
+  }
+  &__items { list-style: none; display: flex; flex-direction: column; gap: $space-2; }
+  &__empty { font-family: $font-family-ui; font-size: $font-size-sm; color: $color-text-muted; font-style: italic; }
+}
+
+// ── Muscle detail ─────────────────────────────────────────────────────────────
+
+.muscle-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $space-4;
+  margin-bottom: $space-10;
+
+  div {
+    padding: $space-4;
+    background: $color-bg-alt;
+    border-radius: $border-radius-md;
+  }
+  dt {
+    font-family: $font-family-ui;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $color-text-muted;
+    margin-bottom: $space-1;
+  }
+  dd { font-family: $font-family-base; color: $color-text; line-height: 1.6; }
+}
+
+.muscle-detail__subhead {
+  font-family: $font-family-base;
+  font-size: $font-size-lg;
+  color: $color-primary-dark;
+  margin-bottom: $space-4;
+}
+
+.muscle-actions { display: flex; flex-direction: column; gap: $space-6; }
+
+.muscle-action-card {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-5;
+  background: $color-white;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $space-2;
+    margin-bottom: $space-4;
+    padding-bottom: $space-3;
+    border-bottom: 1px solid $color-bg-alt;
+  }
+  &__title {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: $font-family-base;
+    font-size: $font-size-lg;
+    color: $color-primary-dark;
+    padding: 0;
+    &:hover { text-decoration: underline; }
+  }
+  &__joint { font-size: $font-size-sm; color: $color-text-muted; }
+  &__prime { font-size: $font-size-xs; color: $color-primary; }
+  &__plane { font-family: $font-family-ui; font-size: $font-size-xs; color: $color-secondary-dark; }
+  &__roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: $space-4; }
+}
+
+.anatomy__loading, .anatomy__error {
+  text-align: center;
+  font-family: $font-family-ui;
+  color: $color-text-muted;
+  padding: $space-12 0;
+}
+.anatomy__error { color: $color-error; }

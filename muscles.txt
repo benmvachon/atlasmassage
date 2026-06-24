@@ -1,0 +1,3197 @@
+== Table ==
+{{sticky table start}}
+{{Static row numbers}}{{sort under}}
+{{row hover highlight}}
+{| class="wikitable sortable static-row-numbers sort-under mw-datatable plainrowheaders sticky-table-head sticky-table-col1"
+|-
+! scope="col" | Muscle
+! scope="col" | Location
+! scope="col" | Origin
+! scope="col" | Insertion
+! scope="col" | Artery
+! scope="col" | Nerve
+! scope="col" | Action
+! scope="col" | [[Anatomical terms of muscle#Ag|Antagonist]]
+! scope="col" | O
+! scope="col" | TA
+|- style="vertical-align: top;"
+! scope="row" | [[Occipitalis muscle|occipitalis]]
+| head, [[occipitofrontalis muscle|occipitofrontalis]], back of skull (left/right)
+| [[superior nuchal line]] of [[occipital bone]], [[Mastoid part of the temporal bone|mastoid part]] of [[temporal bone]]
+| [[epicranial aponeurosis]]
+| [[occipital artery]]
+| [[facial nerve]] [CNVII], [[posterior auricular nerve]]
+| retracts [[scalp]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Frontalis muscle|frontalis]]
+| head, [[occipitofrontalis muscle|occipitofrontalis]], forehead (left/right)
+| skin of eyebrow and [[glabella]]
+| [[epicranial aponeurosis]]
+| [[ophthalmic artery]]
+| [[facial nerve]] [CNVII], [[Temporal branches of the facial nerve|temporal branch]]
+| wrinkles [[eyebrow]]
+| procerus, corrugator supercilii, and orbicularis oculi muscles<ref>{{Citation |last1=Pessino |first1=Kenneth |title=Anatomy, Head and Neck; Frontalis Muscle |date=2023 |url=https://www.ncbi.nlm.nih.gov/books/NBK557752/ |work=StatPearls |access-date=2023-07-02 |place=Treasure Island (FL) |publisher=StatPearls Publishing |pmid=32491684 |last2=Patel |first2=Jay |last3=Patel |first3=Bhupendra C.}}</ref>
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Orbicularis oculi muscle|orbicularis oculi]], orbital part
+| head, forehead/eyelid (left/right)
+| [[frontal bone]]
+| [[lateral palpebral raphe]]
+| [[ophthalmic artery]], [[zygomatico-orbital artery]], [[angular artery]]
+| [[facial nerve]] [CNVII], [[zygomatic branch]]
+| closes [[eyelids]] (voluntary, winking/squeezing)
+| [[levator palpebrae superioris muscle|levator palpebrae superioris]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Orbicularis oculi muscle|orbicularis oculi]], palpebral part
+| head, forehead/eyelid (left/right)
+| [[medial palpebral ligament]]
+| [[lateral palpebral raphe]]
+| [[ophthalmic artery]], [[zygomatico-orbital artery]], [[angular artery]]
+| [[facial nerve]] [CNVII], [[zygomatic branch]]
+| closes [[eyelids]] (involuntary, blinking/sleeping)
+| [[levator palpebrae superioris muscle|levator palpebrae superioris]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Orbicularis oculi muscle|orbicularis oculi]], deep palpebral <small>(lacrimal)</small> part
+| head, forehead/eyelid (left/right)
+| [[Lacrimal bone|posterior crest]] of [[lacrimal bone]]
+| Edges of eyelids
+| [[ophthalmic artery]], [[zygomatico-orbital artery]], [[angular artery]]
+| [[facial nerve]] [CNVII], [[zygomatic branch]]
+| facilitates tear ducts
+| ?
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Corrugator supercilii muscle|corrugator supercilii]]
+| head, eye (left/right)
+| [[Nasal part of frontal bone|nasal part]] of [[frontal bone]]
+| intermediate third of skin of [[eyebrow]]
+| [[ophthalmic artery]]
+| [[facial nerve]] [CNVII], [[zygomatic branch]]
+| moves skin of [[forehead]] medially and inferiorly (towards root of [[Human nose|nose]])
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Depressor supercilii muscle|depressor supercilii]]
+| head, eye (left/right)
+| [[Nasal part of frontal bone|nasal part]] of [[frontal bone]], medial rim of [[orbit]]
+| medial third of skin of [[eyebrow]]
+| [[ophthalmic artery]]
+| [[facial nerve]] [CNVII], [[zygomatic branch]]
+| moves skin of [[eyebrow]]s inferiorly
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Levator palpebrae superioris muscle|levator palpebrae superioris]]
+| head, extraocular (left/right)
+| [[sphenoid bone]]
+| [[tarsal plate]], upper [[eyelid]]
+| [[ophthalmic artery]]
+| [[oculomotor nerve]] [CNIII]
+| [[retracts]] and [[Elevation (kinesiology)|elevates]] [[eyelid]]
+| [[orbicularis oculi muscle|orbicularis oculi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[superior tarsal muscle|superior tarsal]]
+| head, extraocular (left/right)
+| underside of [[levator palpebrae superioris]]
+| [[superior tarsal plate]] of [[eyelid]]
+| [[ophthalmic artery]]
+| [[sympathetic nervous system]]
+| raises [[upper eyelid]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Superior rectus muscle|rectus, superior]]
+| head, eye, orbit (left/right)
+| [[annulus of Zinn]] at orbital apex
+| 7.5&nbsp;mm superior to [[corneal limbus]]
+| [[ophthalmic artery]]
+| [[oculomotor nerve]] [CNIII], [[Superior branch of oculomotor nerve|superior branch]]
+| [[adduction|adduct]]s, [[elevates]], and [[Anatomical terms of motion|medially rotates]] [[Human eye|eye]]
+| Oblique Superior and inferior
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Inferior rectus muscle|rectus, inferior]]
+| head, eye, orbit (left/right)
+| [[annulus of Zinn]] at orbital apex
+| 6.5&nbsp;mm inferior to [[corneal limbus]]
+| [[ophthalmic artery]]
+| [[oculomotor nerve]] [CNIII], [[Inferior branch of oculomotor nerve|inferior branch]]
+| [[adduction|adducts]] and [[depression (kinesiology)|depresses]] [[Human eye|eye]]
+| Oblique Superior and inferior
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Medial rectus muscle|rectus, medial]]
+| head, eye, orbit (left/right)
+| [[annulus of Zinn]] at orbital apex
+| 5.5&nbsp;mm medial to [[corneal limbus]]
+| [[ophthalmic artery]]
+| [[oculomotor nerve]] [CNIII], [[Inferior branch of oculomotor nerve|inferior branch]]
+| [[adduction|adduct]]s [[Human eye|eye]]
+| Oblique Superior and inferior
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Lateral rectus muscle|rectus, lateral]]
+| head, eye, orbit (left/right)
+| [[annulus of Zinn]] at orbital apex
+| 7&nbsp;mm temporal to [[corneal limbus]]
+| [[ophthalmic artery]]
+| [[abducens nerve]] [CNVI]
+| [[Abduction (kinesiology)|abducts]] [[Human eye|eye]]
+| Oblique Superior and inferior
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Superior oblique muscle|oblique, superior]]
+| head, extraocular (left/right)
+| [[annulus of Zinn]] at orbital apex, medial to [[optic canal]]
+| outer posterior quadrant of [[Human eyeball|eyeball]]
+| [[ophthalmic artery]], lateral muscular branch
+| [[trochlear nerve]] [CNIV]
+| [[Abduction (kinesiology)|abducts]], [[intorsion|intorts]], and [[Depression (kinesiology)|depress]] [[Human eye|eye]]
+| right medial, superior, and inferior recti (superior and inferior oblique muscles are the synergists)
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Inferior oblique muscle|oblique, inferior]]
+| head, extraocular (left/right)
+| orbital surface of [[maxilla]], lateral to [[lacrimal groove]]
+| laterally onto [[Human eyeball|eyeball]], deep to [[lateral rectus]], by a short flat tendon
+| [[ophthalmic artery]]
+| [[oculomotor nerve]] [CNIII]
+| [[Abduction (kinesiology)|abducts]], [[extorsion|extorts]], and [[Elevation (kinesiology)|elevates]] [[Human eye|eye]]
+| right medial, superior, and inferior recti (superior and inferior oblique muscles are the synergists)
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[temporoparietalis muscle|temporoparietalis]]
+| head, ear, outer ear (left/right)
+| [[auriculares muscles]]
+| [[epicranial aponeurosis]]
+| 
+| [[facial nerve]] [CNVII]
+| fixes galeal aponeurosis
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[anterior auricular muscle|auricularis anterior]]
+| head, ear, auricular, extrinsic (left/right)
+| [[temporal fascia]]
+| front of [[helix (ear)|helix]] of [[ear]]
+| [[posterior auricular artery]]
+| [[facial nerve]] [CNVII]
+| pulls [[Auricle (anatomy)|auricle]] forwards
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[superior auricular muscle|auricularis superior]]
+| head, ear, auricular, extrinsic (left/right)
+| [[epicranial aponeurosis]]
+| [[Anatomical terms of location|dorsocranial]] surface of [[Auricle (anatomy)|auricle]]
+| [[posterior auricular artery]]
+| [[facial nerve]] [CNVII]
+| pulls [[Auricle (anatomy)|auricle]] upwards
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[posterior auricular muscle|auricularis posterior]]
+| head, ear, auricular, extrinsic (left/right)
+| [[Mastoid part of the temporal bone|mastoid process]] of [[temporal bone]], [[tendon]] of [[Sternocleidomastoid muscle|sternocleidomastoid]]
+| dorsal part of [[Auricle (anatomy)|auricle]]
+| [[posterior auricular artery]]
+| [[facial nerve]] [CNVII]
+| pulls [[Auricle (anatomy)|auricle]] backwards
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[helicis major]]
+| head, ear, auricular, intrinsic (left/right)
+| [[Spina helicis]]
+| Anterior border of the [[helix (ear)|helix]]
+| [[Auricular branch of posterior auricular artery|Auricular branches]] of [[Posterior auricular artery|posterior auricular]] and [[Auricular branch of occipital artery|auricular branch]] of [[Occipital artery|occipital arteries]]
+| [[Facial nerve]]
+| depresses the anterior margin of the ear cartilage
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[helicis minor]]
+| head, ear, auricular, intrinsic (left/right)
+| Base of the [[helical crus]]
+| Anterior aspect of the helical crus
+| [[Auricular branch of posterior auricular artery|Auricular branches]] of [[Posterior auricular artery|posterior auricular]] and [[Auricular branch of occipital artery|auricular branch]] of [[Occipital artery|occipital arteries]]
+| [[Facial nerve]], [[Posterior auricular nerve]] branch
+| Adjusts the shape of the anterior margin of the ear cartilage
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[tragicus]]
+| head, ear, auricular, intrinsic (left/right)
+| Base of the [[tragus (ear)|tragus]]
+| Apex of the [[tragus (ear)|tragus]]
+| [[Auricular branch of posterior auricular artery|Auricular branches]] of [[Posterior auricular artery|posterior auricular]] and [[Auricular branch of occipital artery|auricular branch]] of [[Occipital artery|occipital arteries]]
+| [[Facial nerve]]
+| Increase the opening of the [[external acoustic meatus]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[antitragicus]]
+| head, ear, auricular, intrinsic (left/right)
+| Outer part of the [[antitragus]]
+| [[Cauda helicis]] and [[antihelix]]
+| [[Anterior auricular branches of superficial temporal artery|Auricular branch]] of [[superficial temporal artery|superficial temporal]] and [[Auricular branch of posterior auricular artery|auricular branches]] of [[posterior auricular artery]]
+| [[Facial nerve]]
+| Modifies the auricular shape
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Transverse muscle of auricle|auricle, transverse]]
+| head, ear, auricular, intrinsic (left/right)
+| Cranial surface of the [[eminentia conchae]]
+| Cranial surface of the [[eminentia scaphae]]
+| [[Auricular branch of posterior auricular artery|Auricular branches]] of [[Posterior auricular artery|posterior auricular]] and [[Auricular branch of occipital artery|auricular branch]] of [[Occipital artery|occipital arteries]]
+| [[Facial nerve]]
+| Flattens the cranial profile [[Pinna (anatomy)|outer ear]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[oblique muscle of auricle|auricle, oblique]]
+| head, ear, auricular, intrinsic (left/right)
+| ?
+| ?
+| ?
+| [[Facial nerve]], [[posterior auricular nerve]]
+| ?
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | Muscle of terminal notch<ref>{{Cite web |title=Muscle of terminal notch - e-Anatomy - IMAIOS |url=https://www.imaios.com/en/e-anatomy/anatomical-structure/muscle-of-terminal-notch-1541081620 |access-date=2023-07-27 |website=www.imaios.com |language=en}}</ref>
+| head, ear, auricular, intrinsic (left/right)
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Stapedius muscle|stapedius]]
+| head, ear, inner ear (left/right)
+| tip of pyramid of [[middle ear]]
+| neck of [[stapes]]
+| [[Stapedial branch of posterior auricular artery|stapedial branch]] of [[posterior auricular artery]]
+| [[nerve to the stapedius]] from [[facial nerve]] [CNVII]
+| reduces movement of [[stapes]], controls amplitude of [[sound|sound waves]] to [[inner ear]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Tensor tympani muscle|tensor tympani]]
+| head, ear, inner ear (left/right)
+| [[Eustachian tube]]
+| handle of [[malleus]]
+| [[superior tympanic artery]]
+| [[medial pterygoid nerve]] from [[mandibular nerve]] [CNV<sub>3</sub>]
+| tenses [[tympanic membrane]], controls amplitude of [[sound|sound waves]] to [[inner ear]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[procerus muscle|procerus]]
+| head, nose (left/right)
+| [[fascia]] over lower part of [[nasal bone]]
+| skin of lower part of [[forehead]] between [[eyebrow]]s
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| draws down medial angle of [[eyebrow]] (giving expressions of [[frowning]])
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Depressor septi nasi muscle|depressor septi nasi]]
+| head, nose (left/right)
+| [[incisive fossa]] of [[maxilla]]
+| [[nasal septum]] and back part of alar part of [[nasalis muscle|nasalis]]
+| [[superior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| [[Depression (kinesiology)|depresses]] [[nasal septum]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Levator labii superioris alaeque nasi muscle|levator nasolabialis]] <small>(levator labii superioris alaeque nasi)</small>
+| head, nose (left/right)
+| frontal process of [[maxilla]]
+| [[nostril]] and upper [[lip]]
+| [[superior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| [[wikt:dilates|dilates]] [[nostril]], [[Elevation (kinesiology)|elevates]] [[upper lip]], [[Elevation (kinesiology)|elevates]] [[wing of the nose|wing of nose]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[compressor naris|nasalis, transverse part]]
+| head, nose, nasalis, transverse part (left/right)
+| alveolar yoke of [[canine tooth]]
+| [[lateral nasal cartilage]]
+| [[superior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| compresses [[nostril]]s
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[dilator naris muscle|nasalis, alar part]]
+| head, nose, nasalis, alar part (left/right)
+| alveolar yoke of lateral incisor tooth, [[greater alar cartilage|greater]] and [[lesser alar cartilages]]
+| skin near margin of [[nostril]]
+| [[superior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| dilates [[nostril]]s
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[levator anguli oris]]
+| head, mouth (left/right)
+| [[maxilla]]
+| [[Modiolus (face)|modiolus of mouth]]
+| [[facial artery]]
+| [[facial nerve]] [CNVII]
+| [[Elevation (kinesiology)|elevates]] angle of [[Human mouth|mouth]] ([[smile]])
+| [[Depressor anguli oris muscle|depressor anguli oris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Depressor anguli oris muscle|depressor anguli oris]]
+| head, mouth (left/right)
+| [[Tubercle (anatomy)|tubercle]] of [[human mandible|mandible]]
+| [[Modiolus (face)|modiolus of mouth]]
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[mandibular branch]]
+| [[Depression (kinesiology)|depresses]] angle of [[Human mouth|mouth]] (frown)
+| [[levator anguli oris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Transverse muscle of the chin|transversus menti]]
+| head, mouth (left/right)
+| continuation of depressor anguli oris muscles
+| other side of depressor anguli oris muscles
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[mandibular branch]] or buccal branch
+| [[Depression (kinesiology)|depresses]] angle of [[Human mouth|mouth]] (frown)
+| [[levator anguli oris]]
+| 0.6<ref>{{cite journal |last1=Weaver |first1=C |title=Frequency of occurrence of the transversus menti muscle. |journal=Plastic and Reconstructive Surgery |date=February 1978 |volume=61 |issue=2 |pages=231–3 |doi=10.1097/00006534-197802000-00013 |pmid=622414|s2cid=27905510 }}</ref>
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[levator labii superioris]]
+| head, mouth (left/right)
+| [[medial infra-orbital margin|medial part of infra-orbital margin]] of [[maxilla]]
+| skin and muscle of [[upper lip]] ([[labii superioris]])
+| [[superior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| [[Elevation (kinesiology)|elevates]] [[upper lip]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Depressor labii inferioris muscle|depressor labii inferioris]]
+| head, mouth (left/right)
+| oblique line of [[human mandible|mandible]], between [[symphysis]] and [[mental foramen]]
+| integument of [[lower lip]], [[Orbicularis oris muscle|orbicularis oris]] fibers, its fellow of opposite side
+| [[inferior labial artery]]
+| [[facial nerve]] [CNVII], [[Marginal mandibular branch of the facial nerve|marginal mandibular branch]]
+| [[Depression (kinesiology)|depresses]] [[lower lip]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[mentalis]]
+| head, mouth (left/right)
+| alveolar yoke of lower, lateral incisor tooth, found on [[anatomical terms of location|anterior]] [[human mandible|mandible]]
+| skin of [[chin]]
+| [[inferior labial artery]]
+| [[facial nerve]] [CNVII], [[Marginal mandibular branch of the facial nerve|marginal mandibular branch]]
+| elevates and wrinkles skin of [[chin]], protrudes [[Lip|lower lip]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Buccinator muscle|bucinator]] <small>(buccinator)</small>
+| head, mouth (left/right)
+| [[alveolar process of maxilla|alveolar processes]] of [[maxillary bone|maxilla]] and [[human mandible|mandible]], [[pterygomandibular raphe]]
+| fibres of [[orbicularis oris]]
+| [[buccal artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| compress cheeks against [[Human tooth|teeth]] (blowing), [[mastication]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Orbicularis oris muscle|orbicularis oris]], marginal part
+| head, mouth (left/right)
+| [[maxilla]] and [[human mandible|mandible]]
+| skin around [[lip]]s
+| [[superior labial artery]], [[inferior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| puckers [[lip]]s
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Orbicularis oris muscle|orbicularis oris]], labial part
+| head, mouth (left/right)
+| [[maxilla]] and [[human mandible|mandible]]
+| skin around [[lip]]s
+| [[superior labial artery]], [[inferior labial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| puckers [[lip]]s
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[risorius]]
+| head, mouth (left/right)
+| [[parotid]] [[fascia]]
+| [[modiolus (face)|modiolus]] of mouth
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| draw back angle of [[Human mouth|mouth]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Zygomaticus major muscle|zygomaticus major]]
+| head, mouth (left/right)
+| [[zygomatic bone]] in region of zygomaticomaxillary suture
+| [[Modiolus (face)|modiolus]] of [[Human mouth|mouth]]
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| draws angle of [[Human mouth|mouth]] upward and laterally
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Zygomaticus minor muscle|zygomaticus minor]]
+| head, mouth (left/right)
+| [[zygomatic bone]] in region of zygomaticomaxillary suture
+| skin of [[upper lip]]
+| [[facial artery]]
+| [[facial nerve]] [CNVII], [[Buccal branches of the facial nerve|buccal branch]]
+| elevates [[upper lip]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[masseter muscle|masseter]], superficial part
+| head, coronal plane (left/right)
+| anterior two-thirds of inferior margin of [[zygomatic arch]] and [[maxilla]]
+| angle of [[mandible]], masseteric tuberosity of [[mandible]]
+| [[masseteric artery]]
+| [[masseteric nerve]] from [[mandibular nerve]] [CNV<sub>3</sub>]
+| [[Elevation (kinesiology)|elevates]] and [[Retraction (kinesiology)|retracts]] [[human mandible|mandible]] (closes mouth)
+| [[platysma muscle|platysma]]
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[masseter muscle|masseter]], deep part
+| head, coronal plane (left/right)
+| anterior two-thirds of inferior margin of [[zygomatic arch]] and [[maxilla]]
+| angle of [[mandible]], masseteric tuberosity of [[mandible]]
+| [[masseteric artery]]
+| [[masseteric nerve]] from [[mandibular nerve]] [CNV<sub>3</sub>]
+| [[Elevation (kinesiology)|elevates]] and [[Retraction (kinesiology)|retracts]] [[human mandible|mandible]] (closes mouth)
+| [[platysma muscle|platysma]]
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Temporalis muscle|temporalis]]
+| head, coronal plane (left/right)
+| [[temporal lines]] on [[parietal bone]] of [[skull]]
+| [[Coronoid process of the mandible|coronoid process]] of [[human mandible|mandible]]
+| [[deep temporal arteries]]
+| [[deep temporal nerves]] from [[mandibular nerve]] [CNV<sub>3</sub>]
+| [[Elevation (kinesiology)|elevates]] and [[Retraction (kinesiology)|retracts]] [[human mandible|mandible]] (closes mouth)
+| [[platysma muscle|platysma]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Lateral pterygoid muscle|pterygoid, lateral]]
+| head, coronal plane (left/right)
+| [[Greater wing of sphenoid bone|greater wing of sphenoid]] and [[pterygoid plate|lateral pterygoid process]]
+| [[condyloid process]] of [[mandible]]
+| [[maxillary artery]], [[Pterygoid branches of maxillary artery|pterygoid branches]]
+| [[external pterygoid nerve]] from [[mandibular nerve]] [CNV<sub>3</sub>]
+| [[Depression (kinesiology)|depresses]] [[human mandible|mandible]] (opens mouth)
+| [[Masseter muscle|masseter]], [[Temporalis muscle|temporalis]], [[Medial pterygoid muscle|medial pterygoid]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | pterygoideus proprius<ref>{{Cite journal |last=Barker |first=B. C. |date=October 1981 |title=The pterygoideus proprius muscle |journal=Australian Dental Journal |volume=26 |issue=5 |pages=309–310 |doi=10.1111/j.1834-7819.1981.tb05228.x |issn=0045-0421 |pmid=6949532}}</ref>
+| head, coronal plane (left/right)
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Medial pterygoid muscle|pterygoid, medial]]
+| head, coronal plane (left/right)
+| medial side of [[lateral pterygoid plate]] behind upper teeth (deep head); [[pyramidal process of palatine bone]] and [[maxillary tuberosity]] (superficial head)
+| medial [[angle of the mandible|angle of mandible]]
+| [[maxillary artery]], [[Pterygoid branches of maxillary artery|pterygoid branches]]
+| [[mandibular nerve]] [CNV<sub>3</sub>], [[medial pterygoid nerve]]
+| [[Elevation (kinesiology)|elevates]] mandible, closes [[jaw]], helps [[lateral pterygoid muscle|lateral pterygoid]] in moving jaw from side to side
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[genioglossus]], inferior fibers
+| head, tongue (left/right)
+| superior part of mental spine of [[human mandible|mandible]] ([[symphysis menti]])
+| dorsum of [[tongue]], body of [[hyoid]]
+| [[lingual artery]]
+| [[hypoglossal nerve]] [CNXII]
+| protrudes [[tongue]]
+| 
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[genioglossus]], middle fibers
+| head, tongue (left/right)
+| superior part of mental spine of [[human mandible|mandible]] ([[symphysis menti]])
+| dorsum of [[tongue]], body of [[hyoid]]
+| [[lingual artery]]
+| [[hypoglossal nerve]] [CNXII]
+| depresses [[tongue]]
+| 
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[genioglossus]], superior fibers
+| head, tongue (left/right)
+| superior part of mental spine of [[human mandible|mandible]] ([[symphysis menti]])
+| dorsum of [[tongue]], body of [[hyoid]]
+| [[lingual artery]]
+| [[hypoglossal nerve]] [CNXII]
+| draws tip of [[tongue]] back and down
+| 
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[hyoglossus]] <small>(ceratoglossus)</small>
+| head, tongue (left/right)
+| [[hyoid]]
+| side of [[tongue]]
+| 
+| [[hypoglossal nerve]] [CNXII]
+| depresses [[tongue]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[chondroglossus]]
+| head, tongue (left/right)
+| [[lesser cornu]] and body of [[hyoid bone]]
+| intrinsic muscular fibers of [[tongue]]
+| 
+| [[hypoglossal nerve]] [CNXII]
+| depresses [[tongue]] (some consider this muscle to be part of [[hyoglossus]])
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[styloglossus]]
+| head, tongue (left/right)
+| [[styloid process (temporal)|styloid process of temporal bone]]
+| [[tongue]]
+| [[lingual artery]], sublingual branch
+| [[hypoglossal nerve]] [CNXII]
+| elevates and retracts [[tongue]]
+| inferior and middle fibers of [[genioglossus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Palatoglossus muscle|palatoglossus]]
+| head, tongue and soft palate (left/right)
+| [[palatine aponeurosis]]
+| [[tongue]]
+| 
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]] and [[accessory nerve]] [CNXI]
+| raises back part of [[tongue]], aiding in breathing
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[superior longitudinal muscle|superior longitudinal lingual]]
+| head, tongue (left/right)
+| close to [[epiglottis]], from [[median fibrous septum]]
+| edges of [[tongue]]
+| [[lingual artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]], [[ascending pharyngeal artery]]
+| [[hypoglossal nerve]] [CNXII]
+| shortens [[tongue]], turns tip upward, turns lateral margins upward
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[transversus muscle|transversus linguae]]
+| head, tongue (left/right)
+| [[median fibrous septum]]
+| sides of [[tongue]]
+| [[lingual artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]], [[ascending pharyngeal artery]]
+| [[hypoglossal nerve]] [CNXII]
+| narrows [[tongue]] with no elongation
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[inferior longitudinal muscle|inferior longitudinal lingual]]
+| head, tongue (left/right)
+| root of [[tongue]]
+| apex of [[tongue]]
+| [[lingual artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]], [[ascending pharyngeal artery]]
+| [[hypoglossal nerve]] [CNXII]
+| shortens [[tongue]], retracts, pulls tip downward
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[verticalis muscle|verticalis linguae]]
+| head, tongue (left/right)
+| dorsum of [[tongue]]
+| inferior surface borders of tongue
+| [[lingual artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]], [[ascending pharyngeal artery]]
+| [[hypoglossal nerve]] [CNXII]
+| 
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Tensor veli palatini muscle|tensor veli palatini]]
+| head, soft palate (left/right)
+| [[Pterygoid processes of the sphenoid|medial pterygoid plate]] of [[sphenoid bone]]
+| [[palatine aponeurosis]]
+| 
+| [[mandibular nerve]] [CNV<sub>3</sub>], [[medial pterygoid nerve]]
+| tenses [[soft palate]], aids in [[swallowing]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[levator veli palatini]]
+| head, soft palate (left/right)
+| [[temporal bone]], [[Eustachian tube]]
+| [[palatine aponeurosis]]
+| [[facial artery]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| elevates [[soft palate]]
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[palatopharyngeus muscle|palatopharyngeus]]
+| head, soft palate (left/right)
+| [[palatine aponeurosis]] and [[hard palate]]
+| upper border of [[thyroid cartilage]] (blends with constrictor fibers)
+| [[facial artery]]
+| [[vagus nerve]] [CNX], [[Pharyngeal branch of vagus nerve|pharyngeal branch]]
+| aids in [[breathing]] by pulling [[human pharynx|pharynx]] and [[larynx]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[uvula]]e
+| head, soft palate (left/right)
+| [[hard palate]]
+| soft tissue of [[uvula]]
+| 
+| [[vagus nerve]] [CNX], [[Pharyngeal branch of vagus nerve|pharyngeal branch]]
+| moves and changes shape of [[uvula]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[stylopharyngeus muscle|stylopharyngeus]]
+| head, pharynx (left/right)
+| [[Styloid process (temporal)|styloid process]] of [[temporal bone]]
+| [[thyroid cartilage]] ([[human pharynx|pharynx]])
+| [[ascending pharyngeal artery]], [[Pharyngeal branches of ascending pharyngeal arteries|pharyngeal branches]]
+| [[glossopharyngeal nerve]] [CNIX]
+| elevates [[larynx]], elevates [[human pharynx|pharynx]], [[swallowing]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[salpingopharyngeus muscle|salpingopharyngeus]]
+| head, pharynx (left/right)
+| cartilage of [[Eustachian tube]]
+| posterior [[Muscle fascicle|fasciculus]] of [[pharyngopalatinus]]
+| 
+| [[vagus nerve]] [CNX], [[accessory nerve]] [CNXI]
+| raises [[nasopharynx]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[inferior pharyngeal constrictor muscle|pharyngeal constrictor, inferior]], thyropharyngeal part
+| head, pharynx (left/right)
+| [[cricoid cartilage]], [[thyroid cartilage]]
+| [[pharyngeal raphe]]
+| [[ascending pharyngeal artery]], [[Pharyngeal branches of ascending pharyngeal arteries|pharyngeal branches]]
+| [[vagus nerve]] [CNX], [[superior laryngeal nerve]], [[external laryngeal]] branch and [[recurrent laryngeal nerve]]
+| [[swallowing]]
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[inferior pharyngeal constrictor muscle|pharyngeal constrictor, inferior]], cricopharyngeal part
+| head, pharynx (left/right)
+| [[cricoid cartilage]], [[thyroid cartilage]]
+| [[pharyngeal raphe]]
+| [[ascending pharyngeal artery]], [[Pharyngeal branches of ascending pharyngeal arteries|pharyngeal branches]]
+| [[vagus nerve]] [CNX], [[superior laryngeal nerve]], [[external laryngeal]] branch and [[recurrent laryngeal nerve]]
+| [[swallowing]]
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[middle pharyngeal constrictor muscle|pharyngeal constrictor, middle]], chondropharyngeal part
+| head, pharynx (left/right)
+| [[hyoid bone]]
+| [[pharyngeal raphe]]
+| [[ascending pharyngeal artery]], [[Pharyngeal branches of ascending pharyngeal arteries|pharyngeal branches]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[middle pharyngeal constrictor muscle|pharyngeal constrictor, middle]], ceratopharyngeal part
+| head, pharynx (left/right)
+| [[hyoid bone]]
+| [[pharyngeal raphe]]
+| [[ascending pharyngeal artery]], [[Pharyngeal branches of ascending pharyngeal arteries|pharyngeal branches]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[superior pharyngeal constrictor muscle|pharyngeal constrictor, superior]], pterygopharyngeal part
+| head, pharynx (left/right)
+| [[medial pterygoid plate]], [[pterygomandibular raphé]], [[alveolar process of maxilla|alveolar process]]
+| [[pharyngeal raphe]], [[pharyngeal tubercle]]
+| [[ascending pharyngeal artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 4
+|- style="vertical-align: top;"
+! scope="row" | [[superior pharyngeal constrictor muscle|pharyngeal constrictor, superior]], buccopharyngeal part
+| head, pharynx (left/right)
+| [[medial pterygoid plate]], [[pterygomandibular raphé]], [[alveolar process of maxilla|alveolar process]]
+| [[pharyngeal raphe]], [[pharyngeal tubercle]]
+| [[ascending pharyngeal artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 4
+|- style="vertical-align: top;"
+! scope="row" | [[superior pharyngeal constrictor muscle|pharyngeal constrictor, superior]], mylopharyngeal part
+| head, pharynx (left/right)
+| [[medial pterygoid plate]], [[pterygomandibular raphé]], [[alveolar process of maxilla|alveolar process]]
+| [[pharyngeal raphe]], [[pharyngeal tubercle]]
+| [[ascending pharyngeal artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 4
+|- style="vertical-align: top;"
+! scope="row" | [[superior pharyngeal constrictor muscle|pharyngeal constrictor, superior]], glossopharyngeal part
+| head, pharynx (left/right)
+| [[medial pterygoid plate]], [[pterygomandibular raphé]], [[alveolar process of maxilla|alveolar process]]
+| [[pharyngeal raphe]], [[pharyngeal tubercle]]
+| [[ascending pharyngeal artery]], [[Tonsillar branch of the facial artery|tonsilar branch]] of [[facial artery]]
+| [[vagus nerve]] [CNX], [[pharyngeal plexus]]
+| [[swallowing]]
+| 
+| 2
+| 4
+|- style="vertical-align: top;"
+! scope="row" | [[cricothyroid muscle|cricothyroid]], straight part
+| head, larynx (left/right)
+| anterior and lateral [[cricoid|cricoid cartilage]]
+| [[Thyroid cartilage|inferior cornu]] and lamina of [[thyroid cartilage]]
+| [[cricothyroid branch]] of [[superior thyroid artery]]
+| [[vagus nerve]] [CNX], [[superior laryngeal nerve]], [[external laryngeal nerve|external laryngeal]] branch
+| tenses and elongates [[vocal folds]] (has minor adductory effect)
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[cricothyroid muscle|cricothyroid]], oblique part
+| head, larynx (left/right)
+| anterior and lateral [[cricoid|cricoid cartilage]]
+| [[Thyroid cartilage|inferior cornu]] and lamina of [[thyroid cartilage]]
+| [[cricothyroid branch]] of [[superior thyroid artery]]
+| [[vagus nerve]] [CNX], [[superior laryngeal nerve]], [[external laryngeal nerve|external laryngeal]] branch
+| tenses and elongates [[vocal folds]] (has minor adductory effect)
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Transverse arytenoid muscle|arytenoid, transverse]]
+| head, larynx (left/right)
+| [[arytenoid cartilage]] on one side
+| [[arytenoid cartilage]] on opposite side
+| [[superior laryngeal branch]] of [[superior thyroid artery]]
+| [[vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| approximates [[arytenoid cartilage]]s (closes [[rima glottidis]])
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Oblique arytenoid muscle|arytenoid, oblique]]
+| head, larynx (left/right)
+| [[arytenoid cartilage]] on one side
+| [[arytenoid cartilage]] on opposite side
+| [[superior laryngeal branch]] of [[superior thyroid artery]]
+| [[vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| approximates [[arytenoid cartilage]]s (closes [[rima glottidis]])
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | arytenoid, oblique, [[Aryepiglottic muscle|aryepiglottic part]]
+| head, larynx (left/right)
+| apex of [[arytenoid muscle|arytenoid]]
+| lateral border of [[epiglottis]]
+| [[superior laryngeal artery|laryngeal branch of]] [[superior thyroid artery]]
+| [[vagus nerve]] [CNX], [[inferior laryngeal nerve]]
+| closes the laryngeal inlet
+| ?
+| 2
+| 0
+|- style="vertical-align: top;"
+! scope="row" | [[thyroarytenoid muscle|vocalis]]
+| head, larynx (left/right)
+| inner (anterior) surface of [[thyroid cartilage]]
+| anterior surface of [[arytenoid cartilage]]
+| 
+| [[vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| thickens and decreases length of [[Vocal cords|vocal folds]], [[Adduction|adducts]] during [[Manner of articulation|speech]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | thyroarytenoid, [[Thyroepiglottic muscle|thyroepiglottic part]]
+| head, larynx (left/right)
+| inner (anterior) surface of [[thyroid cartilage]]
+| anterior surface of [[arytenoid cartilage]]
+| 
+| [[vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| thickens and decreases length of [[Vocal cords|vocal folds]], [[Adduction|adducts]] during [[Manner of articulation|speech]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[thyroarytenoid muscle|thyroarytenoid]], external part
+| head, larynx (left/right)
+| inner (anterior) surface of [[thyroid cartilage]]
+| anterior surface of [[arytenoid cartilage]]
+| 
+| [[vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| thickens and decreases length of [[Vocal cords|vocal folds]], [[Adduction|adducts]] during [[Manner of articulation|speech]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[posterior cricoarytenoid muscle|cricoarytenoid, posterior]]
+| head, larynx (left/right)
+| posterior part of [[cricoid cartilage]]
+| [[Muscular process of arytenoid cartilage|muscular process]] of [[arytenoid cartilage]]
+| 
+| [[vagus|vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| [[Abduction (kinesiology)|abducts]] and [[laterally rotates]] cartilage, pulling [[vocal ligament]]s away from midline and forward and so opening [[rima glottidis]]
+| [[lateral cricoarytenoid muscle|lateral cricoarytenoid]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[lateral cricoarytenoid muscle|cricoarytenoid, lateral]]
+| head, larynx (left/right)
+| lateral part of arch of [[cricoid cartilage]]
+| [[Muscular process of arytenoid cartilage|muscular process]] of [[arytenoid cartilage]]
+| 
+| [[vagus|vagus nerve]] [CNX], [[recurrent laryngeal nerve]]
+| [[Adduction|adducts]] and [[medially rotate]]s cartilage, pulling [[vocal ligament]]s towards midline and backwards and so closing [[rima glottidis]]
+| [[Posterior cricoarytenoid muscle|posterior cricoarytenoid]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | ceratocricoideus<ref>{{Cite journal |last1=Maranillo |first1=Eva |last2=Vázquez |first2=Teresa |last3=Mirapeix |first3=Rosa |last4=León |first4=Xavier |last5=McHanwell |first5=Stephen |last6=Quer |first6=Miquel |last7=Sañudo |first7=José Ramón |date=May 2009 |title=Ceratocricoid muscle: an embryological and anatomical study |journal=Clinical Anatomy |volume=22 |issue=4 |pages=463–470 |doi=10.1002/ca.20795 |issn=1098-2353 |pmid=19306315|s2cid=35995462 }}</ref><ref>{{Cite web |title=Ceratocricoid muscle - e-Anatomy - IMAIOS |url=https://www.imaios.com/en/e-anatomy/anatomical-structure/ceratocricoid-muscle-1541081816 |access-date=2023-07-27 |website=www.imaios.com |language=en}}</ref>
+| head, larynx (left/right)
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Platysma muscle|platysma]]
+| Neck, Clavicular, Right, left
+| base of [[human mandible|mandible]]
+| inferior [[clavicle]] and fascia of [[Thorax|chest]]
+| branches of [[submental artery]], branches of [[suprascapular artery]]
+| [[cervical branch of the facial nerve|cervical branch]] of [[facial nerve]] [CNVII]
+| tenses [[Human skin|skin]] of [[neck]]
+| [[Masseter muscle|masseter]], [[Temporalis muscle|temporalis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Sternocleidomastoid muscle|sternocleidomastoid]]
+| Neck, Clavicular, Right, left
+| [[manubrium sterni]] (sternal head), medial portion of [[clavicle]] (clavicular head)
+| [[Mastoid part of the temporal bone|mastoid process]] of [[temporal bone]], [[superior nuchal line]]
+| [[occipital artery]], [[superior thyroid artery]]
+| '''motor''': [[accessory nerve]]<br>'''sensory''': [[cervical plexus]]
+| tilts [[Human head|head]] to its own side, rotates head so face is turned towards opposite side, flexes [[neck]], raises [[sternum]], assists in [[Breathing|forced inspiration]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Digastric muscle|digastric]], anterior belly
+| Neck, Suprahyoid, Right/left
+| [[Digastric fossa of Mandible|digastric fossa]] ([[human mandible|mandible]])
+| intermediate tendon ([[lesser horn]] of [[hyoid bone]])
+| submental branch of [[facial artery]]
+| [[mandibular nerve]] [CNV<sub>3</sub>] via [[mylohyoid nerve]]
+| opens [[jaw]] when [[masseter]] and [[temporalis]] are relaxed
+| ??
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Digastric muscle|digastric]], posterior belly
+| Neck, Suprahyoid, Right/left
+| [[mastoid process]] of [[temporal bone]]
+| intermediate tendon ([[lesser horn]] of [[hyoid bone]])
+| [[occipital artery]]
+| [[facial nerve]] [CNVII]
+| opens [[jaw]] when [[masseter]] and [[temporalis]] are relaxed
+| ??
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Stylohyoid muscle|stylohyoid]]
+| Neck, Suprahyoid, Right/left
+| [[Temporal styloid process|styloid process]] of [[temporal bone]]
+| [[greater horn]] of [[hyoid bone]]
+| [[occipital artery]]
+| [[facial nerve]] [CNVII]
+| elevates [[Hyoid bone|hyoid]] during [[swallowing]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Mylohyoid muscle|mylohyoid]]
+| Neck, Suprahyoid, Right/left
+| [[mylohyoid line]] of [[human mandible|mandible]]
+| [[pharyngeal raphe]]
+| [[mylohyoid branch]] of [[inferior alveolar artery]]
+| [[mylohyoid nerve]], from inferior alveolar branch of [[mandibular nerve]] [CNV<sub>3</sub>]
+| raises [[human oral cavity|oral cavity]] floor, [[elevates]] [[hyoid]], [[Depression (kinesiology)|depresses]] [[human mandible|mandible]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Geniohyoid muscle|geniohyoid]]
+| Neck, Suprahyoid, Right/left
+| [[mandibular symphysis]]
+| anterior surface of body of [[hyoid bone]]
+| 
+| [[cervical spinal nerve 1|C1]] via [[hypoglossal nerve]]
+| elevates [[Hyoid bone|hyoid]] and tongue upward during [[swallowing]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Sternohyoid muscle|sternohyoid]]
+| Neck, Infrahyoid, Right/left
+| [[Human sternum|sternum]], [[manubrium]]
+| [[hyoid bone]]
+| [[superior thyroid artery]]
+| [[ansa cervicalis]]
+| [[Depression (kinesiology)|depresses]] [[Hyoid bone|hyoid]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Sternothyroid muscle|sternothyroid]]
+| Neck, Infrahyoid, Right/left
+| [[Human sternum|sternum]], [[manubrium]]
+| [[thyroid cartilage]]
+| [[superior thyroid artery]]
+| [[ansa cervicalis]]
+| depresses [[larynx]], may slightly depress [[Hyoid bone|hyoid]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Thyrohyoid muscle|thyrohyoid]]
+| Neck, Infrahyoid, Right/left
+| [[thyroid cartilage]]
+| [[hyoid bone]]
+| [[superior thyroid artery]]
+| [[First cervical nerve|C1]]
+| [[Depression (kinesiology)|depress]] [[Hyoid bone|hyoid]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Omohyoid muscle|omohyoid]], superior belly
+| Neck, Infrahyoid, Right/left
+| [[Upper border of the scapula|upper border]] of [[scapula]]
+| [[hyoid bone]]
+| [[inferior thyroid artery]]
+| [[ansa cervicalis]]
+| depresses [[larynx]], depresses and moves to side [[Hyoid bone|hyoid]]
+| ??
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Omohyoid muscle|omohyoid]], inferior belly
+| Neck, Infrahyoid, Right/left
+| [[Upper border of the scapula|upper border]] of [[scapula]]
+| [[hyoid bone]]
+| [[inferior thyroid artery]]
+| [[ansa cervicalis]]
+| depresses [[larynx]], depresses and moves to side [[Hyoid bone|hyoid]]
+| ??
+| 2
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[Levator muscle of thyroid gland|levator glandulae thyroideae]]
+| Neck, Infrahyoid, Right/left
+| [[thyrohyoid muscle]]
+| [[thyroid isthmus]]
+| ?
+| [[ansa cervicalis]]
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Longus colli muscle|longus colli]]
+| Neck, Anterior
+| [[transverse processes]] of [[vertebra]]e [[Cervical vertebrae|C3]], [[Cervical vertebrae|C4]], [[Cervical vertebrae|C5]], and [[Cervical vertebrae|C6]]
+| anterior arch of [[Atlas (anatomy)|atlas]]
+| [[ascending pharyngeal artery]], [[vertebral artery]]
+| [[cervical spinal nerve 2|C2]], [[cervical spinal nerve 3|C3]], [[cervical spinal nerve 4|C4]], [[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]]
+| flexes [[neck]] and [[Human head|head]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Longus capitis muscle|longus capitis]]
+| Neck, Anterior
+| anterior tubercles of [[transverse processes]] of [[vertebra]]e [[Cervical vertebrae|C3]], [[Cervical vertebrae|C4]], [[Cervical vertebrae|C5]], and [[Cervical vertebrae|C6]]
+| [[basilar artery|basilar]] part of [[occipital bone]]
+| ??
+| [[cervical spinal nerve 1|C1]], [[cervical spinal nerve 2|C2]], [[cervical spinal nerve 3|C3]]/[[cervical spinal nerve 4|C4]]
+| [[flexion|flexes]] [[neck]] at [[atlanto-occipital joint]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rectus capitis anterior muscle|rectus capitis, anterior]]
+| Neck, Anterior
+| [[Atlas (anatomy)|atlas]]
+| [[occipital bone]]
+| ??
+| [[cervical spinal nerve 1|C1]]
+| [[flexion|flexes]] [[neck]] at [[atlanto-occipital joint]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rectus capitis lateralis muscle|rectus capitis, lateralis]]
+| Neck, Anterior/Lateral, Right/left
+| upper surface of [[transverse process]] of [[atlas (anatomy)|atlas (C1)]]
+| under surface of [[jugular process]] of [[occipital bone]]
+| ??
+| [[cervical spinal nerve 1|C1]]
+| laterally flexes [[neck]], stabilises sidebens at [[atlanto-occipital joint]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[scalenus anterior]]
+| Neck, Lateral, Right/left
+| [[cervical vertebrae]] C3-C6
+| [[first rib]]
+| [[inferior thyroid artery]], [[ascending cervical artery]]
+| [[ventral ramus]] of [[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]]
+| when neck is fixed, elevates [[first rib]] to aid in [[breathing]]; when rib is fixed, bends neck forward and sideways and rotates it to opposite side
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[scalenus medius]]
+| Neck, Lateral, Right/left
+| [[cervical vertebrae]] C2-C6
+| [[first rib]]
+| [[inferior thyroid artery]], [[ascending cervical artery]]
+| ventral rami of third to eighth cervical spinal nerves
+| elevates [[first rib]], rotates [[neck]] to opposite side
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[scalenus posterior]]
+| Neck, Lateral, Right/left
+| [[cervical vertebrae]] C4 – C6, transverse processes
+| [[second rib]]
+| [[ascending cervical artery]] and [[superficial cervical artery]]
+| [[cervical spinal nerve 6|C6]], [[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]]
+| elevates [[second rib]], tilts [[neck]] to same side
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[scalenus minimus]]
+| Neck, Lateral, Right/left
+| [[cervical vertebrae]] C7
+| [[first rib]]
+| [[superficial cervical artery]]
+| [[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]]
+| elevates [[first rib]]
+| ??
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[levator scapulae muscle|levator scapulae]]
+| Neck/Upper Limb, Verterbral Column, Lateral, Right/left
+| [[posterior tubercles]] of [[transverse processes]] of [[cervical spinal nerve 1|C1]] – [[cervical vertebrae|C4]] [[vertebra]]e
+| superior part of [[medial border of scapula]]
+| [[dorsal scapular artery]]
+| [[cervical nerves|cervical nerve]] ([[cervical spinal nerve 3|C3]], [[cervical spinal nerve 4|C4]]) and [[dorsal scapular nerve]] ([[cervical spinal nerve 5|C5]])
+| [[Elevation (kinesiology)|elevates]] [[scapula]], tilts [[glenoid cavity]] inferiorly by rotating [[scapula]]
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Obliquus capitis superior muscle|obliquus capitis, superior]]
+| Neck, Posterior/Lateral, Right/left
+| [[lateral mass of atlas]]
+| lateral half of [[inferior nuchal line]]
+| ??
+| [[suboccipital nerve]]
+| flexes [[Human head|head]] to same side
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Obliquus capitis inferior muscle|obliquus capitis, inferior]]
+| Neck, Posterior/Lateral, Right/left
+| [[spinous process]] of [[Axis (anatomy)|axis]]
+| [[lateral mass of atlas]]
+| ??
+| [[suboccipital nerve]]
+| rotates [[neck]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rectus capitis posterior minor muscle|rectus capitis, posterior minor]]
+| Neck, Posterior
+| tubercle on posterior arch of [[Atlas (anatomy)|atlas]] (C1)
+| medial part of [[inferior nuchal line]] of [[occipital bone]] and surface between it and [[foramen magnum]]
+| ??
+| a branch of dorsal primary division of [[suboccipital nerve]]
+| sensory organ for neck position, also [[extension (kinesiology)|extends]] head at [[neck]]
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rectus capitis posterior major muscle|rectus capitis, posterior major]]
+| Neck, Posterior
+| [[spinous process]] of [[Axis (anatomy)|axis]] ([[cervical vertebrae|C2]])
+| [[inferior nucheal line]] of [[occipital bone]]
+| [[occipital artery]]
+| [[Dorsal ramus of spinal nerve|dorsal ramus]] of [[cervical spinal nerve 1|C1]] ([[suboccipital nerve]])
+| rotates and extends [[Human head|head]] to same side
+| ??
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rectus abdominis muscle|rectus abdominis]]
+| Torso, Abdomen, right/left
+| [[pubic symphysis]], [[pubic crest]]
+| [[xiphoid process]], [[costal cartilage]]s of ribs 5–7
+| [[inferior epigastric artery]], [[superior epigastric artery]]; contributions from posterior [[intercostal arteries]], [[subcostal arteries]], and deep circumflex arteries
+| [[intercostal nerves]], [[subcostal nerve]]
+| flexes trunk, compresses [[abdominal organs]], aids in [[Breathing|expiration]]
+| [[erector spinae]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Abdominal external oblique muscle|external abdominal oblique]]
+| Torso, Abdomen, right/left
+| external surfaces of [[ribs]] 5–12
+| [[Linea alba (abdomen)|linea alba]], [[pubic tubercle]], anterior half of [[iliac crest]]
+| lower posterior [[intercostal arteries]], [[subcostal artery]], [[deep circumflex iliac artery]]
+| '''motor''': [[intercostal nerves]] (T7-T11), [[subcostal nerve]] '''sensory''': [[iliohypogastric nerve]]
+| flexes trunk to same side, rotates trunk to opposite side, [[Breathing|expiration]], compresses [[abdominal organs]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Abdominal internal oblique muscle|internal abdominal oblique]]
+| Torso, Abdomen, right/left
+| anterior two-thirds of [[iliac crest]], [[iliopectineal arch]], [[thoracolumbar fascia]]
+| inferior borders of ribs 10–12, [[pubic crest]]
+| lower posterior [[intercostal arteries]], [[subcostal artery]], [[superior epigastric artery]], [[inferior epigastric artery]], [[superficial circumflex iliac artery]], [[deep circumflex iliac artery]], posterior [[lumbar arteries]]
+| [[intercostal nerves]] (T7-T11), [[subcostal nerve]], [[iliohypogastric nerve]], [[ilioinguinal nerve]]
+| flexes trunk to same side, rotates trunk to opposite side, [[Breathing|expiration]], compresses [[abdominal organs]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Cremaster muscle|cremaster]]
+| Torso, Abdomen, [[inguinal canal]] and [[scrotum]]
+| [[Internal oblique]]
+| [[Tunica vaginalis]]
+| [[Cremasteric artery]]
+| [[Genital branch of genitofemoral nerve]]
+| raise and lower the [[scrotum]] (involuntary)
+| ?
+| 0-1(M)
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Transversus abdominis muscle|transversus abdominis]]
+| Torso, Abdomen, right/left
+| internal surface of [[costal cartilage]] of [[ribs]] 7–12, [[thoracolumbar fascia]], anterior two-thirds of [[iliac crest]], [[iliopectineal arch]]
+| [[Linea alba (abdomen)|linea alba]], aponeurosis of [[Abdominal internal oblique muscle|internal oblique muscle]], [[pubic crest]]
+| lower posterior [[intercostal arteries]], [[subcostal artery]], [[superior epigastric artery]], [[inferior epigastric artery]], [[superficial circumflex iliac artery]], [[deep circumflex iliac artery]], posterior [[lumbar arteries]]
+| [[intercostal nerves]] T7-T11, [[subcostal nerve]], [[iliohypogastric nerve]], [[ilioinguinal nerve]]
+| rotates trunk to same side, compresses [[abdominal organs]], [[Breathing|expiration]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Pyramidalis muscle|pyramidalis]]
+| Torso, Abdomen, right/left
+| [[pubic symphysis]], [[pubic crest]]
+| [[Linea alba (abdomen)|linea alba]]
+| [[inferior epigastric artery]]
+| [[subcostal nerve]]
+| tenses [[Linea alba (abdomen)|linea alba]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Quadratus lumborum muscle|quadratus lumborum]]
+| Torso, Abdomen, right/left
+| [[iliac crest]], [[iliolumbar ligament]]
+| inferior border of rib 12, transverse processes of [[lumbar vertebrae|L1]]-[[lumbar vertebrae|L4]]
+| [[lumbar arteries|lumbar]], [[median sacral artery|median sacral]], [[iliolumbar artery|iliolumbar]], [[subcostal artery|subcostal arteries]]
+| [[subcostal nerve]], anterior rami of [[spinal nerves]] L1-L4
+| flexes trunk to same side, fixes [[Rib cage|rib 12]] during [[Breathing|inspiration]], extends trunk
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[iliocostalis]] colli
+| Torso, Back, right/left
+| [[sacrum]], [[iliac crest]], [[thoracolumbar fascia]], [[spinous processes]]
+| [[ribs]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[iliocostalis]] lumborum
+| Torso, Back, right/left
+| [[sacrum]], [[iliac crest]], [[thoracolumbar fascia]], [[spinous processes]]
+| The lower six or seven [[ribs]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[iliocostalis]] thoracis
+| Torso, Back, right/left
+| [[sacrum]], [[iliac crest]], [[thoracolumbar fascia]], [[spinous processes]](the lower six ribs)
+| upper six [[ribs]] and the transverse process of CVII
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[longissimus]] capitis
+| Torso/Neck, Back, right/left
+| [[articular processes]] of C4-C7; [[transverse processes]] of T1-T5
+| posterior margin of [[Mastoid part of the temporal bone|mastoid process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]], flexes [[Human head|head]] and [[neck]] to same side
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[longissimus]] colli
+| Torso, Back, right/left
+| [[transverse process]]
+| [[transverse process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[longissimus]] thoracis
+| Torso, Back, right/left
+| [[transverse process]]
+| [[transverse process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[longissimus]] thoracis, lumbar part
+| Torso, Back, right/left
+| [[transverse process]]
+| [[transverse process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 0
+|- style="vertical-align: top;"
+! scope="row" | [[spinalis]] capitis
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[spinalis]] colli
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[spinalis]] thoracis
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| [[lateral sacral artery]]
+| [[posterior branch of spinal nerve]]
+| extends/flexes [[vertebral column]]
+| [[rectus abdominis muscle|rectus abdominis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Latissimus dorsi muscle|latissimus dorsi]]
+| Torso/Upper Limb, Back, Vertebral column, right/left
+| [[Spinous process]]es of [[vertebrae]] [[Thoracic vertebrae#Seventh thoracic vertebra|T6]]-[[Sacrum|S5]], [[thoracolumbar fascia]], [[iliac crest]], inferior 3 or 4 [[rib]]s and [[Inferior angle of the scapula|inferior angle of]] [[scapula]]
+| floor of [[intertubercular groove]] of [[humerus]]
+| [[subscapular artery]], [[dorsal scapular artery]]
+| [[thoracodorsal nerve]](C6 to C8)
+| pulls [[forelimb]] [[dorsum (biology)|dorsally]] and [[Anatomical terms of location|caudally]](Extends, medially rotates and adducts humerus)
+| [[Deltoid muscle|deltoid]], [[Trapezius muscle|trapezius]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[semispinalis thoracis]]
+| Torso, Back, right/left
+| [[transverse process]]es of sixth to tenth [[thoracic vertebrae]]
+| [[spinous process]]es of upper four [[thoracic vertebrae]] and lower two [[cervical vertebrae]]
+| 
+| [[posterior branch of spinal nerve]]
+| extends/rotates [[vertebral column]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[semispinalis cervicis|semispinalis colli]] <small>(cervicis)</small>
+| Torso, Back, right/left
+| [[transverse process]]es of upper five or six [[thoracic vertebrae]]
+| [[spinous processes]], cervical, from axis to fifth
+| 
+| [[posterior branch of spinal nerve]]
+| extends/rotates [[vertebral column]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[semispinalis capitis]]
+| Torso/Neck, Back, right/left
+| [[articular processes]] of C4-C6; [[transverse processes]] of C7 and T1-T7
+| [[spinous process]], [[occipital bone]], area between [[superior nuchal line]] and [[inferior nuchal line]]
+| 
+| [[greater occipital nerve]]
+| extends [[Human head|head]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[multifidus muscle|multifidus]] lumborum
+| Torso, Back, right/left
+| [[sacrum]], [[erector spinae]] [[aponeurosis]], [[Posterior superior iliac spine|PSIS]], and [[iliac crest]]
+| [[spinous process]]
+| 
+| [[posterior branch of spinal nerve]]
+| stabilizes [[vertebra]]e in local movements of [[vertebral column]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[multifidus muscle|multifidus]] thoracis
+| Torso, Back, right/left
+| [[sacrum]], [[erector spinae]] [[aponeurosis]], [[Posterior superior iliac spine|PSIS]], and [[iliac crest]]
+| [[spinous process]]
+| 
+| [[posterior branch of spinal nerve]]
+| stabilizes [[vertebra]]e in local movements of [[vertebral column]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[multifidus muscle|multifidus]] colli
+| Torso, Back, right/left
+| [[sacrum]], [[erector spinae]] [[aponeurosis]], [[Posterior superior iliac spine|PSIS]], and [[iliac crest]]
+| [[spinous process]]
+| 
+| [[posterior branch of spinal nerve]]
+| stabilizes [[vertebra]]e in local movements of [[vertebral column]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rotatores muscle|rotatores]], long 1–11
+| Torso, Back, thoracis, right/left
+| [[transverse process]]
+| [[spinous process]]
+| [[spinous process]]
+| [[posterior branch of spinal nerve|posterior branch]]
+| 
+| 
+| 22
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rotatores muscle|rotatores]], short 1–11
+| Torso, Back, thoracis, right/left
+| [[transverse process]]
+| [[spinous process]]
+| [[spinous process]]
+| [[posterior branch of spinal nerve|posterior branch]]
+| 
+| 
+| 22
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rotatores muscle|rotatores]] lumborum
+| Torso, Back, right/left
+| [[transverse process]]
+| [[spinous process]]
+| [[spinous process]]
+| [[posterior branch of spinal nerve|posterior branch]]
+| 
+| 
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Rotatores muscle|rotatores]] colli
+| Torso, Back, right/left
+| [[transverse process]]
+| [[spinous process]]
+| [[spinous process]]
+| [[posterior branch of spinal nerve|posterior branch]]
+| 
+| 
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Interspinales muscle|interspinales]] lumborum 1–4
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| [[Extension (kinesiology)|extends]], [[flexion|flexes]], and [[rotation|rotates]] vertebral column
+| 
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Interspinales muscle|interspinales]] thoracis 1–3
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| [[Extension (kinesiology)|extends]], [[flexion|flexes]], and [[rotation|rotates]] vertebral column
+| 
+| 6
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Interspinales muscle|interspinales]] colli 1–6
+| Torso, Back, right/left
+| [[spinous process]]
+| [[spinous process]]
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| [[Extension (kinesiology)|extends]], [[flexion|flexes]], and [[rotation|rotates]] vertebral column
+| 
+| 12
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], anterior colli 1–7
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 14
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], lateral posterior colli 1–7
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 14
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], medial posterior colli 1–7
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 14
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], lateral lumborum, dorsal parts 1–5
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 10
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], lateral lumborum, ventral parts 1–5
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 10
+| 2
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], medial lumborum 1–5
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 10
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[intertransversarii]], thoracis 1–9
+| Torso, Back, right/left
+| [[transverse process]]
+| [[Transverse Process|transverse process]] above
+| 
+| [[posterior rami]] of [[spinal nerves]]
+| laterally [[flexion|flexes]] [[torso|trunk]]
+| 
+| 18
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Splenius capitis muscle|splenius capitis]]
+| Torso/Neck, Back, right/left
+| [[nuchal ligament]], [[Vertebra|spinous process]] of [[cervical vertebrae|C7]]-[[thoracic vertebrae|T6]]
+| [[Mastoid part of the temporal bone|mastoid process]] of [[temporal bone]], [[occipital bone]]
+| ??
+| [[cervical spinal nerve 3|C3]], [[cervical spinal nerve 4|C4]]
+| extends, rotates, and laterally flexes [[Human head|head]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Splenius cervicis muscle|splenius colli]]
+| Torso, Back, right/left
+| [[spinous processes]] of [[thoracic vertebrae|T3]]-[[thoracic vertebrae|T6]]
+| [[transverse processes]] of [[Atlas (anatomy)|C1]], [[Axis (anatomy)|C2]], [[cervical vertebra 3|C3]]
+| 
+| [[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]]
+| 
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[External intercostal muscles|external intercostal]] 1–11
+| Torso, Chest (left/right)
+| inferior border of [[rib]] (above)
+| superior border of [[rib]] (below)
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| [[inhalation]]
+| [[Internal intercostal muscles|internal]]
+| 22
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Internal intercostal muscles|internal intercostal]] 1–11
+| Torso, Chest (left/right)
+| inferior border of [[rib]] (above)
+| superior border of [[rib]] (below)
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| holds [[Rib cage|ribs]] steady
+| [[External intercostal muscles|external]]
+| 22
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Innermost intercostal muscle|innermost intercostal]] 1–11
+| Torso, Chest
+| inferior border of [[rib]] (above)
+| superior border of [[rib]] (below)
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| elevates [[Rib cage|ribs]], [[Breathing|expiration]]
+| 
+| 22
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Subcostales muscle|subcostales]] 1-n
+| Torso, Chest
+| inner surface of one [[rib]]
+| inner surface of second or third rib above, near its angle
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| 
+| 
+| 11<ref>{{cite journal |last1=Kim |first1=Jun-Ho |last2=Won |first2=Hyung-Sun |last3=Chung |first3=In-Hyuk |last4=Kim |first4=In-Beom |title=The enigmatic subcostal muscle: Anatomical study with application to spine and chest pain syndromes and avoidance of confusion on imaging: Morphology and Morphometry of the Subcostal Muscle |journal=Clinical Anatomy |date=November 2015 |volume=28 |issue=8 |pages=1017–1021 |doi=10.1002/ca.22631|pmid=26384842 |s2cid=42512626 }}</ref>
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Transversus thoracis muscle|transversus thoracis]]
+| Torso, Chest
+| [[costal cartilages]] of last 3–4 ribs, body of sternum, xiphoid process
+| [[ribs]]/[[costal cartilages]] 2–6
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| depresses ribs
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Levatores costarum muscle|levatores costarum]], longi 1–4
+| Torso, Chest
+| [[transverse processes]] of [[cervical vertebrae|C7]] to [[thoracic vertebrae|T12]] vertebrae
+| superior surfaces of ribs immediately inferior to preceding vertebrae
+| 
+| [[Dorsal ramus of spinal nerve|dorsal rami]] – [[cervical spinal nerve 8|C8]], [[thoracic spinal nerve 1|T1]], [[thoracic spinal nerve 2|T2]], [[thoracic spinal nerve 3|T3]], [[thoracic spinal nerve 4|T4]], [[thoracic spinal nerve 5|T5]], [[thoracic spinal nerve 6|T6]], [[thoracic spinal nerve 7|T7]], [[thoracic spinal nerve 8|T8]], [[thoracic spinal nerve 9|T9]], [[thoracic spinal nerve 10|T10]], [[thoracic spinal nerve 11|T11]]
+| assists in [[Elevation (kinesiology)|elevation]] of thoracic rib cage
+| 
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Levatores costarum muscle|levatores costarum]], breves 1–12
+| Torso, Chest
+| [[transverse processes]] of [[cervical vertebrae|C7]] to [[thoracic vertebrae|T12]] vertebrae
+| superior surfaces of ribs immediately inferior to preceding vertebrae
+| 
+| [[Dorsal ramus of spinal nerve|dorsal rami]] – [[cervical spinal nerve 8|C8]], [[thoracic spinal nerve 1|T1]], [[thoracic spinal nerve 2|T2]], [[thoracic spinal nerve 3|T3]], [[thoracic spinal nerve 4|T4]], [[thoracic spinal nerve 5|T5]], [[thoracic spinal nerve 6|T6]], [[thoracic spinal nerve 7|T7]], [[thoracic spinal nerve 8|T8]], [[thoracic spinal nerve 9|T9]], [[thoracic spinal nerve 10|T10]], [[thoracic spinal nerve 11|T11]]
+| assists in [[Elevation (kinesiology)|elevation]] of thoracic rib cage
+| 
+| 24
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Serratus posterior inferior muscle|serratus posterior inferior]]
+| Torso, Chest
+| vertebrae [[thoracic vertebrae|T11]] – [[lumbar vertebrae|L3]]
+| inferior borders of 9th through 12th [[rib]]s
+| [[intercostal arteries]]
+| [[intercostal nerves]]
+| depresses lower [[Rib cage|ribs]](IX to XII), aiding in [[exhalation|expiration]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Serratus posterior superior muscle|serratus posterior superior]]
+| Torso, Chest
+| [[nuchal ligament]] (or ligamentum nuchae) and [[spinous process]]es of [[vertebra]]e C7 through T3
+| upper borders of 2nd through 5th [[rib]]s
+| [[intercostal arteries]]
+| 2nd through 5th [[intercostal nerve]]s
+| elevates [[Rib cage|ribs]](II to V), aiding in [[inhalation|inspiration]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Thoracic diaphragm|hemidiaphragm]], lumbar/costal/sternal part
+| Torso, Chest, Left/right
+| [[septum transversum]], [[pleuroperitoneal]] folds, inner [[abdominal wall]]
+| 
+| [[pericardiacophrenic artery]], [[musculophrenic artery]], [[inferior phrenic arteries]]
+| [[Phrenic nerve|phrenic]] and lower [[intercostal nerves]]
+| [[breathing]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Coccygeus muscle|coccygeus]]
+| Torso, Pelvis
+| [[sacrospinous ligament]]
+| [[coccyx]]
+| 
+| [[sacral nerves]]: [[sacral spinal nerve 4|S4]], [[sacral spinal nerve 5|S5]] or [[sacral spinal nerve 3|S3]]-S4
+| closes back part of [[pelvic outlet]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[iliococcygeus muscle|iliococcygeus]]
+| Torso, Pelvis, [[Levator ani]]
+| [[ischial spine]], posterior part of [[tendinous arch of pelvic fascia|tendinous arch]] of [[pelvic fascia]]
+| [[coccyx]] and [[anococcygeal raphe]]
+| [[inferior gluteal artery]]
+| [[levator ani nerve]] ([[sacral spinal nerve 4|S4]])
+*[[inferior rectal nerve]] from [[pudendal nerve]] ([[sacral spinal nerve 3|S3]], [[sacral spinal nerve 4|S4]])
+*[[coccygeal plexus]]
+| supports [[Organ (anatomy)|organs]] in [[pelvic cavity]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Pubococcygeus muscle|pubococcygeus]]
+| Torso, Pelvis, [[Levator ani]]
+| back surface of [[Pubis (bone)|pubis]], anterior part of [[obturator fascia]]
+| [[coccyx]] and [[sacrum]]
+| [[inferior gluteal artery]]
+| [[levator ani nerve]] ([[sacral spinal nerve 4|S4]])
+*[[inferior rectal nerve]] from [[pudendal nerve]] ([[sacral spinal nerve 3|S3]], [[sacral spinal nerve 4|S4]])
+*[[coccygeal plexus]]
+| controls [[urine]] flow, contracts during [[orgasm]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Puborectalis muscle|puboanalis]] <small>(puborectalis)</small>
+| Torso, Pelvis, [[Levator ani]]
+| lower part of [[pubic symphysis]]
+| -
+| [[inferior gluteal artery]]
+| [[sacral spinal nerve 3|S3]], [[sacral spinal nerve 4|S4]]. [[levator ani nerve]]
+| inhibits [[defecation]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | puboperinealis
+| Torso, Pelvis, [[Levator ani]]
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | puboprostaticus (males) / [[Pubovaginal muscle|pubovaginalis]] (females)
+| Torso, Pelvis, [[Levator ani]]
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 2(F)(M)
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Sphincter ani externus muscle|external anal sphincter]], subcutaneous, superficial, and deep parts
+| Torso, Perineum
+| -
+| -
+| [[inferior rectal artery]]
+| [[sacral spinal nerve 4|S4]] and twigs from [[inferior anal nerves]] of [[pudendal nerve]]
+| keeps [[anal canal]] and [[Human anus|anus]] closed, aids in expulsion of [[Human feces|feces]]
+| -
+| 1
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[superficial transverse perineal muscle|superficial transverse perineal]]
+| Torso, Perineum, [[Superficial perineal pouch]]
+| anterior surface of [[ischial tuberosity]]
+| central point of [[perineum]]
+| [[perineal artery]]
+| [[pudendal nerve]]
+| constricts [[urethra]] (maintains [[Urinary incontinence|urinary continence]]), constricts [[vagina]] (women)
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Bulbospongiosus muscle|bulbospongiosus]]
+| Torso, Perineum, [[Superficial perineal pouch]]
+| [[perineal raphe]]
+| -
+| [[perineal artery]]
+| [[pudendal nerve]]
+| empties [[urethra]] (men), clenches [[vagina]] (women)
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Ischiocavernosus muscle|ischiocavernosus]]
+| Torso, Perineum, [[Superficial perineal pouch]]
+| [[ischial tuberosity]]
+| [[crus of penis]] (men), [[crus of clitoris]] (women)
+| [[perineal artery]]
+| [[pudendal nerve]]
+| assists [[bulbospongiosus muscle|bulbospongiosus]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Deep transverse perineal muscle|Deep transverse perineal]]
+| Torso, Perineum, [[Deep perineal pouch]]
+| [[Ischium|inferior ramus]] of [[ischium]]
+| its fellow of opposite side
+| 
+| [[pudendal nerve]]
+| constricts [[urethra]] (maintains [[Urinary incontinence|urinary continence]]), constricts [[vagina]] (women)
+| 
+| 0-2(M)
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[External sphincter muscle of female urethra|compressor urethrae]]
+| Torso, Perineum, [[Deep perineal pouch]]
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0-1(F)
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[External sphincter muscle of female urethra|sphincter urethrovaginalis]]
+| Torso, Perineum, [[Deep perineal pouch]]
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0-1(F)
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[External sphincter muscle of urethra (disambiguation)|external urethral sphincter]]
+| Torso, Perineum, [[Deep perineal pouch]]
+| junction of [[Inferior pubic ramus|inferior rami]] of [[pubis (bone)|pubis]] and [[ischium]] about 1.25 – 2&nbsp;cm, and from neighboring fascia
+| its fellow of opposite side
+| 
+| [[Pudendal nerve|perineal branch]] of [[pudendal nerve]] ([[sacral spinal nerve 2|S2]], [[sacral spinal nerve 3|S3]], [[sacral spinal nerve 4|S4]])
+| constricts [[urethra]], maintains [[Urinary incontinence|urinary continence]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Trapezius muscle|trapezius]], descending part
+| Upper limb, Vertebral column, Right/Left
+| down midline, [[external occipital protuberance]], [[nuchal ligament]], ''medial'' part of [[nuchal lines|superior nuchal line]], [[spinous process]]es of [[vertebrae]] [[Cervical vertebrae|C7]]-[[Thoracic vertebrae|T12]]
+| at [[shoulder]]s, ''lateral'' third of [[clavicle]], [[acromion]] of [[scapula]], [[spine of the scapula|spine of scapula]]
+| [[transverse cervical artery]]
+| '''motor''': [[accessory nerve]] [CNXI]
+'''sensory''': [[cervical nerves]] [[cervical spinal nerve 3|C3]] and [[cervical spinal nerve 4|C4]]
+| [[Retraction (kinesiology)|retracts]] and assists in rotating [[scapula]](lower fibers depress scapula, upper fibers elevate it and middle fibers adduct )
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Trapezius muscle|trapezius]], transverse part
+| Upper limb, Vertebral column, Right/Left
+| down midline, [[external occipital protuberance]], [[nuchal ligament]], ''medial'' part of [[nuchal lines|superior nuchal line]], [[spinous process]]es of [[vertebrae]] [[Cervical vertebrae|C7]]-[[Thoracic vertebrae|T12]]
+| at [[shoulder]]s, ''lateral'' third of [[clavicle]], [[acromion]] of [[scapula]], [[spine of the scapula|spine of scapula]]
+| [[transverse cervical artery]]
+| '''motor''': [[accessory nerve]] [CNXI]
+'''sensory''': [[cervical nerves]] [[cervical spinal nerve 3|C3]] and [[cervical spinal nerve 4|C4]]
+| [[Retraction (kinesiology)|retracts]] and elevates [[scapula]]
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Trapezius muscle|trapezius]], ascending part
+| Upper limb, Vertebral column, Right/Left
+| down midline, [[external occipital protuberance]], [[nuchal ligament]], ''medial'' part of [[nuchal lines|superior nuchal line]], [[spinous process]]es of [[vertebrae]] [[Cervical vertebrae|C7]]-[[Thoracic vertebrae|T12]]
+| at [[shoulder]]s, ''lateral'' third of [[clavicle]], [[acromion]] of [[scapula]], [[spine of the scapula|spine of scapula]]
+| [[transverse cervical artery]]
+| '''motor''': [[accessory nerve]] [CNXI]
+'''sensory''': [[cervical nerves]] [[cervical spinal nerve 3|C3]] and [[cervical spinal nerve 4|C4]]
+| [[Retraction (kinesiology)|retracts]] and elevates [[scapula]]
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | transversus nuchae
+| Upper limb, Vertebral column, Right/Left
+| ?
+| ?
+| ?
+| ?
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[rhomboid major muscle|rhomboid major]]
+| Upper limb, Vertebral column, Right?/Left?
+| [[spinous processes]] of [[thoracic vertebrae|T2]] to [[thoracic vertebra 5|T5]] [[vertebra]]e
+| [[medial border of the scapula|medial border of scapula]], inferior to insertion of [[rhomboid minor muscle|rhomboid minor]]
+| [[dorsal scapular artery]]
+| [[dorsal scapular nerve]] ([[cervical spinal nerve 4|C4]] and [[cervical spinal nerve 5|C5]])
+| [[Retraction (kinesiology)|retracts]] [[scapula]] and rotates it to [[Depression (kinesiology)|depress]] [[glenoid cavity]], fixes scapula to [[thoracic wall]]
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[rhomboid minor muscle|rhomboid minor]]
+| Upper limb, Vertebral column, Right?/Left?
+| [[nuchal ligaments]] and [[spinous processes]] of C7- to [[thoracic vertebrae|T1]] [[vertebrae]]
+| [[medial border of the scapula|medial border of scapula]], superior to insertion of [[rhomboid major muscle|rhomboid major]]
+| [[dorsal scapular artery]]
+| [[dorsal scapular nerve]] ([[cervical spinal nerve 4|C4]] and [[cervical spinal nerve 5|C5]])
+| [[Retraction (kinesiology)|retracts (adducts)]] [[scapula]] and rotates it to [[Depression (kinesiology)|depress]] [[glenoid cavity]], fixes scapula to [[thoracic wall]]
+| [[Serratus anterior muscle|serratus anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Sternalis muscle|sternalis]]
+| Upper limb, Thoracic walls, Right?/Left?
+| [[Sternum#Manubrium|manubrium of sternum]] or [[clavicle]]
+| [[Sternum#Xiphoid process|xiphoid process]], [[pectoral fascia]], [[rib cage|lower ribs]], [[costal cartilages]] or [[rectus sheath]]
+| ?
+| various
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[pectoralis major muscle|pectoralis major]]
+| Upper limb, Thoracic walls, Right?/Left?
+| '''clavicular head:''' anterior surface of medial half of [[clavicle]] '''sternocostal head''': anterior surface of [[Human sternum|sternum]], superior six [[costal cartilages]]
+| [[intertubercular groove]] of [[humerus]]
+| [[pectoral branch]] of [[thoracoacromial artery]]
+| [[lateral pectoral nerve]], [[medial pectoral nerve]] '''clavicular head''': [[cervical spinal nerve 5|C5]] and [[cervical spinal nerve 6|C6]] '''sternocostal head''': [[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]] and [[thoracic spinal nerve 1|T1]]
+| [[adduction|adducts]] and [[medially rotates]] [[humerus]], draws [[scapula]] anteriorly and inferiorly '''clavicular head''': [[Flexion|flexes]] [[humerus]] '''sternocostal head''': [[extension (kinesiology)|extends]] [[humerus]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[pectoralis major muscle|pectoralis major]], abdominal part
+| Upper limb, Thoracic walls, Right?/Left?
+| '''clavicular head:''' anterior surface of medial half of [[clavicle]] '''sternocostal head''': anterior surface of [[Human sternum|sternum]], superior six [[costal cartilages]]
+| [[intertubercular groove]] of [[humerus]]
+| [[pectoral branch]] of [[thoracoacromial artery]]
+| [[lateral pectoral nerve]], [[medial pectoral nerve]] '''clavicular head''': [[cervical spinal nerve 5|C5]] and [[cervical spinal nerve 6|C6]] '''sternocostal head''': [[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]] and [[thoracic spinal nerve 1|T1]]
+| [[adduction|adducts]] and [[medially rotates]] [[humerus]], draws [[scapula]] anteriorly and inferiorly '''clavicular head''': [[Flexion|flexes]] [[humerus]] '''sternocostal head''': [[extension (kinesiology)|extends]] [[humerus]]
+| 
+| 0
+| 0
+|- style="vertical-align: top;"
+! scope="row" | [[pectoralis minor muscle|pectoralis minor]]
+| Upper limb, Thoracic walls, Right?/Left?
+| 3rd to 5th [[rib]]s, near their [[costal cartilages]]
+| medial border and superior surface of [[coracoid process]] of [[scapula]]
+| [[pectoral branch]] of [[thoracoacromial artery]]
+| [[medial pectoral nerve]] ([[cervical spinal nerve 8|C8]], [[thoracic spinal nerve 1|T1]])
+| stabilizes [[scapula]] by drawing it inferiorly and anteriorly against [[thoracic wall]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[subclavius muscle|subclavius]]
+| Upper limb, Thoracic walls, Right?/Left?
+| [[first rib]]
+| [[subclavian groove]] of [[clavicle]]
+| [[thoracoacromial artery]], clavicular branch
+| [[subclavian nerve]]
+| [[Depression (kinesiology)|depresses]] [[clavicle]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[serratus anterior muscle|serratus anterior]]
+| Upper limb, Thoracic walls, Right?/Left?
+| fleshy slips from outer surface of upper 8 or 9 [[ribs]]
+| [[Rib|costal]] surface of [[medial margin of the scapula|medial margin of scapula]]
+| [[lateral thoracic artery]] (upper part), [[thoracodorsal artery]] (lower part)
+| [[long thoracic nerve]] (from roots of [[brachial plexus]] [[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]], [[cervical spinal nerve 7|C7]])
+| [[protract]]s and stabilises [[scapula]], assists in upward rotation
+| [[Rhomboid major muscle|rhomboid major]], [[Rhomboid minor muscle|rhomboid minor]], [[Trapezius muscle|trapezius]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[deltoid muscle|deltoid]], clavicular/acromial/scapular spinal parts
+| Upper limb, Shoulder, Right/left
+| [[clavicle]], [[acromion]], [[spine of the scapula|spine of scapula]]
+| [[deltoid tuberosity]] of [[humerus]]
+| primarily [[posterior circumflex humeral artery]]
+| [[axillary nerve]]
+| [[Abduction (kinesiology)|abducts]], [[flexion|flexes]], and [[Extension (kinesiology)|extends]] [[shoulder]]
+| [[Latissimus dorsi muscle|latissimus dorsi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[teres major muscle|teres major]]
+| Upper limb, Shoulder, Right/left
+| posterior surface of [[Inferior angle of the scapula|inferior angle]] of [[scapula]]
+| medial lip of [[intertubercular sulcus]] of [[humerus]]
+| [[Subscapular Artery|subscapular artery]], [[circumflex scapular artery]]
+| [[lower subscapular nerve]] (segmental levels [[cervical spinal nerve 5|C5]] and [[cervical spinal nerve 6|C6]])
+| [[internal rotation|internally rotates]] [[humerus]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[supraspinatus muscle|supraspinatus]]
+| Upper limb, Shoulder, [[rotator cuff]], Right/left
+| [[supraspinous fossa]] of [[scapula]]
+| superior facet of [[greater tubercle]] of [[humerus]]
+| [[suprascapular artery]]
+| [[suprascapular nerve]]
+| [[Abduction (kinesiology)|abducts]] and stabilises [[humerus]]
+| [[infraspinatus]], [[teres minor]], [[pectoralis major]], [[latissimus dorsi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[infraspinatus muscle|infraspinatus]]
+| Upper limb, Shoulder, [[rotator cuff]], Right/left
+| [[infraspinous fossa]] of [[scapula]]
+| middle facet of [[greater tubercle]] of [[humerus]]
+| [[suprascapular|suprascapular artery]], [[circumflex scapular artery]]
+| [[suprascapular nerve]]
+| [[Lateral rotation|laterally rotates]], [[Adduction|adducts]], and stabilises [[humerus]]
+| [[subscapularis]], [[pectoralis major]], [[latissimus dorsi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[teres minor muscle|teres minor]]
+| Upper limb, Shoulder, [[rotator cuff]], Right/left
+| [[lateral border]] of [[scapula]]
+| inferior facet of [[greater tubercle]] of [[humerus]]
+| [[posterior circumflex humeral artery]], [[circumflex scapular artery]]
+| [[axillary nerve]]
+| [[laterally rotates]] and [[adduction|adduct]]s [[humerus]]
+| [[subscapularis]], [[pectoralis major]], [[latissimus dorsi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[subscapularis muscle|subscapularis]]
+| Upper limb, Shoulder, [[rotator cuff]], Right/left
+| [[subscapular fossa]] of [[scapula]]
+| [[lesser tubercle]] of [[humerus]]
+| [[subscapular artery]]
+| [[upper subscapular nerve]], [[lower subscapular nerve]] ([[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]])
+| [[Anatomical terms of motion|medially rotates]] [[humerus]], stabilizes [[shoulder]]
+| [[infraspinatus]], [[teres minor]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[coracobrachialis muscle|coracobrachialis]]
+| Upper Limb, Arm, Anterior compartment, right/left
+| [[coracoid process]] of [[scapula]]
+| medial surface of [[humerus]]
+| [[brachial artery]]
+| [[musculocutaneous nerve]]
+| [[flexion|flexes]] and [[adduction|adducts]] [[shoulder]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[biceps brachii muscle|biceps brachii]]
+| Upper Limb, Arm, Anterior compartment, right/left
+| '''short head:''' [[coracoid process]] of [[scapula]]<br>'''long head:''' [[supraglenoid tubercle]]
+| [[radial tuberosity]], [[bicipital aponeurosis]]
+| [[brachial artery]]
+| [[musculocutaneous nerve]] ([[lateral cord]]: [[cervical spinal nerve 5|C5]], [[cervical spinal nerve 6|C6]], [[cervical spinal nerve 7|C7]])
+| [[Flexion|flexes]] [[Elbow-joint|elbow]], [[supinates]] [[forearm]]
+| [[Triceps brachii muscle|triceps brachii]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[brachialis muscle|brachialis]]
+| Upper Limb, Arm, Anterior compartment, right/left
+| anterior surface of [[humerus]] (mainly distal half)
+| [[coronoid process of the ulna|coronoid process of ulna]], [[tuberosity of the ulna|tuberosity of ulna]]
+| [[radial recurrent artery]]
+| [[musculocutaneous nerve]]
+| [[flexion|flexes]] [[elbow]]
+| [[Triceps brachii muscle|triceps brachii]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[triceps brachii muscle|triceps brachii]]
+| Upper Limb, Arm, Posterior compartment, right/left
+| '''long head:''' [[infraglenoid tubercle]] of [[scapula]] <br>'''lateral head:''' posterior [[humerus]] (above [[radial sulcus]])<br>'''medial head:''' posterior [[humerus]] - (below [[radial sulcus]])
+| [[olecranon]] of [[ulna]]
+| [[deep artery of arm]]
+| [[radial nerve]]
+| [[extension (kinesiology)|extends]] [[forearm]], [[adduction|adduct]]s [[shoulder]] (long head).
+medial head does not function at [[shoulder]].
+| [[biceps brachii muscle|biceps brachii]], [[Brachialis muscle|brachialis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Articularis cubiti muscle|articularis cubiti]]
+| Upper Limb, Arm, Posterior compartment, right/left
+| deep distal surface of medial head of [[triceps]]
+| posterior capsule of [[elbow joint]]
+| [[deep artery of arm]]
+| [[radial nerve]]
+| lifts capsule away from joint
+| ?
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[anconeus muscle|anconeus]]
+| Upper Limb, Arm, Posterior compartment, right/left
+| [[Lateral epicondyle of the humerus|lateral epicondyle of humerus]]
+| lateral surface of [[olecranon]], superior part of posterior [[ulna]]
+| [[Profunda brachii|deep artery of arm]], [[interosseous recurrent artery]]
+| [[radial nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]], and [[thoracic spinal nerve 1|T1]])
+| partly blended with [[triceps]], [[extension (kinesiology)|extends]] [[forearm]], stabilises [[elbow]], [[Abduction (kinesiology)|abducts]] [[ulna]] during [[pronation]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[pronator teres muscle|pronator teres]]
+| Upper limb, Forearm, Anterior compartment, Superficial, Right/left
+| '''humeral head''': [[medial epicondyle of humerus]] ([[common flexor tendon]]) <br>'''ulnar head''': [[coronoid process of the ulna|coronoid process of ulna]]
+| pronator tuberosity of [[radius (bone)|radius]]
+| [[ulnar artery]], [[radial artery]]
+| [[median nerve]]
+| [[pronation|pronates]] [[forearm]], [[Flexion|flexes]] [[Elbow-joint|elbow]]
+| [[Supinator muscle|supinator]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor carpi radialis muscle|flexor carpi radialis]]
+| Upper limb, Forearm, Anterior compartment, Superficial, Right/left
+| [[medial epicondyle of humerus]] ([[common flexor tendon]])
+| bases of [[Second metacarpal bone|second metacarpal]], base of [[third metacarpal bone|third metacarpal]]
+| [[radial artery]]
+| [[median nerve]]
+| [[flexion|flexes]] and [[Abduction (kinesiology)|abducts]] [[wrist]]
+| [[Extensor carpi radialis brevis muscle|extensor carpi radialis brevis]], [[Extensor carpi radialis longus muscle|extensor carpi radialis longus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[palmaris longus muscle|palmaris longus]]
+| Upper limb, Forearm, Anterior compartment, Superficial, Right/left
+| [[medial epicondyle of humerus]] ([[common flexor tendon]])
+| [[palmar aponeurosis]]
+| [[ulnar artery]]
+| [[median nerve]]
+| [[Flexion|flexes]] [[wrist]]
+| [[Extensor carpi radialis brevis muscle|extensor carpi radialis brevis]], [[Extensor carpi radialis longus muscle|extensor carpi radialis longus]], [[Extensor carpi ulnaris muscle|extensor carpi ulnaris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor carpi ulnaris muscle|flexor carpi ulnaris]]
+| Upper limb, Forearm, Anterior compartment, Superficial, Right/left
+| [[medial epicondyle of humerus]] ([[common flexor tendon]])
+| [[pisiform]], [[Hamate bone|hook of hamate]], base of [[Fifth metacarpal bone|fifth metacarpal]]
+| [[ulnar artery]]
+| [[muscular branches of ulnar nerve]]
+| [[flexion|flexes]] and [[adduction|adducts]] [[wrist]]
+| [[Extensor carpi ulnaris muscle|extensor carpi ulnaris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor digitorum superficialis muscle|flexor digitorum superficialis]]
+| Upper limb, Forearm, Anterior compartment, Superficial, Right/left
+| [[medial epicondyle of the humerus|medial epicondyle of humerus]] ([[common flexor tendon]]), parts of [[radius (bone)|radius]] and [[ulna]]
+| bases of middle [[Phalanx bone|phalanges]] 2, 3, 4, and 5
+| [[ulnar artery]]
+| [[median nerve]]
+| [[flexor|flexes]] [[finger]]s (primarily at [[proximal interphalangeal joints]])
+| [[Extensor digitorum muscle|extensor digitorum]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[pronator quadratus]]
+| Upper limb, Forearm, Anterior compartment, Deep, Right/left
+| medial anterior surface of [[ulna]]
+| lateral anterior surface of [[Radius (bone)|radius]]
+| [[anterior interosseous artery]]
+| [[anterior interosseous nerve]] ([[median nerve]])
+| weakly [[pronates]] [[forearm]]
+| [[Supinator muscle|supinator]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor digitorum profundus muscle|flexor digitorum profundus]]
+| Upper limb, Forearm, Anterior compartment, Deep, Right/left
+| [[ulna]]
+| [[distal phalanges]]
+| [[anterior interosseous artery]]
+| '''lateral belly''': [[anterior interosseous nerve]] ([[median nerve]])
+'''medial belly''': [[muscular branches of ulnar nerve]]
+| flexes [[wrist]], flexes [[Interphalangeal articulations of hand|interphalangeal joints]]
+| [[Extensor digitorum muscle|extensor digitorum]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor pollicis longus muscle|flexor pollicis longus]]
+| Upper limb, Forearm, Anterior compartment, Deep, Right/left
+| middle half of [[Anatomical terms of location#Proximal and distal|volar]] surface of [[Radius (bone)|radius]], [[interosseus membrane]]
+| base of [[distal phalanges|distal phalanx]] of [[thumb]]
+| [[anterior interosseous artery]]
+| [[anterior interosseous nerve]] ([[median nerve]]) ([[cervical spinal nerve 8|C8]], [[thoracic spinal nerve 1|T1]])
+| [[Flexion|flexes]] [[thumb]]
+| [[Extensor pollicis longus muscle|extensor pollicis longus]], [[Extensor pollicis brevis muscle|extensor pollicis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor digitorum muscle|extensor digitorum]]
+| Upper limb, Forearm, Posterior compartment, Superficial, Right/left
+| [[lateral epicondyle of the humerus|lateral epicondyle of humerus]] ([[common extensor tendon]])
+| 2nd–5th [[Phalanx bone|phalanges]]
+| [[posterior interosseous artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Extension (kinesiology)|extends]] [[hand]], [[Extension (kinesiology)|extends]] [[finger]]s
+| [[flexor digitorum superficialis muscle|flexor digitorum superficialis]], [[flexor digitorum profundus muscle|flexor digitorum profundus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor digiti minimi muscle|extensor digiti minimi]]
+| Upper limb, Forearm, Posterior compartment, Superficial, Right/left
+| anterior surface of [[Lateral epicondyle of the humerus|lateral epicondyle]] of [[humerus]] ([[common extensor tendon]])
+| [[extensor expansion]], located at base of [[proximal phalanx]] on dorsal side
+| [[posterior interosseous artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Extension (kinesiology)|extends]] [[little finger]] at all joints
+| [[flexor digiti minimi brevis (hand)]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor carpi ulnaris muscle|extensor carpi ulnaris]]
+| Upper limb, Forearm, Posterior compartment, Superficial, Right/left
+| [[lateral epicondyle of the humerus|lateral epicondyle of humerus]] ([[common extensor tendon]]), [[ulna]]
+| [[Fifth metacarpal bone|5th metacarpal]]
+| [[ulnar artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Extension (kinesiology)|extends]] and [[adduction|adduct]]s [[wrist]]
+| [[flexor carpi ulnaris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[brachioradialis]]
+| Upper limb, Forearm, [[mobile wad]], Right/left
+| [[lateral supracondylar ridge]] of [[humerus]]
+| [[radial styloid process]] (distal [[Radius (bone)|radius]])
+| [[radial recurrent artery]]
+| [[radial nerve]]
+| [[Flexion|flexes]] [[forearm]], [[pronates]] [[forearm]] when [[supine]], [[supinates]] [[forearm]] when [[Pronation|prone]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor carpi radialis longus muscle|extensor carpi radialis longus]]
+| Upper limb, Forearm, [[mobile wad]], Right/left
+| [[lateral supracondylar ridge]] of [[humerus]]
+| [[Second metacarpal bone|2nd metacarpal]]
+| [[radial artery]]
+| [[radial nerve]]
+| [[extensor|extends]] [[wrist joint]], [[Abduction (kinesiology)|abducts]] [[hand]] at [[wrist]]
+| [[flexor carpi radialis muscle|flexor carpi radialis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor carpi radialis brevis muscle|extensor carpi radialis brevis]]
+| Upper limb, Forearm, [[mobile wad]], Right/left
+| anterior surface of [[Lateral epicondyle of the humerus|lateral epicondyle]] of [[humerus]] ([[common extensor tendon]])
+| base of [[Third metacarpal bone|3rd metacarpal]]
+| [[radial artery]]
+| [[posterior interosseus nerve]]
+| [[extensor|extends]] [[wrist joint]], [[Abduction (kinesiology)|abducts]] [[hand]] at [[wrist]]
+| [[flexor carpi radialis muscle|flexor carpi radialis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[supinator muscle|supinator]]
+| Upper limb, Forearm, Posterior compartment, Deep, Right/left
+| [[lateral epicondyle of the humerus|lateral epicondyle of humerus]], [[supinator crest]] of [[ulna]], [[radial collateral ligament (elbow)|radial collateral ligament]], [[annular ligament of radius|annular ligament]]
+| lateral proximal shaft of [[Radius (bone)|radius]]
+| [[radial recurrent artery]]
+| [[posterior interosseus nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[supinates]] [[forearm]]
+| [[Pronator teres muscle|pronator teres]], [[pronator quadratus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor indicis proprius|extensor indicis]]
+| Upper limb, Forearm, Posterior compartment, Deep, Right/left
+| [[ulna]]
+| [[index finger]] ([[extensor hood]])
+| 
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[extension (kinesiology)|extends]] [[index finger]], [[wrist]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[abductor pollicis longus muscle|abductor pollicis longus]]
+| Upper limb, Forearm, [[anatomical snuffbox]], Right/left
+| [[ulna]]
+| [[first metacarpal]]
+| [[posterior interosseous artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Abduction (kinesiology)|abducts]] and [[Extension (kinesiology)|extends]] [[thumb]]
+| [[Adductor pollicis muscle|adductor pollicis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor pollicis brevis muscle|extensor pollicis brevis]]
+| Upper limb, Forearm, [[anatomical snuffbox]], Right/left
+| [[Radius (bone)|radius]], [[interosseous membrane of forearm]]
+| [[Proximal phalanges|proximal phalanx]] of [[thumb]]
+| [[posterior interosseous artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Extension (kinesiology)|extends]] [[thumb]] at [[metacarpophalangeal joint]]
+| [[Flexor pollicis longus muscle|flexor pollicis longus]], [[Flexor pollicis brevis muscle|flexor pollicis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor pollicis longus muscle|extensor pollicis longus]]
+| Upper limb, Forearm, [[anatomical snuffbox]], Right/left
+| [[ulna]], [[interosseous membrane of forearm]]
+| [[distal phalanges|distal phalanx]] of [[thumb]]
+| [[posterior interosseous artery]]
+| [[posterior interosseous nerve]] ([[cervical spinal nerve 7|C7]], [[cervical spinal nerve 8|C8]])
+| [[Extension (kinesiology)|extends]] [[thumb]] ([[metacarpophalangeal]] and [[interphalangeal articulations of hand|interphalangeal]])
+| [[Flexor pollicis longus muscle|flexor pollicis longus]], [[Flexor pollicis brevis muscle|flexor pollicis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[opponens pollicis muscle|opponens pollicis]]
+| Upper limb, Hand, Lateral volar, Thenar
+| [[Trapezium (bone)|trapezium]], [[transverse carpal ligament]]
+| [[metacarpal]] bone of [[thumb]] on its radial side
+| [[superficial palmar arch]]
+| [[median nerve]]
+| [[Opposition of the thumb|opposes]] [[thumb]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor pollicis brevis muscle|flexor pollicis brevis]]
+| Upper limb, Hand, Lateral volar, Thenar
+| [[Trapezoid bone|trapezoid]], [[flexor retinaculum of the hand|flexor retinaculum]]
+| [[thumb]], [[Proximal phalanges|proximal phalanx]]
+| [[superficial palmar arch]]
+| [[median nerve]], [[deep branch of ulnar nerve]] (medial head)
+| [[Flexion|flexes]] [[thumb]]
+| [[Extensor pollicis longus muscle|extensor pollicis longus]], [[Extensor pollicis brevis muscle|extensor pollicis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[abductor pollicis brevis muscle|abductor pollicis brevis]]
+| Upper limb, Hand, Lateral volar, Thenar
+| [[Flexor retinaculum of the hand|flexor retinaculum of hand]], [[scaphoid]] and [[trapezium (bone)|trapezium]]
+| radial base of [[proximal phalanx]] of [[thumb]] and [[Thumb extensors (disambiguation)|thumb extensor]]s
+| [[superficial palmar arch]]
+| [[median nerve]]
+| [[Abduction (kinesiology)|abducts]] [[thumb]]
+| [[Adductor pollicis muscle|adductor pollicis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[adductor pollicis muscle|adductor pollicis]]
+| Upper limb, Hand, Lateral volar, Thenar
+| '''transverse head:''' anterior body of [[third metacarpal]]<br>'''oblique head:''' bases of [[second metacarpal|second]] and [[third metacarpal]]s and adjacent [[trapezoid]] and [[capitate bone]]s
+| medial side of base of [[proximal phalanx]] of [[thumb]] and [[ulnar sesamoid]]
+| [[deep palmar arch]]
+| [[deep branch of ulnar nerve]] ([[thoracic spinal nerve 1|T1]])
+| [[adduction|adduct]]s [[thumb]] at [[carpometacarpal joint]]
+| [[Abductor pollicis longus muscle|abductor pollicis longus]], [[Abductor pollicis brevis muscle|abductor pollicis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[palmaris brevis muscle|palmaris brevis]]
+| Upper limb, Hand, Medial volar
+| [[Flexor retinaculum of the hand|flexor retinaculum]] (medial), [[palmar aponeurosis]]
+| [[Hand#Areas|palm]]
+| [[Palmar metacarpal arteries|palmar metacarpal artery]]
+| [[superficial branch of ulnar nerve]]
+| wrinkle skin of [[Hand#Areas|palm]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Abductor digiti minimi muscle of hand|abductor digiti minimi (hand)]]
+| Upper limb, Hand, Medial volar, [[Hypothenar eminence|hypothenar]]
+| [[pisiform]]
+| base of [[proximal phalanx]] of [[Little finger|5th digit]] on ulnar or medial side
+| [[ulnar artery]]
+| [[deep branch of ulnar nerve]]
+| abducts [[little finger]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Flexor digiti minimi brevis (hand)|flexor digiti minimi (hand)]]
+| Upper limb, Hand, Medial volar, [[Hypothenar eminence|hypothenar]]
+| [[hamate bone]]
+| [[little finger]]
+| [[ulnar artery]]
+| [[deep branch of ulnar nerve]]
+| [[Flexion|flexes]] [[little finger]]
+| [[extensor digiti minimi muscle|extensor digiti minimi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[opponens digiti minimi muscle|opponens digiti minimi]] (hand)
+| Upper limb, Hand, Medial volar, [[Hypothenar eminence|hypothenar]]
+| hook of [[hamate]], [[flexor retinaculum of the hand|flexor retinaculum]]
+| medial border of 5th [[metacarpal]]
+| [[ulnar artery]]
+| [[deep branch of ulnar nerve]] ([[cervical spinal nerve 8|C8]] and [[thoracic spinal nerve 1|T1]])
+| draws [[Fifth metacarpal bone|5th metacarpal]] anteriorly and rotates it, bringing little finger (5th digit) into opposition with thumb
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[lumbricals of the hand]] 1–4
+| Upper limb, Hand, Intermediate
+| [[flexor digitorum profundus]]
+| [[extensor expansion]]
+| [[superficial palmar arch]], [[common palmar digital arteries]], [[deep palmar arch]], [[dorsal metacarpal arteries|dorsal digital artery]]
+| [[deep branch of ulnar nerve]], [[median nerve]]
+| [[Flexion|flex]] [[metacarpophalangeal joint]]s, [[Extension (kinesiology)|extend]] [[Interphalangeal articulations of hand|interphalangeal joints]]
+| 
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Dorsal interossei of the hand|dorsal interossei (hand)]] 1–4
+| Upper limb, Hand, Intermediate
+| [[metacarpals]]
+| [[proximal phalanges]]
+| [[Dorsal carpal arch|dorsal metacarpal artery]], [[palmar metacarpal artery]]
+| [[deep branch of ulnar nerve]]
+| [[Abduction (kinesiology)|abduct]] [[finger]]s
+| [[Palmar interossei muscles|palmar interossei]]
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[palmar interossei muscles|palmar interossei]] 1–3
+| Upper limb, Hand, Intermediate
+| [[metacarpals]]
+| [[proximal phalanges]]
+| [[Palmar metacarpal arteries|palmar metacarpal artery]]
+| [[deep branch of ulnar nerve]]
+| [[adduction|adduct]] [[finger]]s
+| [[Dorsal interossei of the hand|dorsal interossei]]
+| 6
+| 1
+|- style="vertical-align: top;"
+! scope="row" | pollical [[palmar interossei muscles|palmar interosseus]]
+| Upper limb, Hand, Intermediate
+| [[metacarpals]]
+| [[proximal phalanges]]
+| [[Palmar metacarpal arteries|palmar metacarpal artery]]
+| [[deep branch of ulnar nerve]]
+| [[adduction|adduct]] [[finger]]s
+| [[Dorsal interossei of the hand|dorsal interossei]]
+| 1.6
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Psoas major muscle|psoas major]]
+| Lower Limb, Iliac region, [[iliopsoas]]
+| [[Vertebra|transverse processes]], [[Vertebral body|bodies]] and [[intervertebral disc]]s of [[Thoracic vertebrae|T12]]-[[Lumbar vertebrae|L5]] [[vertebra]]e
+| [[lesser trochanter]] of [[femur]]
+| [[iliolumbar artery]]
+| [[lumbar plexus]] via anterior branches of [[lumbar spinal nerve 1|L1]], [[lumbar spinal nerve 2|L2]], [[lumbar spinal nerve 3|L3]]<ref name=Moore193>Essential Clinical Anatomy. K.L. Moore & A.M. Agur. Lippincott, 2 ed. 2002. Page 193</ref>
+| [[Flexion|flexes]] and [[rotates laterally]] [[thigh]]
+| [[Gluteus maximus muscle|gluteus maximus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Psoas minor muscle|psoas minor]]
+| Lower Limb, Iliac region, [[iliopsoas]]
+| side of [[thoracic vertebrae|T11]]+[[lumbar vertebrae|L1]] and IV [[intervertebral disc]]
+| [[Pectineal line (pubis)|Pectineal line]] and [[iliopectineal eminence]]
+| [[iliolumbar artery]], [[lumbar arteries]]
+| [[lumbar spinal nerve 1|L1]]
+| weakly flexes trunk [[flexor]]
+| [[Gluteus maximus muscle|gluteus maximus]]
+| 0.8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[iliacus muscle|iliacus]]
+| Lower Limb, Iliac region, [[iliopsoas]]
+| [[iliac fossa]]
+| [[lesser trochanter]] of [[femur]]
+| [[medial femoral circumflex artery]], [[Iliolumbar artery]]
+| [[femoral nerve]] ([[lumbar spinal nerve 2|L2]], [[lumbar spinal nerve 3|L3]]<ref name=Moore193/>)
+| flexes [[hip]]<ref name = Gosling200>Gosling, J. A., Harris, P. F., Humpherson, J. R., Whitmore I., & Willan P. L. T. 2008. Human Anatomy Color Atlas and Text Book. Philadelphia: Mosby Elsevier. page 200</ref>
+| [[Gluteus maximus muscle|gluteus maximus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[tensor fasciae latae]]
+| Lower limb, Gluteal, Left/right
+| [[iliac crest]]
+| [[iliotibial tract]]
+| primarily [[lateral circumflex femoral artery]], [[superior gluteal artery]]
+| [[superior gluteal nerve]] ([[lumbar spinal nerve 4|L4]], [[lumbar spinal nerve 5|L5]])
+| [[flexion|flexes]] [[thigh]], [[medial rotation|medially rotates]] [[thigh]], stabilises [[torso]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[gluteus maximus muscle|gluteus maximus]]
+| Lower limb, [[Gluteal muscles|gluteal]], Left/right
+| gluteal surface of [[ilium (bone)|ilium]], [[lumbar fascia]], [[sacrum]], [[sacrotuberous ligament]]
+| [[gluteal tuberosity]] of [[femur]], [[iliotibial tract]]
+| [[superior gluteal artery]], [[inferior gluteal artery]]
+| [[inferior gluteal nerve]] ([[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]] nerve roots)
+| [[external rotation|externally rotates]] and [[Extension (kinesiology)|extends]] [[hip joint]], supports extended [[knee]] through [[iliotibial tract]], chief antigravity muscle in [[sitting]]
+| [[Iliacus muscle|Iliacus]], [[Psoas major muscle|psoas major]], [[psoas minor]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[gluteus medius muscle|gluteus medius]]
+| Lower limb, [[Gluteal muscles|gluteal]], Left/right
+| gluteal surface of [[ilium (bone)|ilium]], under [[gluteus maximus]]
+| [[greater trochanter]] of [[femur]]
+| [[superior gluteal artery]]
+| [[superior gluteal nerve]] ([[lumbar spinal nerve 4|L4]], [[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]] nerve roots)
+| [[anatomical terms of location|abduction]] of [[hip]]; preventing [[anatomical terms of location|adduction]] of hip [[Medial rotation]] of [[thigh]]
+| [[lateral rotator group]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[gluteus minimus muscle|gluteus minimus]]
+| Lower limb, [[Gluteal muscles|gluteal]], Left/right
+| gluteal surface of [[Ilium (bone)|ilium]], under [[gluteus medius]]
+| [[greater trochanter]] of [[femur]]
+| [[superior gluteal artery]]
+| [[superior gluteal nerve]] ([[lumbar spinal nerve 4|L4]], [[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]] nerve roots)
+| [[anatomical terms of location|abduction]] of [[hip]]; preventing [[anatomical terms of location|adduction]] of hip [[Medial rotation]] of [[thigh]]
+| [[lateral rotator group]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[piriformis muscle|piriformis]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[sacrum]]
+| [[greater trochanter]]
+| [[inferior gluteal artery]], [[lateral sacral artery]], [[superior gluteal artery]]
+| [[piriformis nerve]] ([[sacral spinal nerve 1|S1]] and [[sacral spinal nerve 2|S2]] nerve roots)<ref name="Moore217">Essential Clinical Anatomy. K.L. Moore & A.M. Agur. Lippincott, 2 ed. 2002. Page 217</ref>
+| [[laterally rotate]]s (outward) [[thigh]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[obturator externus muscle|obturator externus]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[obturator foramen]] and [[obturatory membrane]]
+| medial surface of [[greater trochanter]] of [[femur]]
+| [[obturator artery]]
+| [[posterior branch of obturator nerve]] ([[lumbar spinal nerve 3|L3]], [[lumbar spinal nerve 4|L4]])
+| [[Adduction|adduct]] [[thigh]], [[rotate laterally]] thigh
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[superior gemellus muscle|superior gemellus]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[ischial spine]]
+| 
+| 
+| [[nerve to obturator internus]] ([[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| 
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[obturator internus muscle|obturator internus]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[ischiopubic ramus]], [[obturator membrane]]
+| medial surface of [[greater trochanter]] of [[femur]]
+| 
+| [[nerve to obturator internus]] ([[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| [[Abduction (kinesiology)|abducts]] & [[rotates laterally]] [[thigh]], stabilises [[hip]] during [[walking]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[inferior gemellus muscle|inferior gemellus]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[ischial tuberosity]]
+| [[obturator internus]] tendon
+| 
+| [[Nerve to Quadratus femoris|nerve to quadratus femoris]] ([[lumbar spinal nerve 4|L4]], [[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]])
+| [[Rotates laterally|laterally rotates]] [[thigh]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[quadratus femoris muscle|quadratus femoris]]
+| Lower limb, [[Gluteal muscles|gluteal]], [[lateral rotator group]], Left/right
+| [[ischial tuberosity]]
+| [[intertrochanteric crest]]
+| [[inferior gluteal artery]]
+| [[Nerve to Quadratus femoris|nerve to quadratus femoris]] ([[lumbar spinal nerve 4|L4]], [[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]])
+| 
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[articularis genus muscle|articularis genus]]
+| Lower limb, Thigh, Anterior compartment
+| [[femur]]
+| [[suprapatellar bursa]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| pulls [[Knee bursae|suprapatellar bursa]] during extension of [[knee]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[sartorius muscle|sartorius]]
+| Lower limb, Thigh, Anterior compartment
+| superior to [[anterior superior iliac spine]]
+| medial side of upper [[tibia]] in [[Pes anserinus (leg)|pes anserinus]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| [[flexion|flexes]], [[lateral rotation|laterally rotates]], and [[Abduction (kinesiology)|abducts]] [[thigh]], [[flexion|flexes]] and [[medial rotation|medially rotates]] [[human leg|leg]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[rectus femoris muscle|rectus femoris]]
+| Lower limb, Thigh, Anterior compartment
+| [[anterior inferior iliac spine]] and exterior surface of bony ridge which forms iliac portion of [[acetabulum]]
+| [[patella]] and [[tibial tuberosity]] via [[patellar tendon]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| [[knee]] [[Extension (kinesiology)|extension]]; [[hip]] [[flexion]]
+| [[hamstring]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[vastus lateralis muscle|vastus lateralis]]
+| Lower limb, Thigh, Anterior compartment
+| [[greater trochanter]], [[intertrochanteric line]], and [[linea aspera]] of [[femur]]
+| [[patella]] and [[tibial tuberosity]] via [[patellar tendon]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| [[Extension (kinesiology)|extends]] [[knee]]
+| [[hamstring]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[vastus intermedius muscle|vastus intermedius]]
+| Lower limb, Thigh, Anterior compartment
+| anterior surface of [[femur]]
+| [[patella]] and [[tibial tuberosity]] via [[patellar tendon]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| [[Extension (kinesiology)|extends]] [[knee]]
+| [[hamstring]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[vastus medialis]]
+| Lower limb, Thigh, Anterior compartment
+| anteromedial surface of [[femur]]
+| [[patella]] and [[tibial tuberosity]] via [[patellar tendon]]
+| [[femoral artery]]
+| [[femoral nerve]]
+| [[Extension (kinesiology)|extends]] [[knee]]
+| [[hamstring]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[biceps femoris muscle|biceps femoris]]
+| Lower limb, Thigh, Posterior compartment/hamstring
+| [[ischial tuberosity]] (long head), [[linea aspera]] of [[femur]] (short head)<ref name="Gosling273">[[#Gosling|Gosling 2008, p. 273]]</ref>
+| [[head of the fibula|head of fibula]]<ref name="Gosling273" /> articulating with back of [[lateral tibial condyle]]
+| [[inferior gluteal artery]], [[perforating arteries]], [[popliteal artery]]
+| medial (tibial) part of [[sciatic nerve]] (long head), lateral (common fibular) part of [[sciatic nerve]] (short head)<ref name="Gosling273" />
+| [[Flexion|flexes]] [[knee joint]], [[laterally rotates]] leg at knee (when knee is flexed), [[Extension (kinesiology)|extends]] [[hip joint]] (long head only)<ref name="Gosling273" />
+| [[Quadriceps femoris muscle|quadriceps femoris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[semitendinosus muscle|semitendinosus]]
+| Lower limb, Thigh, Posterior compartment/hamstring
+| [[ischial tuberosity]]<ref name="Gosling273" />
+| [[pes anserinus (leg)|pes anserinus]]
+| [[inferior gluteal artery]], [[perforating arteries]]
+| [[sciatic nerve]]<ref name="Gosling273" /> ([[tibial nerve|tibial]], [[lumbar spinal nerve 5|L5]], [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| flexes [[knee]], extends [[hip]], [[medially rotates]] [[Human leg|leg]] at [[knee]]<ref name="Gosling273" />
+| [[Quadriceps femoris muscle|quadriceps femoris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[semimembranosus muscle|semimembranosus]]
+| Lower limb, Thigh, Posterior compartment/hamstring
+| [[ischial tuberosity]]<ref name="Gosling273" />
+| medial surface of [[tibia]]<ref name="Gosling273" />
+| [[profunda femoris]], [[Gluteal artery (disambiguation)|gluteal artery]]
+| [[sciatic nerve]]<ref name="Gosling273" />
+| flexes [[knee]], extends [[hip]], [[medially rotates]] [[Human leg|leg]] at [[knee]]<ref name="Gosling273" />
+| [[Quadriceps femoris muscle|quadriceps femoris]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[gracilis muscle|gracilis]]
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| [[inferior pubic ramus]]<ref name = Gosling266>[[#Gosling|Gosling et al. 2008, p. 266]]</ref>
+| [[tibia]] ([[pes anserinus (leg)|pes anserinus]])
+| [[obturator artery]]
+| [[anterior branch of obturator nerve]]<ref name = Gosling266/>
+| adducts [[hip]], [[flexion|flexes]] [[hip]], [[medial rotation|medially rotates]] [[knee]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[pectineus muscle|pectineus]]
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| [[superior pubic ramus]]<ref name = Gosling266/>
+| [[lesser trochanter]], [[linea aspera]]
+| [[obturator artery]]
+| [[femoral nerve]] and [[obturator nerve]] (medial compartment)<ref name = Gosling266/>
+| adducts and flexes [[hip]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[adductor brevis muscle|adductor brevis]]
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| anterior surface of inferior pubic ramus<ref name = Gosling266/>
+| [[lesser trochanter]] and [[linea aspera]] of [[femur]]
+| [[obturator artery]]
+| [[anterior branch of obturator nerve]]<ref name="Gosling266" />
+| adducts [[hip]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[adductor longus muscle|adductor longus]]
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| pubic body just below pubic crest
+| middle third of [[linea aspera]]
+| [[obturator artery]]
+| [[anterior branch of obturator nerve]]<ref name="Gosling266" />
+| adducts and medially rotates [[hip]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[adductor magnus muscle|adductor magnus]], adductor part
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| [[Pubis (bone)|pubis]]<ref name = Gosling266/>
+| [[femur]], [[adductor tubercle of femur]]
+| [[obturator artery]]
+| [[posterior branch of obturator nerve]] (adductor) and tibial part of [[sciatic nerve]] (vertical head)<ref name = Gosling266/>
+| adducts [[hip]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[Adductor minimus muscle|adductor minimus]]
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles), part of adductor magnus
+| [[Inferior pubic ramus|Inferior ramus]]
+| [[Linea aspera]] of the [[femur]]
+| [[Obturator artery]] and the [[medial circumflex femoral artery]] of the [[femoral artery]].
+| [[Obturator nerve|Obturator]] and [[tibial nerve]]s
+| [[Adduction]] and lateral rotation of [[thigh]]
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[adductor magnus muscle|adductor magnus]], ischiocondylar part
+| Lower limb, Thigh/Hip, Medial compartment (adductor muscles)
+| [[Pubis (bone)|pubis]]<ref name = Gosling266/>
+| [[femur]], [[adductor tubercle of femur]]
+| [[obturator artery]]
+| [[posterior branch of obturator nerve]] (adductor) and tibial part of [[sciatic nerve]] (vertical head)<ref name = Gosling266/>
+| adducts [[hip]]<ref name = Gosling266/>
+| [[gluteus medius]], [[gluteus minimus]]
+| 2
+| 3
+|- style="vertical-align: top;"
+! scope="row" | [[tibialis anterior muscle|tibialis anterior]]
+| Lower limb, Leg, Anterior Compartment
+| [[body of tibia]]
+| [[medial cuneiform]] and [[first metatarsal]] bones of [[foot]]
+| [[anterior tibial artery]]
+| [[deep fibular nerve]]
+| [[dorsiflexion|dorsiflexes]] and [[Inversion (kinesiology)|inverts]] [[foot]]
+| [[fibularis longus]], [[Gastrocnemius muscle|gastrocnemius]], [[Soleus muscle|soleus]], [[Plantaris muscle|plantaris]], [[Tibialis posterior muscle|tibialis posterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor hallucis longus muscle|extensor hallucis longus]]
+| Lower limb, Leg, Anterior Compartment
+| middle portion of anterior surface of [[fibula]], anterior surface of [[interosseous membrane]]
+| dorsal side of base of [[distal phalanges|distal phalanx]] of [[hallux]]
+| [[anterior tibial artery]]
+| [[deep fibular nerve]]
+| extends [[Toe#Hallux|big toe]], assists in [[dorsiflexion]] of [[foot]] at [[ankle]], weakly inverts foot
+| [[Flexor hallucis longus muscle|flexor hallucis longus]], [[Flexor hallucis brevis muscle|flexor hallucis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor digitorum longus muscle|extensor digitorum longus]]
+| Lower limb, Leg, Anterior Compartment
+| [[lateral condyle of tibia]], superior ¾ of [[interosseous membrane]]
+| middle and distal [[Phalanx bone|phalanges]] of lateral four digits
+| [[anterior tibial artery]]
+| [[deep fibular nerve]]
+| [[Extension (kinesiology)|extension]] of [[toes]] and [[ankle]]
+| [[Flexor digitorum longus muscle|flexor digitorum longus]], [[Flexor digitorum brevis muscle|flexor digitorum brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[fibularis tertius]]
+| Lower limb, Leg, Anterior Compartment
+| distal anterior surface of [[fibula]]
+| dorsal surface of [[fifth metatarsal]]
+| [[anterior tibial artery]]
+| [[deep fibular nerve]]
+| [[dorsiflexion|dorsi flexes]] and [[Eversion (kinesiology)|everts]] foot
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[gastrocnemius muscle|gastrocnemius]]
+| Lower Limb, Leg, Calf
+| [[medial condyle of femur|medial condyle]] and [[Lateral condyle of femur|lateral condyle]] of [[femur]]
+| [[calcaneus]]
+| [[sural arteries]]
+| [[tibial nerve]] from [[sciatic nerve]], specifically, nerve roots [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]]
+| [[plantarflexion|plantarflexes]] [[ankle]], [[flexion|flexes]] [[knee]] (minor)
+| [[Tibialis anterior muscle|tibialis anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[soleus muscle|soleus]]
+| Lower Limb, Leg, Calf
+| [[fibula]], medial border of [[tibia]] ([[soleal line]])
+| [[Achilles tendon|tendo calcaneus]]
+| [[sural arteries]]
+| [[tibial nerve]], specifically, nerve roots L<sub>5</sub>–S<sub>2</sub>
+| [[plantarflexion|plantarflexes]] [[ankle]]
+| [[Tibialis anterior muscle|tibialis anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[plantaris muscle|plantaris]]
+| Lower Limb, Leg, Posterior compartment, Superficial
+| [[lateral supracondylar ridge]] of [[femur]] above lateral head of [[Gastrocnemius muscle|gastrocnemius]]
+| [[Achilles tendon|calcaneal tendon]] (medial side, deep to [[gastrocnemius]] tendon)
+| [[sural arteries]]
+| [[tibial nerve]]
+| [[Plantar flexes|plantarflexes]] [[foot|ankle]], [[Flexion|flexes]] [[knee]]
+| [[Tibialis anterior muscle|tibialis anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[popliteus muscle|popliteus]]
+| Lower Limb, Leg, Posterior compartment, Deep
+| middle facet of lateral surface of [[lateral femoral condyle]]
+| posterior [[tibia]] under [[Tibial condyle (disambiguation)|tibial condyle]]s
+| [[popliteal artery]]
+| [[tibial nerve]]
+| [[Medial rotation|medially rotates]] and [[flexion|flexes]] [[knee]]
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Flexor hallucis longus muscle|flexor hallucis longus]]
+| Lower Limb, Leg, Posterior compartment, Deep, [[tarsal tunnel]]
+| posterior surface of upper 1/3 of [[fibula]]
+| base of distal [[Phalanx bones|phalanx]] of [[hallux]]
+| [[fibular artery]] (peroneal branch of [[posterior tibial artery]]
+| [[tibial nerve]], [[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]] nerve roots
+| flexes all joints of [[Toe#Hallux|big toe]], [[plantar flexion|plantarflexes]] [[ankle]]
+| [[Extensor hallucis longus muscle|extensor hallucis longus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor digitorum longus muscle|flexor digitorum longus]]
+| Lower Limb, Leg, Posterior compartment, Deep, [[tarsal tunnel]]
+| medial [[tibia]]
+| distal [[Phalanx bone|phalanges]] of lateral four digits
+| [[posterior tibial artery]]
+| [[tibial nerve]]
+| flexes [[toe]]s
+| [[Extensor digitorum longus muscle|extensor digitorum longus]], [[Extensor digitorum brevis muscle|extensor digitorum brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[tibialis posterior muscle|tibialis posterior]]
+| Lower Limb, Leg, Posterior compartment, Deep, [[tarsal tunnel]]
+| [[tibia]], [[fibula]]
+| [[Navicular bone|navicular]], [[Medial cuneiform bone|medial cuneiform]]
+| [[posterior tibial artery]]
+| [[tibial nerve]]
+| [[Inversion (kinesiology)|inverts]] [[foot]], [[plantar flexion|plantarflexes]] [[foot]] at [[ankle]]
+| [[Tibialis anterior muscle|tibialis anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[fibularis longus]]
+| Lower Limb, Leg, Lateral compartment
+| [[fibula]]
+| [[first metatarsal]], [[medial cuneiform]]
+| [[fibular artery]]
+| [[superficial fibular nerve]]
+| plantarflexes and everts ankle
+| [[tibialis anterior muscle|tibialis anterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[fibularis brevis]]
+| Lower Limb, Leg, Lateral compartment
+| [[fibula]]
+| [[fifth metatarsal]]
+| [[fibular artery]]
+| [[superficial fibular nerve]]
+| plantarflexes and everts ankle
+| [[tibialis posterior muscle|tibialis posterior]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor digitorum brevis muscle|extensor digitorum brevis]]
+| Lower limb, Foot, Dorsal, left/right
+| [[calcaneus]]
+| [[toes]]
+| 
+| [[deep fibular nerve]]
+| extends digits 2, 3, and 4
+| [[Flexor digitorum longus muscle|flexor digitorum longus]], [[Flexor digitorum brevis muscle|flexor digitorum brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[extensor hallucis brevis muscle|extensor hallucis brevis]]
+| Lower limb, Foot, Dorsal, left/right
+| [[calcaneus]]
+| base of proximal [[phalanx bones|phalanx]] of [[Toe#Hallux|big toe]]
+| 
+| [[deep fibular nerve]]
+| extends [[Toe#Hallux|big toe]]
+| [[Flexor hallucis brevis muscle|flexor hallucis brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Dorsal interossei of the foot|dorsal interossei (foot)]] 1–4
+| Lower limb, Foot, Dorsal / Fourth layer, left/right
+| [[metatarsals]]
+| [[proximal phalanges]]
+| 
+| [[lateral plantar nerve]]('''fourth interosseous space''': superficial branch '''others''': deep branch), '''first and second interossei''': lateral branch of [[deep fibular nerve]]
+| abducts [[toe]]s
+| [[Plantar interossei muscles|plantar interossei]]
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[abductor hallucis muscle|abductor hallucis]]
+| Lower limb, plantar, first layer, left/right
+| medial process of [[calcaneus]], [[flexor retinaculum of foot|flexor retinaculum]], [[plantar aponeurosis]]
+| medial side of base of proximal [[phalanx bones|phalanx]] of first digit
+| 
+| [[medial plantar nerve]]
+| abducts [[hallux]]
+| [[Adductor hallucis muscle|adductor hallucis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor digitorum brevis muscle|flexor digitorum brevis]]
+| Lower limb, plantar, first layer, left/right
+| medial process of [[calcaneus]], [[plantar aponeurosis]], [[medial intermuscular septum of thigh|intermuscular septa]]
+| middle [[Phalanx bone|phalanges]] of digits 2–5
+| 
+| [[medial plantar nerve]]
+| flexes lateral four [[toe]]s
+| [[Extensor digitorum longus muscle|extensor digitorum longus]], [[Extensor digitorum brevis muscle|extensor digitorum brevis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Abductor digiti minimi muscle (foot)|abductor digiti minimi (foot)]]
+| Lower limb, plantar, first layer, left/right
+| [[Plantar fascia|plantar aponeurosis]]
+| phalanges of [[fifth toe]]
+| [[lateral plantar artery]]
+| [[lateral plantar nerve]] ([[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| [[Flexion|flexes]] and [[Abduction (kinesiology)|abducts]] [[fifth toe]]
+| [[Flexor digiti minimi brevis muscle (foot)|flexor digiti minimi brevis (foot)]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Abductor digiti minimi muscle (foot)|Abductor of fifth metatarsal]] <small>abductor ossis metatarsi quinti (foot)</small>
+| Lower limb, plantar, first layer, left/right
+| calcaneus
+| [[fifth toe]]
+| [[lateral plantar artery]]
+| [[lateral plantar nerve]] ([[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| [[Abduction (kinesiology)|abducts]] [[fifth toe]]
+| [[Flexor digiti minimi brevis muscle (foot)|flexor digiti minimi brevis (foot)]]
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[quadratus plantae muscle|quadratus plantae]]
+| Lower limb, plantar, second layer, left/right
+| [[calcaneus]]
+| tendons of [[Flexor digitorum longus muscle|flexor digitorum longus]]
+| 
+| [[Plantar nerve|lateral plantar nerve]] ([[sacral spinal nerve 1|S1]], [[sacral spinal nerve 2|S2]])
+| flexes [[distal interphalangeal joint]]s (assists [[Flexor digitorum longus muscle|flexor digitorum longus]])
+| 
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Lumbrical muscle (foot)|lumbricals of the foot]] 1–4
+| Lower limb, plantar, second layer, left/right
+| tendons of [[flexor digitorum longus]]
+| medial surface of [[extensor expansion]] of proximal phalanges of lateral four [[toe]]s
+| [[lateral plantar artery]], [[plantar arch]], four [[plantar metatarsal arteries]]
+| [[Plantar nerve|lateral plantar nerve]] (lateral three lumbricals) and [[Plantar nerve|medial plantar nerve]] (first lumbrical)
+| maintain extension of digits at interphalangeal joints
+| 
+| 8
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor hallucis brevis muscle|flexor hallucis brevis]]
+| Lower limb, plantar, Third layer, left/right
+| plantar surface of [[Cuneiform bones|cuneiforms]], plantar [[calcaneocuboid ligament]], [[long plantar ligament]]
+| '''medial head''': medial sesamoid bone of [[metatarsophalangeal joint]], proximal phalanx of great toe
+'''lateral head''': lateral sesamoid bone of [[metatarsophalangeal joint]], proximal phalanx of great toe
+| 
+| [[medial plantar nerve]]
+| flexes [[Toe#Hallux|big toe]]
+| [[Extensor hallucis longus muscle|extensor hallucis longus]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[adductor hallucis muscle|adductor hallucis]]
+| Lower limb, plantar, Third layer, left/right
+| '''oblique head''': proximal ends of middle 3 [[Metatarsal bones|metatarsals]]
+'''transverse head''': [[metatarsophalangeal joints]], ligaments of lateral 3 toes
+| lateral side of base of proximal [[phalanx]] of [[Toe#Hallux|big toe]], [[Sesamoid bone|sesamoid]]
+| 
+| [[Plantar nerve|lateral plantar nerve]]
+| adducts [[Toe#Hallux|big toe]]
+| [[Abductor hallucis muscle|abductor hallucis]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[flexor digiti minimi brevis muscle (foot)|flexor digiti minimi brevis (foot)]]
+| Lower limb, plantar, Third layer, left/right
+| [[fifth metatarsal bone]]
+| [[Phalanx bones|phalanx]] of [[fifth toe]]
+| 
+| |[[lateral plantar nerve]] (superficial branch)
+| [[Extension (kinesiology)|extends]] and [[Adduction|adducts]] [[fifth toe]]
+| [[Abductor digiti minimi muscle (foot)|abductor digiti minimi]]
+| 2
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[Flexor digiti minimi brevis muscle of foot|opponens digiti minimi muscle of foot]] <small>(opponens digiti quinti)</small>
+| Lower limb, plantar, first layer, left/right
+| ?
+| middle [[Phalanx bone|phalanges]] of digit 5
+| 
+| ?
+| ?
+| ?
+| 0
+| 1
+|- style="vertical-align: top;"
+! scope="row" | [[plantar interossei muscles|plantar interossei]] 1–3
+| Lower limb, plantar, Fourth layer, left/right
+| tendons of [[Plantar interossei muscles|plantar Interossei]]
+| proximal phalanges III-V - muscles cross the metatarsophalangeal joint of toes III-V so the insertions correspond with the origin and there is no crossing between toes
+| [[plantar arch]], [[Dorsal metatarsal arteries|dorsal metatarsal artery]]
+| [[Plantar nerve|lateral plantar nerve]]
+| adducts [[toe]]s 3 - 5, strengthens [[Arches of the foot|transverse arch]]
+| [[Dorsal interossei of the foot|dorsal interossei]]
+| 6
+| 1
+|}
+{{sticky table end}}
