@@ -55,6 +55,17 @@ export default function TeamPage() {
           </li>
         ))}
       </ul>
+      <p className="team__mission-statement">
+      At Atlas Massage, it is our mission to provide therapeutic massage services that help people
+      reduce pain, improve movement, recover from physical stress, and enhance their overall
+      quality of life. We serve athletes, active individuals, and members of our community from all
+      walks of life because we believe massage therapy is an essential part of health and wellness
+      for everyone. Through personalized care and evidence-informed techniques, including sports
+      massage, deep tissue therapy, and myofascial work, we address each client&apos;s unique needs
+      and goals. We are committed to creating an inclusive, welcoming environment where every
+      client can experience the healing, restorative, and performance-enhancing benefits of massage
+      therapy.
+      </p>
     </div>
   );
 }
