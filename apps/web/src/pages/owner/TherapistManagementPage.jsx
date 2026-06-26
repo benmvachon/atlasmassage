@@ -64,6 +64,7 @@ function EditPanel({ therapist, onSave, onCancel }) {
     bio: therapist.bio ?? '',
     specialties: therapist.specialties ?? [],
     isAcceptingClients: therapist.is_accepting_clients,
+    displayOrder: therapist.display_order ?? 0,
   });
   const [headshotFile, setHeadshotFile] = useState(null);
   const [headshotPreview, setHeadshotPreview] = useState(therapist.headshot_url ?? null);
@@ -83,7 +84,7 @@ function EditPanel({ therapist, onSave, onCancel }) {
     setError('');
     try {
       const [profileRes] = await Promise.all([
-        adminService.updateTherapist(therapist.id, form),
+        adminService.updateTherapist(therapist.id, { ...form, displayOrder: Number(form.displayOrder) || 0 }),
         headshotFile ? adminService.uploadTherapistHeadshot(therapist.id, headshotFile) : Promise.resolve(null),
       ]);
       const updated = headshotFile
@@ -141,6 +142,17 @@ function EditPanel({ therapist, onSave, onCancel }) {
             onChange={specialties => setForm(f => ({ ...f, specialties }))}
           />
         </div>
+
+        <label className="owner-label">
+          Display order
+          <input
+            className="owner-input owner-input--sm"
+            type="number"
+            min={0}
+            value={form.displayOrder}
+            onChange={e => setForm(f => ({ ...f, displayOrder: e.target.value }))}
+          />
+        </label>
 
         <label className="owner-toggle">
           <input
@@ -288,6 +300,7 @@ function TherapistRow({ therapist, currentUserId, onEdit, onDeactivate }) {
 
   return (
     <tr className={!therapist.is_active ? 'owner-row--inactive' : ''}>
+      <td className="owner-table__order">{therapist.display_order}</td>
       <td>
         <span className="therapist-name">
           {therapist.headshot_url && (
@@ -360,7 +373,12 @@ export default function TherapistManagementPage() {
   }
 
   function handleSaved(updated) {
-    setTherapists(prev => prev.map(t => t.id === updated.id ? updated : t));
+    setTherapists(prev =>
+      prev.map(t => t.id === updated.id ? updated : t)
+        .sort((a, b) => a.display_order - b.display_order
+          || a.last_name.localeCompare(b.last_name)
+          || a.first_name.localeCompare(b.first_name))
+    );
     setEditingTherapist(null);
   }
 
@@ -409,6 +427,7 @@ export default function TherapistManagementPage() {
             <table className="owner-table">
               <thead>
                 <tr>
+                  <th>Order</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Specialties</th>

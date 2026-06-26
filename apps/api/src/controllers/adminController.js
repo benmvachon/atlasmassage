@@ -334,8 +334,8 @@ export async function createTherapist(req, res, next) {
 
 export async function updateTherapist(req, res, next) {
   try {
-    const { bio, specialties, isAcceptingClients } = req.body;
-    const result = await repos().therapist.updateProfile(req.params.id, { bio, specialties, isAcceptingClients });
+    const { bio, specialties, isAcceptingClients, displayOrder } = req.body;
+    const result = await repos().therapist.updateProfile(req.params.id, { bio, specialties, isAcceptingClients, displayOrder });
     if (!result) throw new AppError('Therapist not found', 404, 'NOT_FOUND');
     const updated = await repos().therapist.findById(req.params.id);
     res.json({ success: true, data: updated });

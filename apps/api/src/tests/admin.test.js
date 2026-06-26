@@ -83,6 +83,7 @@ const THERAPIST = {
   phone: null, is_active: true,
   created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z',
   bio: 'Expert therapist', specialties: ['swedish'], is_accepting_clients: true,
+  display_order: 0,
   roles: ['therapist'],
 };
 
@@ -740,6 +741,33 @@ describe('PUT /api/v1/admin/therapists/:id', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.bio).toBe('Updated bio');
     expect(res.body.data.is_accepting_clients).toBe(false);
+  });
+
+  it('persists displayOrder when provided', async () => {
+    mockTherapistRepo.updateProfile.mockResolvedValue({ user_id: 'therapist-1' });
+    mockTherapistRepo.findById.mockResolvedValue({ ...THERAPIST, display_order: 3 });
+
+    const res = await request(app)
+      .put('/api/v1/admin/therapists/therapist-1')
+      .set('Authorization', ownerBearer())
+      .send({ ...payload, displayOrder: 3 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.display_order).toBe(3);
+    expect(mockTherapistRepo.updateProfile).toHaveBeenCalledWith(
+      'therapist-1',
+      expect.objectContaining({ displayOrder: 3 })
+    );
+  });
+
+  it('returns 422 when displayOrder is negative', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/therapists/therapist-1')
+      .set('Authorization', ownerBearer())
+      .send({ ...payload, displayOrder: -1 });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('displayOrder');
   });
 
   it('returns 404 when therapist does not exist', async () => {

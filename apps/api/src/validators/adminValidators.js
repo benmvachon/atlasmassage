@@ -111,6 +111,8 @@ export const therapistUpdateRules = [
     .optional().isArray().withMessage('Specialties must be an array'),
   body('isAcceptingClients')
     .isBoolean().withMessage('isAcceptingClients is required and must be a boolean'),
+  body('displayOrder')
+    .optional().isInt({ min: 0 }).withMessage('displayOrder must be a non-negative integer'),
 ];
 
 export const testimonialCreateRules = [

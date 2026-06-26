@@ -3,7 +3,7 @@ const SELECT_THERAPIST = `
     u.id, u.email, u.first_name, u.last_name, u.phone, u.is_active,
     u.created_at, u.updated_at,
     t.bio, t.specialties, t.is_accepting_clients,
-    t.headshot_url,
+    t.headshot_url, t.display_order,
     t.daily_booking_limit, t.weekly_booking_limit,
     COALESCE(array_agg(r.name) FILTER (WHERE r.name IS NOT NULL), '{}') AS roles
   FROM users u
@@ -21,7 +21,7 @@ export class TherapistRepository {
     const { rows } = await this.pool.query(
       `${SELECT_THERAPIST}
        GROUP BY u.id, t.user_id
-       ORDER BY u.last_name, u.first_name`
+       ORDER BY t.display_order ASC, u.last_name, u.first_name`
     );
     return rows;
   }
@@ -69,12 +69,13 @@ export class TherapistRepository {
     }
   }
 
-  async updateProfile(id, { bio, specialties, isAcceptingClients }) {
+  async updateProfile(id, { bio, specialties, isAcceptingClients, displayOrder }) {
     const { rows } = await this.pool.query(
       `UPDATE therapists
-       SET bio = $1, specialties = $2, is_accepting_clients = $3, updated_at = NOW()
-       WHERE user_id = $4 RETURNING user_id`,
-      [bio ?? null, specialties ?? [], isAcceptingClients, id]
+       SET bio = $1, specialties = $2, is_accepting_clients = $3,
+           display_order = $4, updated_at = NOW()
+       WHERE user_id = $5 RETURNING user_id`,
+      [bio ?? null, specialties ?? [], isAcceptingClients, displayOrder ?? 0, id]
     );
     return rows[0] ?? null;
   }
