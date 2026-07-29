@@ -160,12 +160,27 @@ export class BusinessRepository {
     return rows[0] ?? null;
   }
 
-  async updateTravelSettings({ travelModeEnabled }) {
+  async updateTravelSettings({ travelModeEnabled, maxDriveMinutes }) {
     const { rows } = await this.pool.query(
       `UPDATE travel_settings
-       SET travel_mode_enabled = $1, updated_at = NOW()
+       SET travel_mode_enabled = $1,
+           max_drive_minutes = COALESCE($2, max_drive_minutes),
+           updated_at = NOW()
        RETURNING *`,
-      [travelModeEnabled]
+      [travelModeEnabled, maxDriveMinutes ?? null]
+    );
+    return rows[0];
+  }
+
+  async saveServiceAreaTowns({ towns, signature }) {
+    const { rows } = await this.pool.query(
+      `UPDATE travel_settings
+       SET service_area_towns = $1::jsonb,
+           service_area_signature = $2,
+           service_area_computed_at = NOW(),
+           updated_at = NOW()
+       RETURNING *`,
+      [JSON.stringify(towns), signature]
     );
     return rows[0];
   }

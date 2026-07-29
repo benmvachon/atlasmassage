@@ -177,10 +177,11 @@ export async function createAppointment(req, res, next) {
         const contact = await businessRepo.getBusinessContactInfo();
         const originAddress = `${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`;
         const destinationAddress = [clientUser.address_line1, clientUser.address_line2, clientUser.city, clientUser.state, clientUser.zip].filter(Boolean).join(', ');
-        const { withinRange } = await isWithinServiceArea({ originAddress, destinationAddress });
+        const maxDriveMinutes = travelSettings.max_drive_minutes ?? undefined;
+        const { withinRange } = await isWithinServiceArea({ originAddress, destinationAddress, maxDriveMinutes });
         if (!withinRange) {
           throw new AppError(
-            "Your address is outside our 20-minute travel service area. Please contact us or update your address in Account Settings.",
+            `Your address is outside our ${maxDriveMinutes ?? 20}-minute travel service area. Please contact us or update your address in Account Settings.`,
             400,
             'OUT_OF_SERVICE_AREA'
           );
@@ -370,7 +371,8 @@ export async function validateGuestAddress(req, res, next) {
         const contact = await repos().business.getBusinessContactInfo();
         const originAddress = `${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`;
         const destinationAddress = [addressLine1, addressLine2, city, state, zip].filter(Boolean).join(', ');
-        const { withinRange, driveMinutes } = await isWithinServiceArea({ originAddress, destinationAddress });
+        const maxDriveMinutes = travelSettings.max_drive_minutes ?? undefined;
+        const { withinRange, driveMinutes } = await isWithinServiceArea({ originAddress, destinationAddress, maxDriveMinutes });
         if (!withinRange) {
           return res.json({ success: true, data: { valid: false, outOfServiceArea: true, driveMinutes } });
         }

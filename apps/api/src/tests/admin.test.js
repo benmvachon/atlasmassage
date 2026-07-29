@@ -385,7 +385,36 @@ describe('PUT /api/v1/admin/business/travel-settings', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data).toMatchObject({ travel_mode_enabled: false });
-    expect(mockBusiness.updateTravelSettings).toHaveBeenCalledWith({ travelModeEnabled: false });
+    expect(mockBusiness.updateTravelSettings).toHaveBeenCalledWith({
+      travelModeEnabled: false,
+      maxDriveMinutes: undefined,
+    });
+  });
+
+  it('updates the configurable max drive time', async () => {
+    mockBusiness.updateTravelSettings.mockResolvedValue({ id: 1, travel_mode_enabled: true, max_drive_minutes: 30 });
+
+    const res = await request(app)
+      .put('/api/v1/admin/business/travel-settings')
+      .set('Authorization', ownerBearer())
+      .send({ travelModeEnabled: true, maxDriveMinutes: 30 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ max_drive_minutes: 30 });
+    expect(mockBusiness.updateTravelSettings).toHaveBeenCalledWith({
+      travelModeEnabled: true,
+      maxDriveMinutes: 30,
+    });
+  });
+
+  it('returns 422 when maxDriveMinutes is out of range', async () => {
+    const res = await request(app)
+      .put('/api/v1/admin/business/travel-settings')
+      .set('Authorization', ownerBearer())
+      .send({ travelModeEnabled: true, maxDriveMinutes: 999 });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.details).toHaveProperty('maxDriveMinutes');
   });
 
   it('returns 422 when travelModeEnabled is missing', async () => {

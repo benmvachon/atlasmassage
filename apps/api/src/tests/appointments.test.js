@@ -95,6 +95,8 @@ await jest.unstable_mockModule('../services/addressValidationService.js', () => 
 const mockIsWithinServiceArea = jest.fn();
 await jest.unstable_mockModule('../services/travelDistanceService.js', () => ({
   isWithinServiceArea: mockIsWithinServiceArea,
+  DEFAULT_MAX_DRIVE_MINUTES: 20,
+  nextPeakDepartureTimestamp: jest.fn(() => 0),
 }));
 
 const { default: request }       = await import('supertest');

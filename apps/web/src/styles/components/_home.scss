@@ -198,3 +198,36 @@
     }
   }
 }
+
+// ── Travel service area ───────────────────────────────────────────────────────
+
+.biz-service-area {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  &__message {
+    margin: 0;
+    color: $color-text-muted;
+    line-height: 1.5;
+  }
+
+  &__towns {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__town {
+    background: $color-bg-alt;
+    color: $color-text;
+    border-radius: $border-radius-full;
+    padding: $space-1 $space-3;
+    font-size: $font-size-xs;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}

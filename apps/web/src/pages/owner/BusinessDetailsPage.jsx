@@ -914,6 +914,7 @@ function TravelSettingsSection({ settings, onSettingsChange }) {
 
   const [form, setForm] = useState({
     travel_mode_enabled: settings?.travel_mode_enabled ?? true,
+    max_drive_minutes: settings?.max_drive_minutes ?? 20,
   });
 
   async function handleSave() {
@@ -923,6 +924,7 @@ function TravelSettingsSection({ settings, onSettingsChange }) {
     try {
       const res = await adminService.updateTravelSettings({
         travelModeEnabled: form.travel_mode_enabled,
+        maxDriveMinutes: Number(form.max_drive_minutes),
       });
       onSettingsChange(res.data);
       setSaved(true);
@@ -938,10 +940,10 @@ function TravelSettingsSection({ settings, onSettingsChange }) {
     <section className="owner-section">
       <h2 className="owner-section__title">Travel Massage Mode</h2>
       <p className="owner-section__desc">
-        While enabled, the landing page shows a service-area map instead of a fixed address, the
-        office address is hidden from the Contact section, and bookings are rejected if the
-        guest&rsquo;s address is outside our 20-minute peak-traffic drive-time range. Disable once you
-        operate from a fixed location clients visit.
+        While enabled, the landing page shows a service-area map and the list of towns we serve
+        instead of a fixed address, the office address is hidden from the Contact section, and
+        bookings are rejected if the guest&rsquo;s address is outside the peak-traffic drive-time
+        range set below. Disable once you operate from a fixed location clients visit.
       </p>
 
       <div className="owner-restrictions">
@@ -957,6 +959,24 @@ function TravelSettingsSection({ settings, onSettingsChange }) {
           </div>
         </label>
       </div>
+
+      <label className="owner-label">
+        Max drive time (minutes)
+        <input
+          className="owner-input owner-input--narrow"
+          type="number"
+          min={5}
+          max={120}
+          step={5}
+          value={form.max_drive_minutes}
+          onChange={e => setForm(f => ({ ...f, max_drive_minutes: e.target.value }))}
+          disabled={saving}
+        />
+      </label>
+      <p className="owner-section__desc">
+        The peak-traffic drive-time limit for accepting bookings. Changing it recalculates the
+        list of towns shown on the landing page.
+      </p>
 
       <div className="owner-restrictions__footer">
         <button

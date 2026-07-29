@@ -3,11 +3,14 @@ import { AppError } from '../middleware/errorHandler.js';
 import { logger } from '../logging/logger.js';
 
 const DISTANCE_MATRIX_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json';
-const MAX_DRIVE_MINUTES = 20;
+
+// Fallback used when a caller (or the stored travel settings) doesn't specify a
+// limit. The owner-configurable value lives in travel_settings.max_drive_minutes.
+export const DEFAULT_MAX_DRIVE_MINUTES = 20;
 
 // Distance Matrix only applies traffic_model when given a concrete departure_time.
 // Use the next weekday at 5:00 PM as a stand-in for "peak traffic".
-function nextPeakDepartureTimestamp() {
+export function nextPeakDepartureTimestamp() {
   const now = new Date();
   const target = new Date(now);
   target.setHours(17, 0, 0, 0);
@@ -16,7 +19,7 @@ function nextPeakDepartureTimestamp() {
   return Math.floor(target.getTime() / 1000);
 }
 
-export async function isWithinServiceArea({ originAddress, destinationAddress }) {
+export async function isWithinServiceArea({ originAddress, destinationAddress, maxDriveMinutes = DEFAULT_MAX_DRIVE_MINUTES }) {
   const apiKey = config.googleMaps.distanceMatrixApiKey;
   if (!apiKey) {
     // No provider configured — accept the address as entered (dev/test fallback).
@@ -55,5 +58,5 @@ export async function isWithinServiceArea({ originAddress, destinationAddress })
   const seconds = element.duration_in_traffic?.value ?? element.duration.value;
   const driveMinutes = seconds / 60;
 
-  return { withinRange: driveMinutes <= MAX_DRIVE_MINUTES, driveMinutes };
+  return { withinRange: driveMinutes <= maxDriveMinutes, driveMinutes };
 }

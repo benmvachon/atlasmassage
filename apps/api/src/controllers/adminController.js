@@ -135,8 +135,8 @@ export async function getTravelSettings(req, res, next) {
 
 export async function updateTravelSettings(req, res, next) {
   try {
-    const { travelModeEnabled } = req.body;
-    const updated = await repos().business.updateTravelSettings({ travelModeEnabled });
+    const { travelModeEnabled, maxDriveMinutes } = req.body;
+    const updated = await repos().business.updateTravelSettings({ travelModeEnabled, maxDriveMinutes });
     res.json({ success: true, data: updated });
   } catch (err) {
     next(err);

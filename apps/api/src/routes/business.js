@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPool } from '../database/pool.js';
 import { BusinessRepository } from '../repositories/businessRepository.js';
+import { resolveServiceAreaTowns } from '../services/serviceAreaService.js';
 
 const router = Router();
 
@@ -39,6 +40,18 @@ router.get('/travel-settings', async (req, res, next) => {
     const repo = new BusinessRepository(getPool());
     const settings = await repo.getTravelSettings();
     res.json({ success: true, data: settings ?? { travel_mode_enabled: false } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Towns within the travel drive-time range. Computed on demand and cached in
+// travel_settings; only recomputed when the address or drive-time limit change.
+router.get('/service-area', async (req, res, next) => {
+  try {
+    const repo = new BusinessRepository(getPool());
+    const data = await resolveServiceAreaTowns(repo);
+    res.json({ success: true, data });
   } catch (err) {
     next(err);
   }
