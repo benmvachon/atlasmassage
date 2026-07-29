@@ -27,6 +27,9 @@ export const schedulingSettingsRules = [
 export const travelSettingsRules = [
   body('travelModeEnabled')
     .isBoolean().withMessage('travelModeEnabled must be a boolean'),
+  body('maxDriveMinutes')
+    .optional()
+    .isInt({ min: 5, max: 120 }).withMessage('maxDriveMinutes must be an integer between 5 and 120'),
 ];
 
 export const businessContactInfoRules = [

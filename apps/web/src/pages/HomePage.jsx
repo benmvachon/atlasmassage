@@ -53,6 +53,10 @@ export default function HomePage() {
   const { data: travelData } = useAsync(() => businessService.getTravelSettings());
   const travelModeEnabled = travelData?.data?.travel_mode_enabled ?? false;
 
+  const { data: serviceAreaData } = useAsync(() => businessService.getServiceArea());
+  const serviceAreaTowns = serviceAreaData?.data?.towns ?? [];
+  const maxDriveMinutes = serviceAreaData?.data?.maxDriveMinutes ?? travelData?.data?.max_drive_minutes ?? 20;
+
   const mapQuery = contact
     ? encodeURIComponent(`${contact.address_line1}, ${contact.city}, ${contact.state} ${contact.zip}`)
     : encodeURIComponent('Boston, Massachusetts');
@@ -76,7 +80,7 @@ export default function HomePage() {
         <section className="location-section">
           <div className="location-section__map">
             {travelModeEnabled && contact ? (
-              <ServiceAreaMap contact={contact} />
+              <ServiceAreaMap contact={contact} maxDriveMinutes={maxDriveMinutes} />
             ) : (
               <iframe
                 title="Atlas Bodywork location"
@@ -122,7 +126,25 @@ export default function HomePage() {
                 <p className="biz-info__muted">Contact info is not available right now.</p>
               ) : (
                 <ul className="biz-contact">
-                  {!travelModeEnabled && (
+                  {travelModeEnabled ? (
+                    <li className="biz-contact__item">
+                      <span className="biz-contact__label">Areas</span>
+                      <div className="biz-service-area">
+                        <p className="biz-service-area__message">
+                          We come to you &mdash; we bring the massage table and everything
+                          else to your home or office
+                          {serviceAreaTowns.length > 0 ? ', serving:' : '.'}
+                        </p>
+                        {serviceAreaTowns.length > 0 && (
+                          <ul className="biz-service-area__towns">
+                            {serviceAreaTowns.map(town => (
+                              <li key={town} className="biz-service-area__town">{town}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </li>
+                  ) : (
                     <li className="biz-contact__item">
                       <span className="biz-contact__label">Address</span>
                       <span>

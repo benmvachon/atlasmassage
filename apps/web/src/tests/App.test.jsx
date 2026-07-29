@@ -9,6 +9,7 @@ jest.mock('../services/businessService', () => ({
     getHours: jest.fn().mockResolvedValue({ data: [] }),
     getContactInfo: jest.fn().mockResolvedValue({ data: null }),
     getTravelSettings: jest.fn().mockResolvedValue({ data: { travel_mode_enabled: false } }),
+    getServiceArea: jest.fn().mockResolvedValue({ data: { towns: [], maxDriveMinutes: 20 } }),
   },
 }));
 
@@ -84,7 +85,7 @@ describe('HomePage', () => {
     expect(screen.getByText(/contact info is not available/i)).toBeInTheDocument();
   });
 
-  it('hides the address and shows the service area map when travel mode is enabled', async () => {
+  it('shows the service area (not the street address) when travel mode is enabled', async () => {
     businessService.getContactInfo.mockResolvedValueOnce({
       data: {
         address_line1: '101 Bellevue Street', address_line2: '', city: 'Newton',
@@ -92,6 +93,9 @@ describe('HomePage', () => {
       },
     });
     businessService.getTravelSettings.mockResolvedValueOnce({ data: { travel_mode_enabled: true } });
+    businessService.getServiceArea.mockResolvedValueOnce({
+      data: { towns: ['Brookline', 'Newton', 'Watertown'], maxDriveMinutes: 20 },
+    });
     await act(async () => {
       render(
         <MemoryRouter>
@@ -99,7 +103,14 @@ describe('HomePage', () => {
         </MemoryRouter>
       );
     });
+    // The real street address must not be exposed in travel mode.
     expect(screen.queryByText('Address')).not.toBeInTheDocument();
+    expect(screen.queryByText(/101 Bellevue Street/)).not.toBeInTheDocument();
+    // Instead we show a "we come to you" message and the served towns from the API.
+    const areasItem = screen.getByText('Areas').closest('li');
+    expect(areasItem.textContent).toMatch(/come to you/i);
+    expect(areasItem.textContent).toContain('Newton');
+    expect(areasItem.textContent).toContain('Brookline');
     expect(screen.getByTestId('service-area-map')).toBeInTheDocument();
   });
 });

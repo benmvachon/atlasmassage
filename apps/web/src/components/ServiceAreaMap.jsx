@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Rough approximation of a 20-minute peak-traffic drive radius. This is a
-// visual stand-in only — the booking modal's actual range check calls the
-// Distance Matrix API for a real drive-time answer.
-const SERVICE_RADIUS_METERS = 10000; // ~9 miles
+// Rough approximation of the peak-traffic drive radius (~500 m per minute, so
+// ~10 km / 9 miles at 20 minutes). This is a visual stand-in only — the booking
+// modal's actual range check calls the Distance Matrix API for a real answer.
+const METERS_PER_DRIVE_MINUTE = 500;
 
 // Mirrors $color-secondary in styles/abstracts/_variables.scss — Maps JS can't
 // read SCSS variables, so this is kept in sync by hand.
@@ -40,7 +40,7 @@ function addressString(contact) {
     .join(', ');
 }
 
-function PinFallback({ contact }) {
+function PinFallback({ contact, maxDriveMinutes }) {
   const mapQuery = encodeURIComponent(addressString(contact));
   return (
     <>
@@ -55,13 +55,13 @@ function PinFallback({ contact }) {
         referrerPolicy="no-referrer-when-downgrade"
       />
       <p className="location-section__map-caption">
-        We travel to you anywhere within a 20-minute drive of our service area at peak traffic.
+        We travel to you anywhere within a {maxDriveMinutes}-minute drive of our service area at peak traffic.
       </p>
     </>
   );
 }
 
-export default function ServiceAreaMap({ contact }) {
+export default function ServiceAreaMap({ contact, maxDriveMinutes = 20 }) {
   const containerRef = useRef(null);
   const [failed, setFailed] = useState(false);
 
@@ -91,7 +91,7 @@ export default function ServiceAreaMap({ contact }) {
           new maps.Circle({
             map,
             center,
-            radius: SERVICE_RADIUS_METERS,
+            radius: maxDriveMinutes * METERS_PER_DRIVE_MINUTE,
             strokeColor: SERVICE_AREA_COLOR,
             strokeOpacity: 0.6,
             strokeWeight: 2,
@@ -105,17 +105,17 @@ export default function ServiceAreaMap({ contact }) {
       });
 
     return () => { cancelled = true; };
-  }, [contact]);
+  }, [contact, maxDriveMinutes]);
 
   if (!API_KEY || failed || !contact) {
-    return <PinFallback contact={contact} />;
+    return <PinFallback contact={contact} maxDriveMinutes={maxDriveMinutes} />;
   }
 
   return (
     <>
       <div ref={containerRef} style={{ width: '100%', height: 420 }} />
       <p className="location-section__map-caption">
-        We travel to you anywhere within a 20-minute drive.
+        We travel to you anywhere within a {maxDriveMinutes}-minute drive.
       </p>
     </>
   );
