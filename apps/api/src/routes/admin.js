@@ -4,6 +4,7 @@ import path from 'path';
 import multer from 'multer';
 import * as adminController from '../controllers/adminController.js';
 import * as testimonialController from '../controllers/testimonialController.js';
+import * as essayController from '../controllers/essayController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import {
   bookingRestrictionsRules,
@@ -20,6 +21,9 @@ import {
   therapistUpdateRules,
   testimonialCreateRules,
   testimonialUpdateRules,
+  essayCreateRules,
+  essayUpdateRules,
+  essayReorderRules,
   travelSettingsRules,
   validate,
 } from '../validators/adminValidators.js';
@@ -41,6 +45,38 @@ const uploadHeadshot = multer({
     cb(null, /^image\/(jpeg|png|webp)$/.test(file.mimetype));
   },
 }).single('headshot');
+
+const essayPdfStorage = multer.diskStorage({
+  destination: path.join(__dirname, '..', '..', 'public', 'essays', 'pdfs'),
+  filename(_req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase() || '.pdf';
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+  },
+});
+
+const uploadEssayPdf = multer({
+  storage: essayPdfStorage,
+  limits: { fileSize: 25 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    cb(null, file.mimetype === 'application/pdf');
+  },
+}).single('pdf');
+
+const essayHeroStorage = multer.diskStorage({
+  destination: path.join(__dirname, '..', '..', 'public', 'essays', 'images'),
+  filename(_req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+  },
+});
+
+const uploadEssayHeroImage = multer({
+  storage: essayHeroStorage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    cb(null, /^image\/(jpeg|png|webp)$/.test(file.mimetype));
+  },
+}).single('heroImage');
 
 const router = Router();
 
@@ -115,5 +151,16 @@ router.get('/testimonials', testimonialController.listAll);
 router.post('/testimonials', testimonialCreateRules, validate, testimonialController.createTestimonial);
 router.put('/testimonials/:id', testimonialUpdateRules, validate, testimonialController.updateTestimonial);
 router.delete('/testimonials/:id', testimonialController.deleteTestimonial);
+
+// ── Essays ────────────────────────────────────────────────────────────────────
+// /reorder precedes /:id so the literal segment is not swallowed by the param.
+router.get('/essays', essayController.listAll);
+router.post('/essays', essayCreateRules, validate, essayController.createEssay);
+router.put('/essays/reorder', essayReorderRules, validate, essayController.reorderEssays);
+router.get('/essays/:id', essayController.getEssay);
+router.put('/essays/:id', essayUpdateRules, validate, essayController.updateEssay);
+router.post('/essays/:id/pdf', uploadEssayPdf, essayController.uploadEssayPdf);
+router.post('/essays/:id/hero-image', uploadEssayHeroImage, essayController.uploadEssayHeroImage);
+router.delete('/essays/:id', essayController.deleteEssay);
 
 export default router;

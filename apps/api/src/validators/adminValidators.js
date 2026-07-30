@@ -173,3 +173,59 @@ export const testimonialUpdateRules = [
   body('displayOrder')
     .optional().isInt({ min: 0 }).withMessage('displayOrder must be a non-negative integer'),
 ];
+
+// ── Essays ────────────────────────────────────────────────────────────────────
+// slug is optional on both create and update — the controller derives it from
+// the title when omitted.
+
+const essayFieldRules = [
+  body('title')
+    .trim().notEmpty().withMessage('Title is required')
+    .isLength({ max: 200 }).withMessage('Title must be 200 characters or fewer'),
+  body('slug')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ max: 120 }).withMessage('Slug must be 120 characters or fewer')
+    .matches(/^[a-z0-9-]+$/).withMessage('Slug may contain only lowercase letters, numbers, and hyphens'),
+  body('subtitle')
+    .optional({ values: 'falsy' })
+    .trim().isLength({ max: 300 }).withMessage('Subtitle must be 300 characters or fewer'),
+  body('author')
+    .optional({ values: 'falsy' })
+    .trim().isLength({ max: 120 }).withMessage('Author must be 120 characters or fewer'),
+  body('summary')
+    .optional({ values: 'falsy' }).trim(),
+  body('bodyMarkdown')
+    .trim().notEmpty().withMessage('Essay body is required'),
+  body('heroImagePath')
+    .optional({ nullable: true, values: 'falsy' })
+    .trim().isLength({ max: 255 }).withMessage('Hero image path must be 255 characters or fewer'),
+  body('heroImageAlt')
+    .optional({ values: 'falsy' })
+    .trim().isLength({ max: 300 }).withMessage('Hero image alt text must be 300 characters or fewer'),
+  body('displayOrder')
+    .optional().isInt({ min: 0 }).withMessage('displayOrder must be a non-negative integer'),
+  // Sent as YYYY-MM-DD by the dashboard; an empty value clears the date.
+  body('publishedAt')
+    .optional({ nullable: true, values: 'falsy' })
+    .isISO8601().withMessage('publishedAt must be a valid date'),
+];
+
+export const essayCreateRules = [
+  ...essayFieldRules,
+  body('isPublished')
+    .optional().isBoolean().withMessage('isPublished must be a boolean'),
+];
+
+export const essayUpdateRules = [
+  ...essayFieldRules,
+  body('isPublished')
+    .isBoolean().withMessage('isPublished is required and must be a boolean'),
+];
+
+export const essayReorderRules = [
+  body('orderedIds')
+    .isArray({ min: 1 }).withMessage('orderedIds must be a non-empty array'),
+  body('orderedIds.*')
+    .isUUID().withMessage('orderedIds must contain only essay ids'),
+];

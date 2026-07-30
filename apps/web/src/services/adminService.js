@@ -95,6 +95,24 @@ export const adminService = {
   updateTestimonial: (id, data) => api.put(`/admin/testimonials/${id}`, data),
   deleteTestimonial: (id) => api.delete(`/admin/testimonials/${id}`),
 
+  // Essays
+  listEssays: () => api.get('/admin/essays'),
+  createEssay: (data) => api.post('/admin/essays', data),
+  updateEssay: (id, data) => api.put(`/admin/essays/${id}`, data),
+  deleteEssay: (id) => api.delete(`/admin/essays/${id}`),
+  reorderEssays: (orderedIds) => api.put('/admin/essays/reorder', { orderedIds }),
+  uploadEssayPdf: (id, file, filename) => {
+    const fd = new FormData();
+    fd.append('pdf', file);
+    if (filename) fd.append('filename', filename);
+    return api.upload(`/admin/essays/${id}/pdf`, fd);
+  },
+  uploadEssayHeroImage: (id, file) => {
+    const fd = new FormData();
+    fd.append('heroImage', file);
+    return api.upload(`/admin/essays/${id}/hero-image`, fd);
+  },
+
   // Membership plans
   listMembershipPlans: () => api.get('/admin/membership-plans'),
   createMembershipPlan: (data) => api.post('/admin/membership-plans', data),

@@ -86,7 +86,10 @@
   &__nav {
     display: flex;
     align-items: center;
-    gap: $space-6;
+    // A signed-in owner sees ten items here, and .header__inner is capped at
+    // $container-max-width regardless of viewport — so the gap has to stay
+    // tight enough for the nav to clear the logo inside that fixed width.
+    gap: $space-4;
 
     a {
       font-family: $font-family-ui;

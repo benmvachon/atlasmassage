@@ -1,0 +1,294 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Essay form ────────────────────────────────────────────────────────────────
+
+.essay-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.essay-form__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-5;
+
+  @include respond-to(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.essay-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-2;
+}
+
+// ── Markdown editor ───────────────────────────────────────────────────────────
+// Stacks on narrow screens; side-by-side once there is room for two columns of
+// readable text.
+
+.essay-editor {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background: $color-white;
+
+  @include respond-to(lg) {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+}
+
+.essay-editor__pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  @include respond-to(lg) {
+    & + & { border-left: 1px solid $color-border; }
+  }
+}
+
+.essay-editor__pane-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: $color-bg-alt;
+  border-bottom: 1px solid $color-border;
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-text-muted;
+}
+
+.essay-editor__hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+
+  code {
+    font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+    background: $color-primary-tint-sm;
+    border-radius: $border-radius-sm;
+    padding: 1px 4px;
+  }
+}
+
+.essay-editor__textarea {
+  flex: 1;
+  min-height: 520px;
+  border: 0;
+  padding: $space-5;
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  font-size: $font-size-sm;
+  line-height: 1.7;
+  color: $color-text;
+  resize: vertical;
+  tab-size: 2;
+
+  &:focus {
+    outline: none;
+    box-shadow: inset $focus-shadow-sm;
+  }
+}
+
+.essay-editor__preview {
+  flex: 1;
+  min-height: 520px;
+  max-height: 720px;
+  overflow-y: auto;
+  padding: $space-5;
+  background: $color-bg;
+
+  // The preview shows the reader's type at a smaller scale so both panes fit.
+  .essay__body {
+    font-size: $font-size-sm;
+
+    h2 { font-size: $font-size-lg; margin-top: $space-8; }
+    h3 { font-size: $font-size-sm; }
+  }
+}
+
+.essay-editor__preview-empty {
+  color: $color-text-muted;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+}
+
+// ── PDF panel ─────────────────────────────────────────────────────────────────
+
+.essay-pdf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-5;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+}
+
+.essay-pdf__status {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+}
+
+.essay-pdf__current {
+  color: $color-text;
+
+  &--none { color: $color-text-muted; }
+}
+
+.essay-pdf__note {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  line-height: 1.6;
+}
+
+// Visually hidden but still reachable by keyboard via its <label>.
+.essay-pdf__input {
+  @include visually-hidden;
+}
+
+.essay-pdf__input:focus-visible + label {
+  @include focus-ring;
+}
+
+.essay-pdf__actions label {
+  cursor: pointer;
+}
+
+// ── Hero image panel ──────────────────────────────────────────────────────────
+// Same shell as the PDF panel, with a thumbnail standing in for the filename.
+
+.essay-hero {
+  @extend .essay-pdf;
+}
+
+.essay-hero__status {
+  @extend .essay-pdf__status;
+}
+
+.essay-hero__preview {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-border;
+}
+
+.essay-hero__none {
+  color: $color-text-muted;
+}
+
+.essay-hero__note {
+  @extend .essay-pdf__note;
+}
+
+.essay-hero__input {
+  @include visually-hidden;
+}
+
+.essay-hero__input:focus-visible + label {
+  @include focus-ring;
+}
+
+.essay-hero__actions label {
+  cursor: pointer;
+}
+
+// ── Essay table ───────────────────────────────────────────────────────────────
+
+.essay-table__order {
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.essay-table__move {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-1;
+}
+
+.essay-table__move-btn {
+  background: none;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-sm;
+  color: $color-text-muted;
+  cursor: pointer;
+  line-height: 1;
+  padding: $space-1 $space-2;
+  font-size: $font-size-xs;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-tint-sm;
+    color: $color-primary;
+    border-color: $color-primary-border-md;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible { @include focus-ring; }
+}
+
+.essay-table__position {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+.essay-table__title {
+  display: block;
+  font-weight: 600;
+}
+
+.essay-table__subtitle {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-top: $space-1;
+}
+
+.essay-table__slug {
+  display: block;
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-top: $space-1;
+}
+
+.essay-table__pdf { text-align: center; }
+
+.essay-table__no-pdf { color: $color-text-muted; }
+
+.essay-table__date {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  margin-top: $space-1;
+  white-space: nowrap;
+}

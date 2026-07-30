@@ -11,6 +11,7 @@ const OWNER_NAV_ITEMS = [
   { to: '/owner/business',       label: 'Business Details' },
   { to: '/owner/therapists',     label: 'Therapists' },
   { to: '/owner/testimonials',   label: 'Testimonials' },
+  { to: '/owner/essays',         label: 'Essays' },
 ];
 
 const THERAPIST_NAV_ITEMS = [

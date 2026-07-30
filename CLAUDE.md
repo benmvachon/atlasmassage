@@ -80,7 +80,7 @@ Key middleware in `apps/api/src/middleware/auth.js`:
 
 ### Database
 
-PostgreSQL via `pg` pool. Sequential SQL migration files in `apps/api/src/database/migrations/` (currently `001`–`020`). The migration runner tracks applied files in a `schema_migrations` table. Monetary values are stored as integer cents; primary keys are UUIDs.
+PostgreSQL via `pg` pool. Sequential SQL migration files in `apps/api/src/database/migrations/` (currently `001`–`055`). The migration runner tracks applied files in a `schema_migrations` table. Monetary values are stored as integer cents; primary keys are UUIDs.
 
 ### Sass
 
@@ -96,7 +96,7 @@ import { jest } from '@jest/globals';
 
 ## ADRs
 
-`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0013**. Never reuse or renumber; supersede with a new ADR instead.
+`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0014**. Never reuse or renumber; supersede with a new ADR instead.
 
 ## Scaffolding origin
 
@@ -125,7 +125,18 @@ What this means in practice: **most controllers, services, and repositories are 
    - ✅ `TherapistManagementPage` (`/owner/therapists`) — add, edit, deactivate therapists
    - ✅ Owner sidebar layout, role-aware redirect on login, "Admin" header link
    - ✅ 38 integration tests covering all admin endpoints
+   - ✅ `EssaysManagementPage` (`/owner/essays`) — Markdown editor with live preview, reorder, publish, PDF upload
    - ❌ Remaining dashboards (appointments, revenue, audit logs) — stubs only
+
+### Essays / Pathology
+
+Long-form clinical essays published at `/pathology` (index) and `/pathology/:slug` (reader). Body content is Markdown in the `essays` table; the downloadable PDF is a separately uploaded file. The two are independent by design — editing the Markdown does not regenerate the PDF. See `docs/adr/ADR-0013-essay-publishing.md`.
+
+`apps/web/src/utils/essayMarkdown.js` is the single renderer for both the public reader and the dashboard preview. Beyond plain Markdown it supports `[^N]` citation markers linked to the ordered list under a `## References` heading. Output is sanitized with DOMPurify.
+
+PDFs are served by `GET /api/v1/essays/:slug/pdf` (published-only, readable filename), **not** by `express.static` — only `apps/api/public/essays/images` is static.
+
+Hero images are uploaded via `POST /admin/essays/:id/hero-image` (JPEG/PNG/WebP, 8 MB), which replaces and deletes the previous file. `published_at` is owner-editable: the dashboard sends `YYYY-MM-DD`, the API anchors it to midnight UTC, and the client formats it back in UTC — keep both halves in UTC or the date shifts a day for western readers.
 
 ## Environment variables
 
