@@ -14,6 +14,10 @@ export default defineConfig({
         target: `http://localhost:${process.env.API_PORT || '3001'}`,
         changeOrigin: true,
       },
+      '/essays': {
+        target: `http://localhost:${process.env.API_PORT || '3001'}`,
+        changeOrigin: true,
+      },
     },
   },
   build: {

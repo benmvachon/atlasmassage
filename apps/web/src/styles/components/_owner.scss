@@ -336,6 +336,15 @@
   font-family: $font-family-ui;
   font-size: $font-size-sm;
   font-weight: 500;
+
+  // For labels wrapping a composite control rather than a single input.
+  &__text { font-weight: 500; }
+
+  &__hint {
+    font-weight: 400;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
 }
 
 .owner-toggle {
@@ -425,6 +434,13 @@
     font-family: $font-family-ui;
     font-size: $font-size-md;
     font-weight: 600;
+    margin-bottom: $space-4;
+  }
+
+  &__note {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
     margin-bottom: $space-4;
   }
 

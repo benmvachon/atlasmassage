@@ -16,6 +16,8 @@
   "dependencies": {
     "@stripe/react-stripe-js": "^6.5.0",
     "@stripe/stripe-js": "^9.7.0",
+    "dompurify": "^3.4.12",
+    "marked": "^18.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
@@ -53,6 +55,10 @@
     "transform": {
       "^.+\\.[jt]sx?$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!marked/)",
+      "\\.pnp\\.[^\\\\]+$"
+    ],
     "testMatch": [
       "**/tests/**/*.test.{js,jsx}"
     ],

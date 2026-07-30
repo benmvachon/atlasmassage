@@ -10,7 +10,9 @@ import OwnerRoute from '../components/OwnerRoute.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import ServicesPage from '../pages/ServicesPage.jsx';
 import TestimonialsPage from '../pages/TestimonialsPage.jsx';
-import AnatomyPage from '../pages/AnatomyPage.jsx';
+// import AnatomyPage from '../pages/AnatomyPage.jsx';
+import PathologyPage from '../pages/PathologyPage.jsx';
+import EssayPage from '../pages/EssayPage.jsx';
 import TeamPage from '../pages/TeamPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import SignupPage from '../pages/SignupPage.jsx';
@@ -31,6 +33,7 @@ import MarketingSourcesPage from '../pages/owner/MarketingSourcesPage.jsx';
 import MarketingAnalyticsPage from '../pages/owner/MarketingAnalyticsPage.jsx';
 import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
 import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
+import EssaysManagementPage from '../pages/owner/EssaysManagementPage.jsx';
 import FeedbackPage from '../pages/FeedbackPage.jsx';
 import GuestManagePage from '../pages/GuestManagePage.jsx';
 import GiftCardsPage from '../pages/GiftCardsPage.jsx';
@@ -44,7 +47,9 @@ export default function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />
-        <Route path="/anatomy" element={<AnatomyPage />} />
+        {/* <Route path="/anatomy" element={<AnatomyPage />} /> */}
+        <Route path="/pathology" element={<PathologyPage />} />
+        <Route path="/pathology/:slug" element={<EssayPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/memberships" element={<MembershipsPage />} />
@@ -81,6 +86,7 @@ export default function AppRoutes() {
         <Route path="/owner/business" element={<BusinessDetailsPage />} />
         <Route path="/owner/therapists" element={<TherapistManagementPage />} />
         <Route path="/owner/testimonials" element={<TestimonialsManagementPage />} />
+        <Route path="/owner/essays" element={<EssaysManagementPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

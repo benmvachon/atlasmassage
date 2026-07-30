@@ -1,0 +1,428 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Pathology index ───────────────────────────────────────────────────────────
+
+.page--pathology {
+  max-width: $container-max-width;
+  margin: 0 auto;
+}
+
+.pathology__intro {
+  max-width: 680px;
+  margin: 0 auto $space-16;
+  text-align: center;
+}
+
+.pathology__heading {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  margin-bottom: $space-6;
+  letter-spacing: 0.04em;
+}
+
+.pathology__tagline {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  line-height: 1.75;
+  color: $color-text-muted;
+}
+
+.pathology__status {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-16 0;
+
+  &--error { color: $color-error; }
+}
+
+.pathology__list {
+  display: grid;
+  gap: $space-8;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+// ── Essay card ────────────────────────────────────────────────────────────────
+
+.essay-card {
+  @include card;
+
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow $transition-base, transform $transition-base;
+
+  // Image beside the text once there is room for both.
+  @include respond-to(md) {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover { transform: none; }
+  }
+}
+
+.essay-card__media {
+  display: block;
+  flex-shrink: 0;
+  background: $color-bg-alt;
+  overflow: hidden;
+
+  @include respond-to(md) {
+    width: 280px;
+  }
+}
+
+.essay-card__image {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+
+  @include respond-to(md) {
+    height: 100%;
+    min-height: 260px;
+  }
+}
+
+.essay-card__main {
+  flex: 1;
+  min-width: 0;
+  padding: $space-8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.essay-card__title {
+  font-family: $font-family-logo;
+  font-size: $font-size-xl;
+  letter-spacing: 0.03em;
+  margin-bottom: $space-2;
+}
+
+.essay-card__title-link {
+  color: $color-primary-dark;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+
+  &:focus-visible { @include focus-ring; }
+}
+
+.essay-card__subtitle {
+  font-family: $font-family-base;
+  font-style: italic;
+  font-size: $font-size-md;
+  color: $color-text;
+  margin-bottom: $space-4;
+}
+
+.essay-card__summary {
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  line-height: 1.7;
+  color: $color-text-muted;
+  margin-bottom: $space-4;
+}
+
+.essay-card__meta {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-text-muted;
+}
+
+.essay-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  // Pushes the buttons to the bottom so cards of differing text length still
+  // line their actions up.
+  margin-top: auto;
+  padding-top: $space-5;
+}
+
+// ── Essay reader ──────────────────────────────────────────────────────────────
+
+.page--essay {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.essay__back {
+  display: inline-block;
+  font-family: $font-family-ui;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  text-decoration: none;
+  margin-bottom: $space-8;
+
+  &:hover { color: $color-primary; }
+
+  &:focus-visible { @include focus-ring; }
+}
+
+.essay__back-wrap {
+  text-align: center;
+}
+
+.essay__header {
+  text-align: center;
+  margin-bottom: $space-10;
+}
+
+.essay__title {
+  font-family: $font-family-logo;
+  font-size: $font-size-2xl;
+  color: $color-primary-dark;
+  letter-spacing: 0.05em;
+  margin-bottom: $space-3;
+}
+
+.essay__subtitle {
+  font-family: $font-family-base;
+  font-style: italic;
+  font-size: $font-size-lg;
+  line-height: 1.5;
+  color: $color-text;
+  margin-bottom: $space-5;
+}
+
+.essay__byline {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $color-text-muted;
+  margin-bottom: $space-6;
+}
+
+.essay__download {
+  margin-top: $space-2;
+}
+
+.essay__hero {
+  margin: 0 0 $space-10;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-md;
+  }
+}
+
+.essay__hero-caption {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  text-align: center;
+  margin-top: $space-3;
+  line-height: 1.5;
+}
+
+// ── Contents ──────────────────────────────────────────────────────────────────
+
+.essay__contents {
+  background: $color-primary-tint-xs;
+  border-left: 3px solid $color-primary;
+  border-radius: 0 $border-radius-md $border-radius-md 0;
+  padding: $space-5 $space-6;
+  margin-bottom: $space-10;
+}
+
+.essay__contents-title {
+  font-family: $font-family-ui;
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $color-text-muted;
+  margin-bottom: $space-3;
+}
+
+.essay__contents-list {
+  margin: 0;
+  padding-left: $space-5;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  list-style: decimal;
+
+  li {
+    margin-bottom: $space-2;
+
+    &::marker { color: $color-text-muted; }
+  }
+
+  a {
+    color: $color-primary-dark;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+
+    &:focus-visible { @include focus-ring; }
+  }
+}
+
+// ── Essay body ────────────────────────────────────────────────────────────────
+// Styles the HTML produced by renderEssayMarkdown, so selectors here are plain
+// elements rather than BEM classes.
+
+.essay__body {
+  font-family: $font-family-base;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: $color-text;
+
+  // Anchored headings should not land under the fixed header.
+  h2, h3 { scroll-margin-top: calc(#{$header-height} + #{$space-6}); }
+
+  h2 {
+    font-family: $font-family-logo;
+    font-size: $font-size-xl;
+    color: $color-primary-dark;
+    letter-spacing: 0.04em;
+    margin: $space-12 0 $space-5;
+    padding-bottom: $space-3;
+    border-bottom: 1px solid $color-primary-border-sm;
+
+    &:first-child { margin-top: 0; }
+  }
+
+  h3 {
+    font-family: $font-family-ui;
+    font-size: $font-size-md;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $color-secondary-dark;
+    margin: $space-8 0 $space-4;
+  }
+
+  p { margin-bottom: $space-5; }
+
+  strong {
+    font-weight: 700;
+    color: $color-primary-dark;
+  }
+
+  em { font-style: italic; }
+
+  // The global reset strips list markers; prose needs them back.
+  ul, ol {
+    margin: 0 0 $space-5 0;
+    padding-left: $space-8;
+  }
+
+  ul { list-style: disc; }
+  ol { list-style: decimal; }
+
+  li {
+    margin-bottom: $space-2;
+    line-height: 1.7;
+
+    &::marker { color: $color-secondary-dark; }
+  }
+
+  a {
+    color: $color-primary;
+    text-decoration: underline;
+
+    &:hover { color: $color-primary-dark; }
+
+    &:focus-visible { @include focus-ring; }
+  }
+
+  blockquote {
+    margin: 0 0 $space-5;
+    padding-left: $space-5;
+    border-left: 3px solid $color-secondary;
+    font-style: italic;
+    color: $color-text-muted;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: $border-radius-md;
+    margin: $space-8 auto;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid $color-border;
+    margin: $space-10 0;
+  }
+}
+
+// ── Citations & references ────────────────────────────────────────────────────
+
+.essay__fnref {
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: super;
+  margin-left: 1px;
+
+  a {
+    text-decoration: none;
+    color: $color-primary;
+    padding: 0 2px;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.essay__body .essay__references {
+  font-size: $font-size-sm;
+  line-height: 1.6;
+  color: $color-text-muted;
+  padding-left: $space-6;
+
+  li {
+    margin-bottom: $space-4;
+    scroll-margin-top: calc(#{$header-height} + #{$space-6});
+
+    // Highlight the entry a citation link jumped to.
+    &:target {
+      background: $color-secondary-tint-md;
+      border-radius: $border-radius-sm;
+      padding: $space-2 $space-3;
+      margin-left: -#{$space-3};
+    }
+  }
+}
+
+.essay__ref-backlink {
+  text-decoration: none;
+  color: $color-primary;
+  font-size: $font-size-xs;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ── Footer actions ────────────────────────────────────────────────────────────
+
+.essay__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  align-items: center;
+  margin-top: $space-12;
+  padding-top: $space-8;
+  border-top: 1px solid $color-border;
+}

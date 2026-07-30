@@ -24,6 +24,11 @@ app.use(cors({ origin: config.cors.origin, credentials: true }));
 // Static headshots (uploaded + seed images)
 app.use('/headshots', express.static(path.join(__dirname, '..', 'public', 'headshots')));
 
+// Essay hero images. The PDFs in this directory are deliberately NOT served
+// statically — they go through GET /api/v1/essays/:slug/pdf so downloads are
+// gated on the essay being published and land under a readable filename.
+app.use('/essays/images', express.static(path.join(__dirname, '..', 'public', 'essays', 'images')));
+
 // Raw body for Stripe webhooks — must precede express.json()
 app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
 
