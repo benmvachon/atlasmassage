@@ -226,6 +226,13 @@ The PM2 config runs in cluster mode (`instances: 'max'`) across all CPU cores wi
 
 ## 11. Nginx and TLS
 
+> **`infrastructure/nginx.conf` is a starting template, not the deployed file.**
+> It is copied *once* at provisioning time and then maintained by hand on each
+> server. Editing it in the repo changes nothing on a running box. Real servers
+> diverge quickly — certbot rewrites the certificate paths, and staging uses a
+> different hostname, a Cloudflare origin certificate, and a different web root.
+> Always read the live config before changing anything (see §11.2).
+
 Copy the existing config (already written for your domain):
 
 ```bash
@@ -249,6 +256,88 @@ Certbot will auto-update the nginx config with the real certificate paths (the p
 sudo systemctl enable nginx
 sudo systemctl restart nginx
 ```
+
+### 11.1 Assets that live outside the web root
+
+The SPA build is the nginx `root`, but two asset trees are **not** part of it —
+they live in the API's checkout and are written to at runtime by owner uploads:
+
+| URL prefix        | On disk                                          |
+|-------------------|--------------------------------------------------|
+| `/headshots/`     | `apps/api/public/headshots/`                     |
+| `/essays/images/` | `apps/api/public/essays/images/`                 |
+
+Every one of these needs its own `location`. Without one the request falls
+through to the SPA fallback (`try_files $uri $uri/ /index.html`), which answers
+**200 with `text/html` and the index.html shell** — an image URL that looks
+successful but renders blank. That is the signature of a missing block here.
+
+Serve them straight from disk rather than proxying static files through Node:
+
+```nginx
+location /headshots/ {
+    alias /var/www/atlasmassage/apps/api/public/headshots/;
+    expires 30d;
+}
+
+location /essays/images/ {
+    alias /var/www/atlasmassage/apps/api/public/essays/images/;
+    expires 30d;
+}
+```
+
+Note the **trailing slash on both the location and the `alias`** — omitting
+either breaks path joining. The API must still be able to write to these
+directories, so they stay owned by the user PM2 runs as, not `www-data`.
+
+`expires 30d` is safe because replacing an image through the dashboard writes a
+new generated filename and repoints the database row — a live URL's bytes never
+change. Use `expires`, **not** `add_header Cache-Control`: a single `add_header`
+inside a `location` discards every inherited one, silently stripping the
+security headers from these responses.
+
+PDFs are deliberately excluded. `apps/api/public/essays/pdfs/` must **never**
+get a `location` block — downloads go through `GET /api/v1/essays/:slug/pdf` so
+they stay gated on the essay being published. See ADR-0013.
+
+### 11.2 Finding and editing the live config
+
+The file is normally `/etc/nginx/sites-available/atlasmassage`, symlinked from
+`sites-enabled/`. Confirm rather than assume — `nginx -T` dumps the fully
+resolved config with a marker before each included file:
+
+```bash
+sudo nginx -T | grep -E '^# configuration file'          # every file in play
+sudo grep -rn server_name /etc/nginx/sites-enabled/ /etc/nginx/conf.d/
+```
+
+Add location blocks **inside the `listen 443` server block** for that hostname.
+Then:
+
+```bash
+sudo cp /etc/nginx/sites-available/atlasmassage{,.bak}   # certbot writes here too
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 11.3 When a fix does not appear to take
+
+If Cloudflare fronts the server (a `/etc/ssl/cloudflare/origin.pem` certificate
+is the tell), it caches by file extension and **will have cached the broken
+`text/html` responses**. Test each layer bottom-up to find where it breaks:
+
+```bash
+# 1. Express directly — bypasses nginx and Cloudflare
+curl -I http://127.0.0.1:3001/essays/images/<file>.jpg
+
+# 2. nginx directly — bypasses Cloudflare
+curl -I --resolve <domain>:443:127.0.0.1 https://<domain>/essays/images/<file>.jpg
+
+# 3. Through Cloudflare — compare cf-cache-status
+curl -I https://<domain>/essays/images/<file>.jpg
+```
+
+The layer where `Content-Type` stops being `image/jpeg` is the one at fault. If
+only step 3 is wrong, purge the Cloudflare cache for those URLs.
 
 ---
 
@@ -274,6 +363,82 @@ tail -f /var/log/atlasmassage/api-error.log
 
 ---
 
+## The `deploy` User
+
+CI deploys over SSH. `.github/workflows/ci.yml` runs, on every push to `main`
+that passes lint/test/build:
+
+```yaml
+uses: appleboy/ssh-action@v1
+with:
+  host:     ${{ secrets.DEPLOY_HOST }}
+  username: ${{ secrets.DEPLOY_USER }}
+  key:      ${{ secrets.DEPLOY_SSH_KEY }}
+  script:   /home/deploy/atlas-deploy.sh
+```
+
+Two things follow from that, and both are easy to trip over:
+
+- **`atlas-deploy.sh` is not in this repository.** It exists only at
+  `/home/deploy/atlas-deploy.sh` on the server. It is not version-controlled,
+  not reviewed, and not backed up. Read it before assuming what a deploy does.
+- **Authentication is key-based, not password-based.** The account is expected
+  to have a locked password (`adduser --disabled-password`), which is correct
+  and not a problem to fix.
+
+`infrastructure/atlas-backup.service` also runs as `User=deploy`.
+
+### Passwords and sudo
+
+A locked password does **not** stop you from acting as `deploy`.
+`sudo -u deploy <cmd>` authenticates *you* and checks *your* sudoers entry for
+permission to run as that user — it never prompts for the target's password.
+(`su - deploy` does, which is why it fails on a `--disabled-password` account.)
+
+If the deploy script contains `sudo` — the frontend steps in §9 do
+(`sudo cp`, `sudo chown`) — then `deploy` must have **`NOPASSWD`** sudo. A
+non-interactive SSH session cannot answer a password prompt; it would hang and
+the deploy would fail. Verify rather than assume:
+
+```bash
+sudo passwd -S deploy    # P = password set, NP = none, L = locked
+sudo -l -U deploy        # what deploy may run via sudo
+sudo -l                  # what YOU may run, and as which users
+sudo grep -rn deploy /etc/sudoers /etc/sudoers.d/
+```
+
+### Which user runs what
+
+| Task | Run as |
+|---|---|
+| `nginx -t`, `systemctl reload nginx`, editing `/etc/nginx/**` | you, with `sudo` (needs root) |
+| Application deploy (pull, build, `pm2 reload`) | `deploy`, via CI |
+| Writing to `apps/api/public/**` (uploads) | the user PM2 runs as |
+
+Administering nginx is a root task. There is no reason to become `deploy` for
+it — that account exists to deploy the application, not to configure the server.
+
+---
+
+## Per-Server Facts Worth Recording
+
+These differ between environments and are **not** derivable from this repo.
+Fill in as they are established, so the next person does not have to guess.
+
+| | Production | Staging |
+|---|---|---|
+| Hostname | `atlasmassage.com` | `blorvis.com` |
+| TLS | Let's Encrypt via certbot | Cloudflare origin cert (`/etc/ssl/cloudflare/origin.pem`) |
+| Fronted by Cloudflare | — | yes (caches by extension; purge after asset fixes) |
+| nginx web root | `/var/www/atlasmassage/web` (copied build) | `/var/www/atlasmassage/apps/web/dist` (built in place) |
+| nginx site file | `/etc/nginx/sites-available/atlasmassage` | `/etc/nginx/sites-available/atlasmassage` |
+
+Note the web roots differ: production copies `dist/` to a separate directory
+(§9), staging serves it directly out of the checkout. A `root` path copied
+between the two will silently serve nothing.
+
+---
+
 ## Checklist
 
 | Item | Location |
@@ -286,3 +451,6 @@ tail -f /var/log/atlasmassage/api-error.log
 | Stripe webhook endpoint registered | Stripe → Developers → Webhooks |
 | TLS cert auto-renewal confirmed | `sudo certbot renew --dry-run` |
 | PM2 startup init service registered | Output of `pm2 startup` |
+| `/headshots/` and `/essays/images/` location blocks present | §11.1 |
+| Essay hero images present on disk after deploy | `ls apps/api/public/essays/images/` |
+| Cloudflare cache purged after any asset-routing fix | §11.3 |
