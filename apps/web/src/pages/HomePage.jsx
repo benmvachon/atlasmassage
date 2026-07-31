@@ -131,8 +131,7 @@ export default function HomePage() {
                       <span className="biz-contact__label">Areas</span>
                       <div className="biz-service-area">
                         <p className="biz-service-area__message">
-                          We come to you &mdash; we bring the massage table and everything
-                          else to your home or office
+                          We come to you at your home, your office, your gym, wherever and bring all our supplies
                           {serviceAreaTowns.length > 0 ? ', serving:' : '.'}
                         </p>
                         {serviceAreaTowns.length > 0 && (
