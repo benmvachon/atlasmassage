@@ -212,6 +212,20 @@
   &__title {
     font-size: $font-size-2xl;
     margin-bottom: $space-8;
+
+    // Tighten up when an explanatory subtitle follows the heading.
+    &:has(+ .owner-page__subtitle) {
+      margin-bottom: $space-2;
+    }
+  }
+
+  &__subtitle {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+    color: $color-text-muted;
+    max-width: 62ch;
+    margin-bottom: $space-8;
   }
 }
 
@@ -1841,4 +1855,37 @@
 
 .mkt-end {
   margin-top: $space-4;
+}
+
+// ── Audit log ─────────────────────────────────────────────────────────────────
+
+.audit-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $space-4;
+
+  .owner-label {
+    flex: 1 1 10rem;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  &__clear {
+    flex: 0 0 auto;
+  }
+}
+
+.audit-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-4;
+  margin-top: $space-6;
+
+  &__status {
+    font-family: $font-family-ui;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
 }

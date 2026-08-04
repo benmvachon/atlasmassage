@@ -12,6 +12,7 @@ const OWNER_NAV_ITEMS = [
   { to: '/owner/therapists',     label: 'Therapists' },
   { to: '/owner/testimonials',   label: 'Testimonials' },
   { to: '/owner/essays',         label: 'Essays' },
+  { to: '/owner/audit-log',      label: 'Audit Log' },
 ];
 
 const THERAPIST_NAV_ITEMS = [

@@ -55,6 +55,14 @@ await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
   UserRepository: jest.fn(() => mockUserRepo),
 }));
 
+// The audit trail writes through its own repository. It must be mocked rather
+// than left to fail into recordAudit's catch, or every assertion below would
+// pass against a silently no-op audit log.
+const mockAuditRepo = {};
+await jest.unstable_mockModule('../repositories/auditLogRepository.js', () => ({
+  AuditLogRepository: jest.fn(() => mockAuditRepo),
+}));
+
 await jest.unstable_mockModule('../services/notificationService.js', () => ({
   NotificationService: jest.fn(() => ({
     sendBookingConfirmation: jest.fn().mockResolvedValue(),
@@ -201,6 +209,9 @@ beforeEach(() => {
     findByAppointment: jest.fn().mockResolvedValue({
       clientName: 'Test Client', clientId: CLIENT_ID, guestEmail: null, sessions: [],
     }),
+  });
+  Object.assign(mockAuditRepo, {
+    create: jest.fn().mockResolvedValue({ id: 1 }),
   });
   Object.assign(mockTransferRepo, {
     findPendingByAppointment: jest.fn().mockResolvedValue(null),
@@ -687,6 +698,29 @@ describe('GET /api/v1/appointments/:id/soap-notes', () => {
     expect(res.status).toBe(403);
   });
 
+  it('returns 403 when a different therapist tries to read notes', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer('other-therapist-id', ['therapist']));
+    expect(res.status).toBe(403);
+    expect(mockSoapRepo.findByAppointmentId).not.toHaveBeenCalled();
+  });
+
+  it('allows an owner to read notes on any appointment', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(OWNER_ID, ['owner']));
+    expect(res.status).toBe(200);
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(404);
+  });
+
   it('returns 401 when unauthenticated', async () => {
     const res = await request(app).get(`/api/v1/appointments/${APPT_ID}/soap-notes`);
     expect(res.status).toBe(401);
@@ -782,9 +816,104 @@ describe('GET /api/v1/appointments/:id/client-history', () => {
     expect(res.status).toBe(403);
   });
 
+  it('returns 403 when a therapist requests history for another therapist\'s appointment', async () => {
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer('other-therapist-id', ['therapist']));
+    expect(res.status).toBe(403);
+    expect(mockHistoryRepo.findByAppointment).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when appointment does not exist', async () => {
+    mockApptRepo.findById.mockResolvedValue(null);
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+    expect(res.status).toBe(404);
+  });
+
   it('returns 401 when unauthenticated', async () => {
     const res = await request(app).get(`/api/v1/appointments/${APPT_ID}/client-history`);
     expect(res.status).toBe(401);
+  });
+});
+
+// ── Audit trail ──────────────────────────────────────────────────────────────
+
+describe('audit logging of PHI access', () => {
+  it('records a phi.read when a therapist opens client history', async () => {
+    await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+
+    expect(mockAuditRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId:   THERAPIST_ID,
+        action:   'phi.read',
+        entity:   'client_history',
+        entityId: APPT_ID,
+      })
+    );
+  });
+
+  it('records a phi.read when SOAP notes exist', async () => {
+    mockSoapRepo.findByAppointmentId.mockResolvedValue({ id: 'sn-uuid', subjective: 'S' });
+    await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+
+    expect(mockAuditRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'phi.read', entity: 'soap_notes' })
+    );
+  });
+
+  it('does not record a read when there are no SOAP notes to see', async () => {
+    mockSoapRepo.findByAppointmentId.mockResolvedValue(null);
+    await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+
+    expect(mockAuditRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('does not record anything when access is denied', async () => {
+    await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer('other-therapist-id', ['therapist']));
+
+    expect(mockAuditRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('records a phi.write when SOAP notes are saved', async () => {
+    await request(app)
+      .post(`/api/v1/appointments/${APPT_ID}/soap-notes`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']))
+      .send({ subjective: 'S', objective: 'O', assessment: 'A', plan: 'P' });
+
+    expect(mockAuditRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'phi.write', entity: 'soap_notes' })
+    );
+  });
+
+  it('never writes health record contents into the audit entry', async () => {
+    await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+
+    const serialized = JSON.stringify(mockAuditRepo.create.mock.calls);
+    for (const phi of ['current_medications', 'recent_surgeries', 'injuries', 'date_of_birth']) {
+      expect(serialized).not.toContain(phi);
+    }
+  });
+
+  it('still serves the clinical read when the audit write fails', async () => {
+    mockAuditRepo.create.mockRejectedValue(new Error('audit table unavailable'));
+    const res = await request(app)
+      .get(`/api/v1/appointments/${APPT_ID}/client-history`)
+      .set('Authorization', bearer(THERAPIST_ID, ['therapist']));
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveProperty('sessions');
   });
 });
 

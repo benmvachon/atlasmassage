@@ -96,7 +96,7 @@ import { jest } from '@jest/globals';
 
 ## ADRs
 
-`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0014**. Never reuse or renumber; supersede with a new ADR instead.
+`docs/adr/` contains the authoritative record of every major architectural decision. Before changing the tech stack, a design pattern used across modules, or any trade-off a future developer would question, read the relevant ADR and create a new one if your change supersedes it. The next ADR number is **ADR-0015**. Never reuse or renumber; supersede with a new ADR instead.
 
 ## Scaffolding origin
 
@@ -127,6 +127,16 @@ What this means in practice: **most controllers, services, and repositories are 
    - ✅ 38 integration tests covering all admin endpoints
    - ✅ `EssaysManagementPage` (`/owner/essays`) — Markdown editor with live preview, reorder, publish, PDF upload
    - ❌ Remaining dashboards (appointments, revenue, audit logs) — stubs only
+
+### Client health information
+
+Intake data (DOB, medications, surgeries, pregnancy status, injuries) lives in `health_records`. See `docs/adr/ADR-0014-phi-handling.md` — it also records why Atlas is **not** a HIPAA covered entity, which is load-bearing for future decisions.
+
+Three rules when touching clinical data:
+
+- Any endpoint reading `health_records`, `soap_notes`, or client history must call `authorizeClinicalAccess()` in `appointmentController.js` first. Role checks alone are not sufficient — the therapist must be the one assigned to the appointment.
+- Call `recordAudit()` from `services/auditService.js` on every PHI read, write, and creation. **Never pass record contents** in `oldData`/`newData` — identifiers only.
+- `scripts/backup.sh` fails closed without `BACKUP_AGE_RECIPIENT`. Never "fix" that by removing the check; the private key is intentionally off-server.
 
 ### Essays / Pathology
 

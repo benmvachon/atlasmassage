@@ -363,6 +363,70 @@ tail -f /var/log/atlasmassage/api-error.log
 
 ---
 
+## 13. Encrypted Backups
+
+`scripts/backup.sh` (run by `atlas-backup.timer`) encrypts every dump with
+[age](https://age-encryption.org) before it touches disk. The database contains
+client health records; unencrypted dumps sitting in `/var/backups` were the
+single largest exposure in the old setup. See `docs/adr/ADR-0014-phi-handling.md`.
+
+### Generating the key — do this on your laptop, not the server
+
+```bash
+age-keygen -o atlas-backup-key.txt
+# Public key: age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
+```
+
+Store `atlas-backup-key.txt` somewhere durable and off this server — a password
+manager entry and one offline copy. **If you lose it, every backup is
+permanently unreadable.** There is no recovery path; that is the point.
+
+### Configuring the server
+
+Add the **public** key to `/var/www/atlasmassage/apps/api/.env`:
+
+```bash
+BACKUP_AGE_RECIPIENT=age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
+```
+
+Install age and run the job once by hand:
+
+```bash
+sudo apt install age
+sudo systemctl start atlas-backup.service
+tail -20 /var/log/atlasmassage/backup.log
+```
+
+The script **fails closed**: if `age` is missing or `BACKUP_AGE_RECIPIENT` is
+unset it exits non-zero and writes nothing. A loudly failing backup gets fixed;
+a silently plaintext one does not. Do not "fix" a failure by removing the check.
+
+### Restoring
+
+Restore requires the private key, so do it on the machine that holds it:
+
+```bash
+scp deploy@atlasmassage.com:/var/backups/atlasmassage/daily/atlas_2026-08-03_020000.dump.age .
+age -d -i atlas-backup-key.txt atlas_2026-08-03_020000.dump.age > restored.dump
+pg_restore -h localhost -U atlas -d atlasmassage_restore restored.dump
+```
+
+**Verify a restore now, not during an incident.** An encrypted backup you have
+never decrypted is not yet a backup.
+
+### Migrating from the old plaintext backups
+
+Any pre-existing `*.dump` files are unencrypted clinical data. Once you have
+confirmed an encrypted restore works, delete them:
+
+```bash
+find /var/backups/atlasmassage -name '*.dump' -not -name '*.dump.age' -delete
+```
+
+The backup script warns about leftovers on every run until they are gone.
+
+---
+
 ## The `deploy` User
 
 CI deploys over SSH. `.github/workflows/ci.yml` runs, on every push to `main`
@@ -454,3 +518,7 @@ between the two will silently serve nothing.
 | `/headshots/` and `/essays/images/` location blocks present | §11.1 |
 | Essay hero images present on disk after deploy | `ls apps/api/public/essays/images/` |
 | Cloudflare cache purged after any asset-routing fix | §11.3 |
+| `age` installed and `BACKUP_AGE_RECIPIENT` set | §13 |
+| Backup private key stored off-server | §13 |
+| Encrypted restore verified at least once | §13 |
+| Legacy unencrypted `*.dump` files deleted | §13 |

@@ -25,6 +25,11 @@ await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
   UserRepository: jest.fn(() => mockUserRepo),
 }));
 
+const mockAuditRepo = {};
+await jest.unstable_mockModule('../repositories/auditLogRepository.js', () => ({
+  AuditLogRepository: jest.fn(() => mockAuditRepo),
+}));
+
 await jest.unstable_mockModule('bcrypt', () => ({
   default: { hash: jest.fn().mockResolvedValue('$2b$12$hashed') },
 }));
@@ -87,10 +92,31 @@ const THERAPIST = {
   roles: ['therapist'],
 };
 
+const AUDIT_ENTRIES = [
+  {
+    id: 2, user_id: 'therapist-1', action: 'phi.read', entity: 'client_history',
+    entity_id: 'appt-1', old_data: null, new_data: null, ip_address: '10.0.0.4',
+    created_at: '2026-08-01T14:00:00Z',
+    first_name: 'Sarah', last_name: 'Chen', actor_email: 'sarah@example.com',
+  },
+  {
+    id: 1, user_id: null, action: 'phi.create', entity: 'health_record',
+    entity_id: 'hr-1', old_data: null, new_data: null, ip_address: '10.0.0.9',
+    created_at: '2026-07-30T09:00:00Z',
+    first_name: null, last_name: null, actor_email: null,
+  },
+];
+
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   jest.clearAllMocks();
+
+  Object.assign(mockAuditRepo, {
+    create: jest.fn().mockResolvedValue({ id: 1 }),
+    list: jest.fn().mockResolvedValue({ entries: AUDIT_ENTRIES, total: 2 }),
+    distinctActions: jest.fn().mockResolvedValue(['phi.read', 'phi.write']),
+  });
 
   Object.assign(mockBusiness, {
     getBusinessHours: jest.fn().mockResolvedValue(HOURS),
@@ -852,5 +878,97 @@ describe('DELETE /api/v1/admin/therapists/:id', () => {
       .set('Authorization', ownerBearer());
 
     expect(res.status).toBe(404);
+  });
+});
+
+// ── GET /admin/audit-logs ─────────────────────────────────────────────────────
+
+describe('GET /api/v1/admin/audit-logs', () => {
+  it('returns entries with pagination metadata for an owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/audit-logs')
+      .set('Authorization', ownerBearer());
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.entries).toHaveLength(2);
+    expect(res.body.data.total).toBe(2);
+    expect(res.body.data.page).toBe(1);
+    expect(res.body.data.totalPages).toBe(1);
+    expect(res.body.data.actions).toEqual(['phi.read', 'phi.write']);
+  });
+
+  it('passes action and entity filters through to the repository', async () => {
+    await request(app)
+      .get('/api/v1/admin/audit-logs?action=phi.read&entity=soap_notes')
+      .set('Authorization', ownerBearer());
+
+    expect(mockAuditRepo.list).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'phi.read', entity: 'soap_notes' })
+    );
+  });
+
+  it('extends an inclusive end date to the following midnight', async () => {
+    await request(app)
+      .get('/api/v1/admin/audit-logs?start=2026-08-01&end=2026-08-31')
+      .set('Authorization', ownerBearer());
+
+    expect(mockAuditRepo.list).toHaveBeenCalledWith(
+      expect.objectContaining({
+        start: '2026-08-01T00:00:00.000Z',
+        end:   '2026-09-01T00:00:00.000Z',
+      })
+    );
+  });
+
+  it('converts page into an offset', async () => {
+    await request(app)
+      .get('/api/v1/admin/audit-logs?page=3&limit=25')
+      .set('Authorization', ownerBearer());
+
+    expect(mockAuditRepo.list).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 25, offset: 50 })
+    );
+  });
+
+  it('caps limit so a single request cannot pull the whole table', async () => {
+    await request(app)
+      .get('/api/v1/admin/audit-logs?limit=100000')
+      .set('Authorization', ownerBearer());
+
+    expect(mockAuditRepo.list).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 200 })
+    );
+  });
+
+  it('ignores an unparseable end date rather than filtering everything out', async () => {
+    await request(app)
+      .get('/api/v1/admin/audit-logs?end=not-a-date')
+      .set('Authorization', ownerBearer());
+
+    expect(mockAuditRepo.list).toHaveBeenCalledWith(
+      expect.objectContaining({ end: null })
+    );
+  });
+
+  it('returns 403 for a therapist who is not an owner', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/audit-logs')
+      .set('Authorization', therapistBearer());
+
+    expect(res.status).toBe(403);
+    expect(mockAuditRepo.list).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 for a plain client', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/audit-logs')
+      .set('Authorization', clientBearer());
+
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 401 when unauthenticated', async () => {
+    const res = await request(app).get('/api/v1/admin/audit-logs');
+    expect(res.status).toBe(401);
   });
 });

@@ -17,6 +17,7 @@ import { generateSlots } from '../services/slotService.js';
 import { validateAddress } from '../services/addressValidationService.js';
 import { isWithinServiceArea } from '../services/travelDistanceService.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { recordAudit, AuditAction, AuditEntity } from '../services/auditService.js';
 import { config } from '../config/index.js';
 import { logger } from '../logging/logger.js';
 
@@ -192,6 +193,7 @@ export async function createAppointment(req, res, next) {
     // Resolve or create health record.
     // Authenticated clients reuse their most recent record; guests always create a new one.
     let healthRecordId = null;
+    let healthRecordCreated = false;
     if (clientId) {
       const existingHealth = await healthRepo.findLatestByClientId(clientId);
       if (existingHealth) {
@@ -206,6 +208,7 @@ export async function createAppointment(req, res, next) {
           dateOfBirth: healthDateOfBirth,
         });
         healthRecordId = created.id;
+        healthRecordCreated = true;
       }
     } else {
       const created = await healthRepo.create({
@@ -217,6 +220,17 @@ export async function createAppointment(req, res, next) {
         dateOfBirth: healthDateOfBirth,
       });
       healthRecordId = created.id;
+      healthRecordCreated = true;
+    }
+
+    // Guests are unauthenticated here, so user_id will be null — the intake was
+    // self-submitted. That is the correct reading of the entry, not a gap.
+    if (healthRecordCreated) {
+      await recordAudit(req, {
+        action: AuditAction.PHI_CREATE,
+        entity: AuditEntity.HEALTH_RECORD,
+        entityId: healthRecordId,
+      });
     }
 
     // Resolve or create consent signature.
@@ -690,10 +704,43 @@ export async function getHealthStatus(req, res, next) {
   }
 }
 
+// Clinical records are readable only by the therapist assigned to the appointment.
+// Owners see everything. Returns the appointment on success, or null after calling
+// next() with the appropriate error.
+async function authorizeClinicalAccess(req, next) {
+  const { appointment: apptRepo } = repos();
+  const appt = await apptRepo.findById(req.params.id);
+  if (!appt) {
+    next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+    return null;
+  }
+
+  const isOwner = req.user.roles?.includes('owner');
+  if (!isOwner && appt.therapist_id !== req.user.sub) {
+    next(new AppError('You can only view records for your own appointments', 403, 'FORBIDDEN'));
+    return null;
+  }
+
+  return appt;
+}
+
 export async function getSoapNotes(req, res, next) {
   try {
+    const appt = await authorizeClinicalAccess(req, next);
+    if (!appt) return;
+
     const { soap: soapRepo } = repos();
-    const notes = await soapRepo.findByAppointmentId(req.params.id);
+    const notes = await soapRepo.findByAppointmentId(appt.id);
+
+    // Only record a read when there was something to read.
+    if (notes) {
+      await recordAudit(req, {
+        action: AuditAction.PHI_READ,
+        entity: AuditEntity.SOAP_NOTES,
+        entityId: appt.id,
+      });
+    }
+
     res.json({ success: true, data: notes });
   } catch (err) {
     next(err);
@@ -720,6 +767,13 @@ export async function upsertSoapNotes(req, res, next) {
       assessment,
       plan,
     });
+
+    await recordAudit(req, {
+      action: AuditAction.PHI_WRITE,
+      entity: AuditEntity.SOAP_NOTES,
+      entityId: appt.id,
+    });
+
     res.json({ success: true, data: notes });
   } catch (err) {
     next(err);
@@ -728,9 +782,22 @@ export async function upsertSoapNotes(req, res, next) {
 
 export async function getClientHistory(req, res, next) {
   try {
+    const appt = await authorizeClinicalAccess(req, next);
+    if (!appt) return;
+
     const { history: historyRepo } = repos();
-    const result = await historyRepo.findByAppointment(req.params.id);
+    const result = await historyRepo.findByAppointment(appt.id);
     if (!result) return next(new AppError('Appointment not found', 404, 'NOT_FOUND'));
+
+    // The broadest PHI read in the app: every session, intake, and note for
+    // this client. Record the client it exposed, not what it contained.
+    await recordAudit(req, {
+      action: AuditAction.PHI_READ,
+      entity: AuditEntity.CLIENT_HISTORY,
+      entityId: appt.id,
+      newData: { clientId: result.clientId, sessionCount: result.sessions.length },
+    });
+
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);

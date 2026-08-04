@@ -118,6 +118,18 @@ export const adminService = {
   createMembershipPlan: (data) => api.post('/admin/membership-plans', data),
   updateMembershipPlan: (id, data) => api.put(`/admin/membership-plans/${id}`, data),
 
+  // Audit logs
+  getAuditLogs: ({ action, entity, start, end, page, limit } = {}) => {
+    const params = new URLSearchParams();
+    if (action) params.set('action', action);
+    if (entity) params.set('entity', entity);
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    if (page) params.set('page', String(page));
+    if (limit) params.set('limit', String(limit));
+    return api.get(`/admin/audit-logs?${params}`);
+  },
+
   // Transfer requests
   listTransferRequests: () => api.get('/admin/transfer-requests'),
   approveTransferRequest: (id, toTherapistId) =>

@@ -104,10 +104,12 @@ router.get('/transfer-requests', adminController.listTransferRequests);
 router.post('/transfer-requests/:id/approve', adminController.approveTransferRequest);
 router.post('/transfer-requests/:id/deny', adminController.denyTransferRequest);
 
+// ── Audit logs ────────────────────────────────────────────────────────────────
+router.get('/audit-logs', adminController.getAuditLogs);
+
 // ── Remaining stubs ───────────────────────────────────────────────────────────
 router.get('/users', adminController.listUsers);
 router.put('/settings', adminController.updateSettings);
-router.get('/audit-logs', adminController.getAuditLogs);
 
 // ── Business details ──────────────────────────────────────────────────────────
 router.get('/business', adminController.getBusinessDetails);

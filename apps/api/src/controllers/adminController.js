@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getPool } from '../database/pool.js';
 import { config } from '../config/index.js';
 import { AppointmentRepository } from '../repositories/appointmentRepository.js';
+import { AuditLogRepository } from '../repositories/auditLogRepository.js';
 import { BusinessRepository } from '../repositories/businessRepository.js';
 import { TherapistRepository } from '../repositories/therapistRepository.js';
 import { TransferRequestRepository } from '../repositories/transferRequestRepository.js';
@@ -605,10 +606,64 @@ export async function updateMembershipPlan(req, res, next) {
   }
 }
 
+// ── Audit logs ────────────────────────────────────────────────────────────────
+
+const AUDIT_PAGE_SIZE = 50;
+const MAX_AUDIT_PAGE_SIZE = 200;
+
+export async function getAuditLogs(req, res, next) {
+  try {
+    const audit = new AuditLogRepository(getPool());
+
+    const limit = Math.min(
+      Number.parseInt(req.query.limit, 10) || AUDIT_PAGE_SIZE,
+      MAX_AUDIT_PAGE_SIZE
+    );
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+
+    // `end` is an inclusive calendar day from the UI; the repository compares
+    // with `<`, so push it to the following midnight or the last day is missed.
+    let end = null;
+    if (req.query.end) {
+      const parsed = new Date(`${req.query.end}T00:00:00.000Z`);
+      if (!Number.isNaN(parsed.getTime())) {
+        parsed.setUTCDate(parsed.getUTCDate() + 1);
+        end = parsed.toISOString();
+      }
+    }
+
+    const [{ entries, total }, actions] = await Promise.all([
+      audit.list({
+        action: req.query.action || null,
+        entity: req.query.entity || null,
+        userId: req.query.userId || null,
+        start: req.query.start ? `${req.query.start}T00:00:00.000Z` : null,
+        end,
+        limit,
+        offset: (page - 1) * limit,
+      }),
+      audit.distinctActions(),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        entries,
+        actions,
+        total,
+        page,
+        limit,
+        totalPages: Math.max(Math.ceil(total / limit), 1),
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ── Remaining stubs ───────────────────────────────────────────────────────────
 
 const stub = (_req, _res, next) => next(new AppError('Not implemented', 501, 'NOT_IMPLEMENTED'));
 
 export const listUsers = stub;
 export const updateSettings = stub;
-export const getAuditLogs = stub;

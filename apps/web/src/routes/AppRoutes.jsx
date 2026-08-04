@@ -34,6 +34,7 @@ import MarketingAnalyticsPage from '../pages/owner/MarketingAnalyticsPage.jsx';
 import TransferRequestsPage from '../pages/owner/TransferRequestsPage.jsx';
 import TestimonialsManagementPage from '../pages/owner/TestimonialsManagementPage.jsx';
 import EssaysManagementPage from '../pages/owner/EssaysManagementPage.jsx';
+import AuditLogsPage from '../pages/owner/AuditLogsPage.jsx';
 import FeedbackPage from '../pages/FeedbackPage.jsx';
 import GuestManagePage from '../pages/GuestManagePage.jsx';
 import GiftCardsPage from '../pages/GiftCardsPage.jsx';
@@ -87,6 +88,7 @@ export default function AppRoutes() {
         <Route path="/owner/therapists" element={<TherapistManagementPage />} />
         <Route path="/owner/testimonials" element={<TestimonialsManagementPage />} />
         <Route path="/owner/essays" element={<EssaysManagementPage />} />
+        <Route path="/owner/audit-log" element={<AuditLogsPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
